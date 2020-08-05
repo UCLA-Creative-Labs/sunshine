@@ -1,4 +1,13 @@
+# Mergify Rules
+# 1. Conventional Commits
+# 2. Automatic merge + squash
+# 3. Automatic merge
+# 4. Remove stale reviews
+# 5. Dependabot
+
 pull_request_rules:
+
+  # 1. Check title to follow conventional commits
   - name: if fails conventional commits
     actions:
       comment:
@@ -9,7 +18,9 @@ pull_request_rules:
       - status-failure=Semantic Pull Request
       - -merged
       - -closed
-  - name: automatic merge and squasb
+  
+  # 2. Automatically merge master into branch, build, and squash
+  - name: automatic merge and squash
     actions:
       comment:
         message: Thanks for contributing! Your pull request will be updated from master and then merged automatically (do not update manually, and be sure to [allow changes to be pushed to your fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)).
@@ -29,10 +40,12 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       - -approved-reviews-by~=author
       - "#changes-requested-reviews-by=0"
+  
+  # 3. Automatically merge master into branch and build
   - name: automatic merge
     actions:
       comment:
-        message: Thank you for contributing! Your pull request will be updated from master and then merged automatically without squashing (do not update manually, and be sure to [allow changes to be pushed to your fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)).
+        message: Thank you for contributing! Your pull request will be updated from master and then merged automatically (do not update manually, and be sure to [allow changes to be pushed to your fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)).
       merge:
         strict: smart
         # Merge instead of squash
@@ -51,6 +64,8 @@ pull_request_rules:
       - "#approved-reviews-by>=1"
       - -approved-reviews-by~=author
       - "#changes-requested-reviews-by=0"
+  
+  # 4. Dismiss reviews that are stale/merged
   - name: remove stale reviews
     actions:
       dismiss_reviews:
@@ -59,14 +74,15 @@ pull_request_rules:
     conditions:
       - author!=dependabot[bot]
       - author!=dependabot-preview[bot]
-      - label!=contribution/core
       - base=master
       - -merged
       - -closed
-  - name: automatic merge of Dependabot PRs
+  
+  # 5. Automatically merge dependabot's blessed PRs
+  - name: automatically merge Dependabot PRs
     actions:
       comment:
-        message: Thanks Dependabot!
+        message: Thanks Dependabot 🙏!
       merge:
         # 'strict: false' disables Mergify keeping the branch up-to-date from master.
         # It's not necessary: Dependabot will do that itself.
