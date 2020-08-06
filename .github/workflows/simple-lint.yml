@@ -3,7 +3,7 @@ on: pull_request
 
 jobs:
   run-linters:
-    name: simple run for linters
+    name: Simple run for linters
     runs-on: ubuntu-latest
 
     steps:
