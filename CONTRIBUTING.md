@@ -29,7 +29,7 @@ $ yarn install
 To expedite local development, run locally:
 
 ```
-$ yarn install
+$ yarn start
 ```
 
 To test the production build, run:
