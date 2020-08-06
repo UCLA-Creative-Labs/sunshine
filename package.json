@@ -3,7 +3,7 @@
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js --host=0.0.0.0",
     "build": "webpack --config webpack.prod.js",
-    "lint": "eslint '**/*.tsx'"
+    "lint": "eslint '**/*.tsx' '**/*.ts'"
   },
   "dependencies": {
     "@types/react": "^16.9.36",

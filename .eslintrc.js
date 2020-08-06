@@ -22,6 +22,7 @@ module.exports = {
 		'react',
 		'@typescript-eslint'
 	],
+	'ignorePatterns': [ 'node_modules/', 'dist/' ],
 	'rules': {
 		'linebreak-style': [ 'error', 'unix' ],
 
