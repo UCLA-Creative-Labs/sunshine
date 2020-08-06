@@ -1,3 +1,5 @@
+## TODO figure out how to get this work properly
+
 name: Lint
 on: pull_request
 
@@ -24,4 +26,5 @@ jobs:
           github_token: ${{ secrets.github_token }}
           # Enable linters
           eslint: true
+          eslint_dir: 'src/**/*'
      
