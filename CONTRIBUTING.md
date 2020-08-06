@@ -1,9 +1,18 @@
 # Contributing Guidelines
 
-Thanks for thinking about contributing to the Creative Labs website, aka Sunshine! ❤️
+Thanks for your interest in contributing to the Creative Labs website, aka Sunshine! ❤️
 
 These guidelines describe how to set up your environment and submit your own contributions! Please read it 
 carefully and, if there is anything that isn't up-to-date, feel free to submit a PR with your corrections 🙃
+
+- [Getting Started](#Getting-Started)
+- [Pull Requests](#Pull-Requests)
+  - [Step 1: Open an Issue](#Step-1:-Open-an-Issue)
+  - [Step 2: Design](#Step-2:-Design)
+  - [Step 3: Beep Boop](#Step-3:-Beep-Boop)
+  - [Step 4: Commit](#Step-4:-Commit)
+  - [Step 5: Pull Request](#Step-5:-Pull-Request)
+  - [Step 6: Merge](#Step-6:-Merge)
 
 ## Getting Started
 
@@ -35,7 +44,7 @@ $ python3 -m http.server
 
 The following should be the general workflow of your pull requests. We have protected `master` so no one can 
 push directly to master. We also use [`mergify`](https://mergify.io/) to automate our merging process. No one 
-should be merging directly to `master`. Check out our [`.mergify.yml` file](.mergify.yml) for our conditions.
+should be merging directly to `master`. Check out our [`.mergify.yml`](.mergify.yml) file for our conditions.
 
 ### Step 1: Open an Issue
 
@@ -47,7 +56,7 @@ code design proactively leads to less overhead for everyone and allows for colla
 Always reference a visual design when developing and make sure to link that design in the discussion. In terms of 
 code design, make sure to read through the [design guidelines](DESIGN_GUIDELINES.md) for general patterns we follow. 
 
-### Step 3: Coding Wizardry
+### Step 3: Beep Boop
 
 Beep boop. Beep boop. Here are some general guidelines:
 
