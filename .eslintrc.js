@@ -1,39 +1,39 @@
 module.exports = {
-	'env': {
-		'browser': true,
-		'es2020': true
-	},
-	'extends': [
-		'eslint:recommended',
-		'plugin:react/recommended',
-		'plugin:import/typescript',
-		'plugin:@typescript-eslint/recommended'
-	],
-	'parser': '@typescript-eslint/parser',
-	'parserOptions': {
-		'ecmaFeatures': {
-			'jsx': true
-		},
-		'ecmaVersion': 11,
-		'sourceType': 'module'
-	},
-	'plugins': [
-		'import',
-		'react',
-		'@typescript-eslint'
-	],
-	'ignorePatterns': [ 'node_modules/', 'dist/' ],
-	'rules': {
-		'linebreak-style': [ 'error', 'unix' ],
+  env: {
+    browser: true,
+    es2020: true,
+  },
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:import/typescript',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 11,
+    sourceType: 'module',
+  },
+  plugins: [
+    'import',
+    'react',
+    '@typescript-eslint',
+  ],
+  ignorePatterns: [ '*.md', '*.log', '*.lock', '*js', '*.toml', '*.json', 'node_modules/', 'dist/' ],
+  rules: {
+    'linebreak-style': [ 'error', 'unix' ],
 
-		'@typescript-eslint/no-require-imports': [ 'error' ],
+    '@typescript-eslint/no-require-imports': [ 'error' ],
 
     // 2 space indentation
     '@typescript-eslint/indent': [ 'error', 2 ],
 
     // Style
     'quotes': [ 'error', 'single', { avoidEscape: true } ],
-  
+
     // ensures clean diffs, see https://medium.com/@nikgraf/why-you-should-enforce-dangling-commas-for-multiline-statements-d034c98e36f8
     'comma-dangle': [ 'error', 'always-multiline' ],
 
@@ -42,8 +42,8 @@ module.exports = {
       'error',
       {
         optionalDependencies: false,    // Disallow importing optional dependencies (those shouldn't be in use in the project)
-        peerDependencies: false         // Disallow importing peer dependencies (that aren't also direct dependencies)
-      }
+        peerDependencies: false,         // Disallow importing peer dependencies (that aren't also direct dependencies)
+      },
     ],
 
     // Require all imported libraries actually resolve (!!required for import/no-extraneous-dependencies to work!!)
@@ -101,21 +101,21 @@ module.exports = {
     // Member ordering
     '@typescript-eslint/member-ordering': ['error', {
       default: [
-        "public-static-field",
-        "public-static-method",
-        "protected-static-field",
-        "protected-static-method",
-        "private-static-field",
-        "private-static-method",
+        'public-static-field',
+        'public-static-method',
+        'protected-static-field',
+        'protected-static-method',
+        'private-static-field',
+        'private-static-method',
 
-        "field",
+        'field',
 
         // Constructors
-        "constructor", // = ["public-constructor", "protected-constructor", "private-constructor"]
+        'constructor', // = ["public-constructor", "protected-constructor", "private-constructor"]
 
         // Methods
-        "method",
-      ]
+        'method',
+      ],
     }],
-	}
+  },
 };
