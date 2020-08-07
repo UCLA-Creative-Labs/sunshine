@@ -20,5 +20,6 @@
       "./node_modules/@types",
       "./custom_typing"
     ]
-  }
+  },
+  "includes": ["**/*.ts", "**/*.tsx"]
 }

@@ -16,13 +16,13 @@ module.exports = {
     },
     ecmaVersion: 11,
     sourceType: 'module',
+    project: './tsconfig.json',
   },
   plugins: [
     'import',
     'react',
     '@typescript-eslint',
   ],
-  ignorePatterns: [ '*.toml', '*.json', 'node_modules/', 'dist/', '*.css', '*.scss' ],
   rules: {
     'linebreak-style': [ 'error', 'unix' ],
 
@@ -83,8 +83,8 @@ module.exports = {
       ignoreRegExpLiterals: true,
     }],
 
-    // // One of the easiest mistakes to make
-    // '@typescript-eslint/no-floating-promises': ['error'],
+    // One of the easiest mistakes to make
+    '@typescript-eslint/no-floating-promises': ['error'],
 
     // Don't leave log statements littering the premises!
     'no-console': ['error'],
