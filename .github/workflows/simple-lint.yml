@@ -3,14 +3,14 @@ on: pull_request
 
 jobs:
   run-linters:
-    name: simple run for linters
+    name: Simple run for linters
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout git repo
+      - name: Checkout Git repo
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: yarn install
 
       - name: Run linters
