@@ -3,7 +3,7 @@
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js --host=0.0.0.0",
     "build": "webpack --config webpack.prod.js",
-    "lint": "npx eslint '**/*.tsx' '**/*.ts'"
+    "lint": "npx eslint '**/*.tsx' '**/*.ts' && npx stylelint '**/*.css' '**/*.scss'"
   },
   "dependencies": {
     "@types/react": "^16.9.36",
@@ -36,6 +36,8 @@
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.1.3",
+    "stylelint": "^13.6.1",
+    "stylelint-config-standard": "^20.0.0",
     "ts-loader": "^7.0.5",
     "typescript": "^3.9.5",
     "url-loader": "^4.1.0",

@@ -12,11 +12,6 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-
       - name: Install Dependencies
         run: yarn install
 
@@ -26,5 +21,4 @@ jobs:
           github_token: ${{ secrets.github_token }}
           # Enable linters
           eslint: true
-          eslint_dir: 'src/**/*'
      
