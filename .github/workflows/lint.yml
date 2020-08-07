@@ -1,24 +1,17 @@
-## TODO figure out how to get this work properly
-
-name: Lint
+name: Simple Lint
 on: pull_request
 
 jobs:
   run-linters:
-    name: Run linters
+    name: Run Linters
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout git repo
+      - name: Checkout Git repo
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: yarn install
 
       - name: Run linters
-        uses: wearerequired/lint-action@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          # Enable linters
-          eslint: true
-     
+        run: yarn lint
