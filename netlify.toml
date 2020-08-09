@@ -1,8 +1,8 @@
 [build]
-    publish = "dist/"
-    command = "yarn build"
+  publish = 'dist/'
+  command = 'yarn build'
 
 [[redirects]]
-    from = "/*"
-    to = "/"
-    status = 200
+  from = '/*'
+  to = '/'
+  status = 200

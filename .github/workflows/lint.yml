@@ -1,0 +1,17 @@
+name: Simple Lint
+on: pull_request
+
+jobs:
+  run-linters:
+    name: Run Linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Git repo
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run linters
+        run: yarn lint
