@@ -64,10 +64,15 @@ Beep boop. Beep boop. Here are some general guidelines:
 - Coding Style (Abridged)
   - 2 space indentation
   - 120 characters width
-  - files should be lowercased and kebab cased (i.e. foo-bar.ts)
-  - objects and variables should be camel cased (i.e. fooBar )
+  - files and React components must follow PascalCasing (i.e. FooBar.tsx)
+  - objects and variables must follow camelCasing (i.e. fooBar )
 - Try to maintain a single bug or feature per PR. It's a okay to prune as you go, but bear in mind that code
-  code reviews start to get fatigueing after 5 files. 
+  code reviews start to get fatigueing after 5 files.
+
+We use [eslint](.eslintrc.js) for `.ts` and `.tsx` files and [stylelint](.stylelintrc.json) for `.css` and `.scss` files. 
+Make sure your changes follow the linter rules as they can not be merged if thats the case.
+If there are any improvements that you wish to make to our linters, feel free to make an issue and PR to suggest changes!
+
 
 ### Step 4: Commit 
 
