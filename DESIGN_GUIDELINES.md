@@ -119,6 +119,7 @@ To maintain structure, we recommend you adhere to the following file organizatio
 
 * Functions which perform a series of mathematical calculations or manipulations should go inside a file named `MathUtils.ts`.
 * Complex functions used in a specific component should go inside a file named `<ComponentName>Utils.ts`.
+* General, non-specific utilites should go inside a file named `Utils.ts`.
 * Custom React Hooks should go inside a file named `Hooks.ts`.
 
 ## Assets
