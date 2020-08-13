@@ -71,7 +71,7 @@ Refrain from adding extra functions to a component module outside of the compone
 If you want to include simple, brief functions within a component module, add them to the component function as named lambda expressions, like so:
 ```typescript
 const someFunction = (arg1: <type>, arg2: <type>, ...): <return type> => {
-    ...
+  ...
 };
 ```
 This is primarily useful for functions that use JSX code.
@@ -93,7 +93,7 @@ export default function ComponentName(props: ComponentNameProps) {
   ...
 
   return(
-      ...
+    ...
   );
 }
 ```
