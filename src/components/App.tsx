@@ -3,15 +3,14 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from 'react-router-dom';
 
-import Navbar     from './Navbar';
-import Splash     from './Splash';
 import About      from './About';
-import Projects   from './Projects';
 import Fellowship from './Fellowship';
 import Footer     from './Footer';
+import Navbar     from './Navbar';
+import Projects   from './Projects';
+import Splash     from './Splash';
 
 import './styles/App.scss';
 

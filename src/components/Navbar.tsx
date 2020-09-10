@@ -34,7 +34,7 @@ function Navbar(): React.Component {
     };
     window.addEventListener('scroll', onScroll);
 
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll);
   }, [ scrollTop ]);
 
   return (
