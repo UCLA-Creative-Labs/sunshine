@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Mulish:wght@700;800&display=swap');
+
+// Fonts
+$heading-bold-font:  normal 700 48px 'Mulish', sans-serif;
+$heading-xbold-font: normal 800 2em 'Mulish', sans-serif;
+$logo-font: normal 700 1em 'Mulish', sans-serif;
+$body-reg-font:  normal 400 18px 'Lato', sans-serif;
+$body-bold-font: normal 700 1em 'Lato', sans-serif;
+
+$logo-kerning: 0.1rem;
+
+// General
+$padding-horiz: 64px;
+$padding-vert:  48px;
+$section-padding: $padding-vert $padding-horiz;
+
+// Colors
+$colors: (
+  splashBg: #85B6FF,
+  navbarBgScroll: #000000,
+  navbarText: #000000,
+  navbarTextScroll: #FFFFFF,
+);
+
+// Navbar
+$navbar-height: 8vw;
+$navbar-transition: 0.3s;
+
+// Splash
+$sun-bg: url('../../assets/sunmoon-bg.svg');
+$sm-diam: 225px;
+$sm-face: url('../../assets/sunmoon-face.svg');
+$sm-face-width:  88px;
+$sm-face-height: 30px;
+
+// Export colors to JS
+:export {
+  @each $key, $value in $colors {
+    #{unquote($key)}: $value;
+  }
+}

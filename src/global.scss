@@ -1,4 +1,20 @@
+@import 'components/styles/variables';
+
 body {
   padding: 0;
   margin: 0;
+  font: $body-reg-font;
+}
+
+h1 {
+  font: $heading-xbold-font;
+}
+
+h2 {
+  font: $heading-bold-font;
+}
+
+.logotype {
+  font: $logo-font;
+  letter-spacing: $logo-kerning;
 }

@@ -1,0 +1,17 @@
+@import 'variables';
+
+#splash {
+  box-sizing: border-box;
+  height: calc(100vh - #{$navbar-height});
+  width: calc(100vw - 15px); // To avoid slight overflow
+  padding: $section-padding;
+  margin: 0;
+  margin-top: calc(#{$navbar-height} - 1px); // To avoid artifacting
+  background-color: map-get($colors, splashBg);
+}
+
+#blurb {
+  width: 60vw;
+  position: absolute;
+  bottom: $padding-vert;
+}
