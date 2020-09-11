@@ -1,6 +1,6 @@
 import React from 'react';
 
-import '../styles/SunMoon.scss';
+import '../styles/Splash.scss';
 
 function SunMoon(): React.Component {
   return (
