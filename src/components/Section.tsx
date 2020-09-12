@@ -18,7 +18,7 @@ interface SectionProps {
 }
 
 function Section(props: SectionProps): React.Component {
-  const dataWithCorrectedImagePaths = props.data.map(data => { data.image = `/assets/${data.image}`; return data; });
+  props.data.forEach(data => data.image = `/assets/${data.image}`);
 
   return (
     <div className='section' id={props.title.toLowerCase()}>
@@ -26,7 +26,7 @@ function Section(props: SectionProps): React.Component {
       <div
         id='section-items'
         style={{ columns: `${props.data.length} auto`, marginBottom: 42 }}>
-        { dataWithCorrectedImagePaths.map(data => <ItemBlock data={data} key={data.title} />) }
+        { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
       </div>
       {props.linkText && <a>{props.linkText.toUpperCase()}</a>}
     </div>
