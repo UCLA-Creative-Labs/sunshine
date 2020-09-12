@@ -10,6 +10,7 @@
   background-color: map-get($colors, splashBg);
   color: map-get($colors, navbarText);
   transition: background-color $navbar-transition, color $navbar-transition;
+  user-select: none;
 }
 
 #title {

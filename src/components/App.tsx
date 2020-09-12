@@ -5,12 +5,11 @@ import {
   Route,
 } from 'react-router-dom';
 
-import About      from './About';
-import Fellowship from './Fellowship';
-import Footer     from './Footer';
-import Navbar     from './Navbar';
-import Projects   from './Projects';
-import Splash     from './Splash';
+import sectionItem from '../assets/sectionInfo.json';
+import Footer      from './Footer';
+import Navbar      from './Navbar';
+import Section     from './Section';
+import Splash      from './Splash';
 
 import './styles/App.scss';
 
@@ -21,9 +20,17 @@ function App(): React.Component {
         <Route exact path='/'>
           <div style={{ margin: 0, padding: 0 }}>
             <Splash />
-            <About />
-            <Projects />
-            <Fellowship />
+            <Section
+              title={'About'}
+              data={sectionItem.about} />
+            <Section
+              title={'Projects'}
+              data={sectionItem.projects}
+              linkText={'View all projects on Medium ➔'} />
+            <Section
+              title={'Fellowship'}
+              data={sectionItem.fellowship}
+              linkText={'Read more + apply ➔'} />
           </div>
         </Route>
       </Switch>
