@@ -1,0 +1,31 @@
+@import 'variables';
+
+#splash {
+  margin-top: calc(#{$navbar-height} - 1px); // To avoid artifacting
+  background-color: map-get($colors, splashBg);
+}
+
+#blurb {
+  width: 60vw;
+  position: absolute;
+  bottom: $padding-vert;
+}
+
+#sunmoon {
+  width: $sm-diam;
+  height: $sm-diam;
+  background-image: $sun-bg;
+  position: absolute;
+  right: $padding-horiz;
+  margin-top: calc(2 * #{$padding-vert});
+  margin-right: calc(2.5 * #{$padding-horiz});
+}
+
+#sunmoon-face {
+  width: $sm-face-width;
+  height: $sm-face-height;
+  background-image: $sm-face;
+  position: absolute;
+  top: 55%;
+  left: 30%;
+}

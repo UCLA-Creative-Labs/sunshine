@@ -1,4 +1,48 @@
+@import 'components/styles/variables';
+
 body {
   padding: 0;
   margin: 0;
+  font: $body-reg-font;
+}
+
+h1 {
+  font: $heading-xbold-font;
+  letter-spacing: $heading-kerning;
+}
+
+h2 {
+  font: $heading-bold-font;
+  letter-spacing: $heading-kerning;
+}
+
+h3 {
+  font: $body-bold-font;
+}
+
+p {
+  line-height: 1.6em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.logotype {
+  font: $logo-font;
+  letter-spacing: $logo-kerning;
+}
+
+.section {
+  box-sizing: border-box;
+  min-height: calc(100vh - #{$navbar-height});
+  width: calc(100vw - 15px); // To avoid slight overflow
+  padding: $section-padding;
+  margin: 0;
+  border-top: 1px solid dimgray;
 }

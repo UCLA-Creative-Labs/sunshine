@@ -1,0 +1,47 @@
+{
+  "about": [
+    {
+      "image": "who-are-we.svg",
+      "title": "Who are we?",
+      "body": "The Creative Labs community is managed by a small team of developers, designers, and project managers.",
+      "linkText": "More on our team + history ➔",
+      "linkPath": "",
+    },
+    {
+      "image": "what-we-do.svg",
+      "title": "What do we do?",
+      "body": "Creative Labs gives students the platform that allows them to make their ideas come to life. We were founded on the dream to just make cool things.",
+      "linkText": "Join the community ➔",
+      "linkPath": "",
+    },
+  ],
+  "projects": [
+    {
+      "image": "spring.svg",
+      "title": "Spring 2020",
+      "body": "Completed projects during our very first virtual quarter.",
+    },
+    {
+      "image": "winter.svg",
+      "title": "Winter 2020",
+      "body": "ultra short blurb",
+    },
+    {
+      "image": "fall.svg",
+      "title": "Fall 2020",
+      "body": "ultra short blurb",
+    },
+  ],
+  "fellowship": [
+    {
+      "image": "placeholder.svg",
+      "title": "Design Fellow",
+      "body": "Designers will learn the basics of graphic design and website design. TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+    },
+    {
+      "image": "placeholder.svg",
+      "title": "Developer Fellow",
+      "body": "Developers will learn how to bootstrap a static website, make i TEXT TEXT TEXT TEXT TEXT TEXT TEXT TEXT",
+    },
+  ]
+}

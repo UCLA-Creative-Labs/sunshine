@@ -1,0 +1,38 @@
+@import 'variables';
+
+#footer {
+  display: flex;
+  align-items: center;
+  height: $footer-height;
+  width: 100%;
+  background-color: map-get($colors, footerBg);
+  color: map-get($colors, footerText);
+  user-select: none;
+}
+
+#footer-tag {
+  display: flex;
+  align-items: center;
+  padding-left: $padding-horiz;
+  font-weight: 800;
+  font-size: 20px;
+  text-align: left;
+}
+
+#footer-tag > p {
+  font-weight: 400;
+  margin-right: 0.8ch;
+}
+
+#footer-nav {
+  text-align: right;
+  flex: 1;
+  justify-content: center;
+  margin-right: 5%;
+  margin-left: auto;
+  color: map-get($colors, footerText);
+}
+
+#footer-nav a {
+  padding-left: 6%;
+}

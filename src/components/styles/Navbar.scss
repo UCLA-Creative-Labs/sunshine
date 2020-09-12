@@ -1,0 +1,49 @@
+@import 'variables';
+
+#navbar {
+  display: flex;
+  align-items: center;
+  height: $navbar-height;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  background-color: map-get($colors, splashBg);
+  color: map-get($colors, navbarText);
+  transition: background-color $navbar-transition, color $navbar-transition;
+  user-select: none;
+}
+
+#title {
+  display: flex;
+  align-items: center;
+  padding-left: $padding-horiz;
+  font-weight: 800;
+  font-size: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+#logo {
+  width: 33px;
+  height: 33px;
+  margin-right: 10px;
+  background-image: url('../../assets/cl-logo.svg');
+  background-position: center;
+  filter: invert(0%);
+  transition: filter $navbar-transition;
+}
+
+#navigation {
+  text-align: right;
+  flex: 1;
+  justify-content: center;
+  margin-right: 5%;
+  margin-left: auto;
+  color: map-get($colors, navbarText);
+  transition: color $navbar-transition;
+}
+
+#navigation a {
+  padding-left: 6%;
+  cursor: pointer;
+}
