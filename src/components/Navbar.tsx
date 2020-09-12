@@ -3,7 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import colors from './styles/_variables.scss';
 import './styles/Navbar.scss';
 
-function Navbar(): React.Component {
+interface NavbarProps {
+  isDay: boolean;
+}
+
+function Navbar(props: NavbarProps): React.Component {
   const [ scrollTop, setScrollTop ] = useState<number>(0);
   const [ sectionScrollStates, setSectionScrollStates ]
     = useState<boolean>([ true, false, false, false ]);
@@ -20,6 +24,28 @@ function Navbar(): React.Component {
     || (rect.bottom <= window.innerHeight && rect.bottom >= window.innerHeight * 0.4);
   };
 
+  const toNightStyle = () => {
+    const navbarStyle = navbarRef.current.style;
+    const navigationStyle = navigationRef.current.style;
+    const logoStyle = logoRef.current.style;
+
+    navbarStyle.backgroundColor = colors.navbarBgScroll;
+    navbarStyle.color = colors.navbarTextScroll;
+    navigationStyle.color = colors.navbarTextScroll;
+    logoStyle.filter = 'invert(100%)';
+  };
+
+  const toDayStyle = () => {
+    const navbarStyle = navbarRef.current.style;
+    const navigationStyle = navigationRef.current.style;
+    const logoStyle = logoRef.current.style;
+
+    navbarStyle.backgroundColor = colors.splashBgDay;
+    navbarStyle.color = colors.navbarText;
+    navigationStyle.color = colors.navbarText;
+    logoStyle.filter = 'invert(0%)';
+  };
+
   useEffect(() => {
     sectionsRef.current = [
       document.getElementById('splash'),
@@ -30,23 +56,16 @@ function Navbar(): React.Component {
   }, []);
 
   useEffect(() => {
+    if (!props.isDay) toNightStyle();
+  }, [ props.isDay ]);
+
+  useEffect(() => {
     const vpHeight = window.innerHeight;
 
-    const navbarStyle = navbarRef.current.style;
-    const navigationStyle = navigationRef.current.style;
-    const logoStyle = logoRef.current.style;
-
-    if (scrollTop >= 0.2 * vpHeight) {
-      navbarStyle.backgroundColor = colors.navbarBgScroll;
-      navbarStyle.color = colors.navbarTextScroll;
-      navigationStyle.color = colors.navbarTextScroll;
-      logoStyle.filter = 'invert(100%)';
-    } else {
-      navbarStyle.backgroundColor = colors.splashBg;
-      navbarStyle.color = colors.navbarText;
-      navigationStyle.color = colors.navbarText;
-      logoStyle.filter = 'invert(0%)';
-    }
+    if ((scrollTop < 0.2 * vpHeight) && props.isDay)
+      toDayStyle();
+    else
+      toNightStyle();
 
     const onScroll = ev => {
       setScrollTop(ev.target.documentElement.scrollTop);

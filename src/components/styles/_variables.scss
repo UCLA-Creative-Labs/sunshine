@@ -17,7 +17,10 @@ $section-padding: $padding-vert $padding-horiz;
 
 // Colors
 $colors: (
-  splashBg: #85b6ff,
+  splashBgDay: #85b6ff,
+  splashBgNight: #000,
+  splashTextDay: #000,
+  splashTextNight: #fff,
   navbarBgScroll: #000,
   navbarText: #000,
   navbarTextScroll: #fff,
@@ -30,11 +33,13 @@ $navbar-height: 8vw;
 $navbar-transition: 0.3s;
 
 // Splash
-$sun-bg: url('../../assets/sunmoon-bg.svg');
+$sun-bg: url('../../assets/sun.svg');
+$moon-bg: url('../../assets/moon.svg');
 $sm-diam: 225px;
 $sm-face: url('../../assets/sunmoon-face.svg');
 $sm-face-width:  88px;
 $sm-face-height: 30px;
+$splash-transition: $navbar-transition;
 
 // Footer
 $footer-height: 8vw;

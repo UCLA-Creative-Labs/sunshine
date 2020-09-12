@@ -2,9 +2,13 @@ import React from 'react';
 
 import '../styles/Splash.scss';
 
-function SunMoon(): React.Component {
+interface SunMoonProps {
+  isDay: boolean;
+}
+
+function SunMoon(props: SunMoonProps): React.Component {
   return (
-    <div id='sunmoon'>
+    <div id={'sunmoon'} className={props.isDay ? 'day' : 'night'}>
       <div id='sunmoon-face' />
     </div>
   );
