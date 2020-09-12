@@ -6,7 +6,7 @@ function Footer(): React.Component {
   return (
     <div id='footer'>
       <span id='footer-tag'>
-        <p>Made with ❥ by</p>
+        <p>Made with <span aria-lable='heart' role='img'>❤️</span> by</p>
         <h3 className='logotype'>
           CREATIVE LABS
         </h3>
