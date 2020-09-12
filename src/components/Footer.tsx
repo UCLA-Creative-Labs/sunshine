@@ -13,9 +13,9 @@ function Footer(): React.Component {
       </span>
       <div id='footer-nav'>
         <nav>
-          <a>FACEBOOK</a>
-          <a>INSTAGRAM</a>
-          <a>MEDIUM</a>
+          <a target='_blank' rel='noreferrer' href='https://www.facebook.com/uclacreatives'>FACEBOOK</a>
+          <a target='_blank' rel='noreferrer' href='https://www.instagram.com/creativelabsucla/'>INSTAGRAM</a>
+          <a target='_blank' rel='noreferrer' href='https://medium.com/creative-labs'>MEDIUM</a>
         </nav>
       </div>
     </div>

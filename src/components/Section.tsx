@@ -21,7 +21,7 @@ function Section(props: SectionProps): React.Component {
   const dataWithCorrectedImagePaths = props.data.map(data => { data.image = `/assets/${data.image}`; return data; });
 
   return (
-    <div className='section' id={props.title}>
+    <div className='section' id={props.title.toLowerCase()}>
       <h1>{props.title.toUpperCase()}</h1>
       <div
         id='section-items'

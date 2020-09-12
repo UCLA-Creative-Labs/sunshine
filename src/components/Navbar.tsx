@@ -4,11 +4,30 @@ import colors from './styles/_variables.scss';
 import './styles/Navbar.scss';
 
 function Navbar(): React.Component {
-  const [ scrollTop, setScrollTop ] = useState(0);
+  const [ scrollTop, setScrollTop ] = useState<number>(0);
+  const [ sectionScrollStates, setSectionScrollStates ]
+    = useState<boolean>([ true, false, false, false ]);
 
   const navbarRef = useRef(null);
   const navigationRef = useRef(null);
   const logoRef = useRef(null);
+  const sectionsRef = useRef<HTMLElement[]>([]);
+
+  const isElementInView: boolean = (el: HTMLElement) => {
+    const rect: DOMRect = el.getBoundingClientRect();
+
+    return (rect.top >= 0 && rect.top <= window.innerHeight * 0.4)
+    || (rect.bottom <= window.innerHeight && rect.bottom >= window.innerHeight * 0.4);
+  };
+
+  useEffect(() => {
+    sectionsRef.current = [
+      document.getElementById('splash'),
+      document.getElementById('about'),
+      document.getElementById('projects'),
+      document.getElementById('fellowship'),
+    ];
+  }, []);
 
   useEffect(() => {
     const vpHeight = window.innerHeight;
@@ -17,7 +36,7 @@ function Navbar(): React.Component {
     const navigationStyle = navigationRef.current.style;
     const logoStyle = logoRef.current.style;
 
-    if (scrollTop >= 0.1 * vpHeight) {
+    if (scrollTop >= 0.2 * vpHeight) {
       navbarStyle.backgroundColor = colors.navbarBgScroll;
       navbarStyle.color = colors.navbarTextScroll;
       navigationStyle.color = colors.navbarTextScroll;
@@ -31,23 +50,59 @@ function Navbar(): React.Component {
 
     const onScroll = ev => {
       setScrollTop(ev.target.documentElement.scrollTop);
+
+      for (let i = 0; i < sectionsRef.current.length; i++) {
+        if (isElementInView(sectionsRef.current[i])) {
+          const scrollState: boolean[] = new Array(sectionsRef.current.length).fill(false);
+          scrollState[i] = true;
+          setSectionScrollStates(scrollState);
+        }
+      }
+
     };
+
     window.addEventListener('scroll', onScroll);
 
     return () => window.removeEventListener('scroll', onScroll);
   }, [ scrollTop ]);
 
+  const scrollToElement = (el: HTMLElement) => {
+    const navbarHeight = document.getElementById('navbar').offsetHeight;
+    window.scrollBy({
+      top: el.getBoundingClientRect().top - navbarHeight,
+      left: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <div id={'navbar'} ref={navbarRef}>
-      <h3 id={'title'} className={'logotype'}>
+      <h3 id={'title'} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0])}>
         <div id={'logo'} ref={logoRef} />
         CREATIVE LABS
       </h3>
       <div id={'navigation'} ref={navigationRef}>
         <nav>
-          <a style={{ fontWeight: 700 }}>HOME</a>
-          <a>PROJECTS</a>
-          <a>ABOUT</a>
+          <a
+            onClick={() => scrollToElement(sectionsRef.current[0])}
+            style={{ fontWeight: sectionScrollStates[0] ? 700 : 400 }}>
+            HOME
+          </a>
+          <a
+            onClick={() => scrollToElement(sectionsRef.current[1])}
+            style={{ fontWeight: sectionScrollStates[1] ? 700 : 400 }}>
+            ABOUT
+          </a>
+          <a
+            onClick={() => scrollToElement(sectionsRef.current[2])}
+            style={{ fontWeight: sectionScrollStates[2] ? 700 : 400 }}>
+            PROJECTS
+          </a>
+          <a
+            onClick={() => scrollToElement(sectionsRef.current[3])}
+            style={{ fontWeight: sectionScrollStates[3] ? 700 : 400 }}>
+            FELLOWSHIP
+          </a>
         </nav>
       </div>
     </div>
