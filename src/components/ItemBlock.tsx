@@ -14,7 +14,8 @@ function ItemBlock(props: ItemBlockProps): React.Component {
     <div className='item-block'>
       <img
         className='item-img'
-        src={props.data.image} />
+        src={props.data.image}
+        alt={props.data.title} />
       <h3 className='item-title'>{props.data.title}</h3>
       <p className='item-body'>{props.data.body}</p>
       { props.data.linkText && <a>{props.data.linkText.toUpperCase()}</a>}
