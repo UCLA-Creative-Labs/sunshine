@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import '../styles/Splash.scss';
 
@@ -28,14 +28,14 @@ function SunMoon(props: SunMoonProps): React.Component {
 
     const mouseDist = [
       props.mousePos[0] - bgRect.current.left - bgRect.current.width/2,
-      props.mousePos[1] - bgRect.current.top - bgRect.current.height/2
+      props.mousePos[1] - bgRect.current.top - bgRect.current.height/2,
     ];
     const theta = Math.atan2(mouseDist[1], mouseDist[0]);
     const rcos = radius.current * Math.cos(theta);
     const rsin = radius.current * Math.sin(theta);
     const clampedDistance = [
       mouseDist[0] < 0 ? Math.max(rcos, mouseDist[0]) : Math.min(rcos, mouseDist[0]),
-      mouseDist[1] < 0 ? Math.max(rsin, mouseDist[1]) : Math.min(rsin, mouseDist[1])
+      mouseDist[1] < 0 ? Math.max(rsin, mouseDist[1]) : Math.min(rsin, mouseDist[1]),
     ];
 
     // small delay to make it seem smoother
