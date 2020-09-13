@@ -1,3 +1,5 @@
+@import 'variables';
+
 .item-block {
   break-inside: avoid-column;
   page-break-inside: avoid-column; // For Firefox
@@ -10,4 +12,11 @@
   max-height: 324;
   user-select: none;
   pointer-events: none;
+}
+
+@media only screen and (max-width: 600px) {
+  .item-block {
+    padding-top: $padding-vert-mobile;
+    padding-bottom: $padding-vert-mobile;
+  }
 }

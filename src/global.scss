@@ -46,3 +46,15 @@ a:hover {
   margin: 0;
   border-top: 1px solid dimgray;
 }
+
+@media only screen and (max-width: 600px) {
+  .section {
+    min-height: calc(100vh - #{$navbar-height-mobile});
+    width: 100vw;
+    padding: $section-padding-mobile;
+  }
+
+  .section h1 {
+    font-size: 36px;
+  }
+}

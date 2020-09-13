@@ -48,3 +48,26 @@
   background-color: map-get($colors, splashBgNight);
   color: map-get($colors, splashTextNight);
 }
+
+@media only screen and (max-width: 600px) {
+  #splash {
+    margin-top: calc(#{$navbar-height-mobile} - 1px);
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #blurb {
+    width: 90%;
+    font-size: 28px;
+    bottom: $padding-vert-mobile;
+  }
+
+  #sunmoon {
+    width: $sm-diam-mobile;
+    height: $sm-diam-mobile;
+    background-size: cover;
+    margin-top: 0;
+    margin-right: calc(-1 * #{$padding-horiz-mobile});
+    right: 0;
+  }
+}
