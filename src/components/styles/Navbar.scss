@@ -7,7 +7,7 @@
   width: 100%;
   position: fixed;
   top: 0;
-  background-color: map-get($colors, splashBg);
+  background-color: map-get($colors, splashBgDay);
   color: map-get($colors, navbarText);
   transition: background-color $navbar-transition, color $navbar-transition;
   user-select: none;

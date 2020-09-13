@@ -2,7 +2,7 @@
 
 #splash {
   margin-top: calc(#{$navbar-height} - 1px); // To avoid artifacting
-  background-color: map-get($colors, splashBg);
+  transition: background-color $splash-transition, color $splash-transition;
 }
 
 #blurb {
@@ -14,11 +14,12 @@
 #sunmoon {
   width: $sm-diam;
   height: $sm-diam;
-  background-image: $sun-bg;
   position: absolute;
   right: $padding-horiz;
   margin-top: calc(2 * #{$padding-vert});
   margin-right: calc(2.5 * #{$padding-horiz});
+  border-radius: 50%;
+  overflow: hidden;
 }
 
 #sunmoon-face {
@@ -28,4 +29,22 @@
   position: absolute;
   top: 55%;
   left: 30%;
+}
+
+#sunmoon.day {
+  background-image: $sun-bg;
+}
+
+#sunmoon.night {
+  background-image: $moon-bg;
+}
+
+#splash.day {
+  background-color: map-get($colors, splashBgDay);
+  color: map-get($colors, splashTextDay);
+}
+
+#splash.night {
+  background-color: map-get($colors, splashBgNight);
+  color: map-get($colors, splashTextNight);
 }

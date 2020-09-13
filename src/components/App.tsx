@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Switch,
@@ -14,12 +14,40 @@ import Splash      from './Splash';
 import './styles/App.scss';
 
 function App(): React.Component {
-  return(
+  const [ isDay, setIsDay ] = useState(true);
+  const [ mousePos, setMousePos ] = useState(null);
+
+  const onMouseMove = e => {
+    setMousePos([ e.clientX, e.clientY ]);
+  };
+
+  useEffect(() => {
+    const now = new Date();
+    const getIsDayDefault = () => {
+      const defaultSunrise = new Date(), defaultSunset = new Date();
+      defaultSunrise.setHours(6);
+      defaultSunset.setHours(20);
+      setIsDay(now >= defaultSunrise && now <= defaultSunset);
+    };
+
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      fetch(`https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&formatted=0`)
+        .then(res => res.json())
+        .then(data => {
+          const sunrise = new Date(data.results.sunrise), sunset  = new Date(data.results.sunset);
+          setIsDay(now >= sunrise && now <= sunset);
+        })
+        .catch(() => { getIsDayDefault(); });
+    }, () => { getIsDayDefault(); });
+  }, []);
+
+  return(<div onMouseMove={onMouseMove}>
     <Router>
       <Switch>
         <Route exact path='/'>
           <div style={{ margin: 0, padding: 0 }}>
-            <Splash />
+            <Splash isDay={isDay} mousePos={mousePos} />
             <Section
               title={'About'}
               data={sectionItem.about} />
@@ -34,10 +62,10 @@ function App(): React.Component {
           </div>
         </Route>
       </Switch>
-      <Navbar />
+      <Navbar isDay={isDay} />
       <Footer />
     </Router>
-  );
+  </div>);
 }
 
 export default App;

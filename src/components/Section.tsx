@@ -18,7 +18,7 @@ interface SectionProps {
 }
 
 function Section(props: SectionProps): React.Component {
-  props.data.forEach(data => data.image = `/assets/${data.image}`);
+  props.data.forEach(data => data.image.indexOf('/assets/') == -1 ? data.image = `/assets/${data.image}` : data.image);
 
   return (
     <div className='section' id={props.title.toLowerCase()}>
