@@ -4,6 +4,7 @@ body {
   padding: 0;
   margin: 0;
   font: $body-reg-font;
+  background-color: map-get($colors, splashBgDay);
 }
 
 h1 {
@@ -39,6 +40,7 @@ a:hover {
 }
 
 .section {
+  background-color: $section-bg;
   box-sizing: border-box;
   min-height: calc(100vh - #{$navbar-height});
   width: calc(100vw - 15px); // To avoid slight overflow
