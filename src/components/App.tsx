@@ -15,6 +15,11 @@ import './styles/App.scss';
 
 function App(): React.Component {
   const [ isDay, setIsDay ] = useState(true);
+  const [ mousePos, setMousePos ] = useState(null);
+
+  const onMouseMove = e => {
+    setMousePos([ e.clientX, e.clientY ]);
+  };
 
   useEffect(() => {
     const now = new Date();
@@ -37,12 +42,12 @@ function App(): React.Component {
     }, () => { getIsDayDefault(); });
   }, []);
 
-  return(
+  return(<div onMouseMove={onMouseMove}>
     <Router>
       <Switch>
         <Route exact path='/'>
           <div style={{ margin: 0, padding: 0 }}>
-            <Splash isDay={isDay} />
+            <Splash isDay={isDay} mousePos={mousePos} />
             <Section
               title={'About'}
               data={sectionItem.about} />
@@ -60,7 +65,7 @@ function App(): React.Component {
       <Navbar isDay={isDay} />
       <Footer />
     </Router>
-  );
+  </div>);
 }
 
 export default App;

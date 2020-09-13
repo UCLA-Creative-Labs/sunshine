@@ -18,6 +18,8 @@
   right: $padding-horiz;
   margin-top: calc(2 * #{$padding-vert});
   margin-right: calc(2.5 * #{$padding-horiz});
+  border-radius: 50%;
+  overflow: hidden;
 }
 
 #sunmoon-face {
