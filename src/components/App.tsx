@@ -11,7 +11,7 @@ import Navbar      from './Navbar';
 import Section     from './Section';
 import Splash      from './Splash';
 
-import './styles/App.scss';
+import colors from './styles/_variables.scss';
 
 function App(): React.Component {
   const [ isDay, setIsDay ] = useState(true);
@@ -42,11 +42,14 @@ function App(): React.Component {
     }, () => { getIsDayDefault(); });
   }, []);
 
+  useEffect(() => {
+    // For Safari browsers
+    if (isDay) document.body.style.backgroundColor = colors.splashBgDay;
+    else document.body.style.backgroundColor = colors.splashBgNight;
+  }, [ isDay ]);
+
   return(
-    <div
-      id='app'
-      className={isDay ? 'day' : 'night'}
-      onMouseMove={onMouseMove}>
+    <div id='app' onMouseMove={onMouseMove}>
       <Router>
         <Switch>
           <Route exact path='/'>

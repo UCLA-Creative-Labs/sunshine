@@ -1,9 +1,0 @@
-@import 'variables';
-
-#app.day {
-  background-color: map-get($colors, splashBgDay);
-}
-
-#app.night {
-  background-color: map-get($colors, splashBgNight);
-}

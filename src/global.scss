@@ -4,6 +4,7 @@ body {
   padding: 0;
   margin: 0;
   font: $body-reg-font;
+  background-color: map-get($colors, splashBgDay);
 }
 
 div {
