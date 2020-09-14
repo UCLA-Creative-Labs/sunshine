@@ -1,7 +1,7 @@
 @import 'variables';
 
 #splash {
-  margin-top: calc(#{$navbar-height} - 1px); // To avoid artifacting
+  margin-top: calc(#{$navbar-height});
   transition: background-color $splash-transition, color $splash-transition;
 }
 
@@ -51,7 +51,7 @@
 
 @media only screen and (max-width: 600px) {
   #splash {
-    margin-top: calc(#{$navbar-height-mobile} - 1px);
+    margin-top: calc(#{$navbar-height-mobile});
     overflow-x: hidden;
     position: relative;
   }

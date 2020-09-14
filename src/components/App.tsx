@@ -37,35 +37,41 @@ function App(): React.Component {
         .then(data => {
           const sunrise = new Date(data.results.sunrise), sunset  = new Date(data.results.sunset);
           setIsDay(now >= sunrise && now <= sunset);
+          // setIsDay(false);
         })
         .catch(() => { getIsDayDefault(); });
     }, () => { getIsDayDefault(); });
   }, []);
 
-  return(<div onMouseMove={onMouseMove}>
-    <Router>
-      <Switch>
-        <Route exact path='/'>
-          <div style={{ margin: 0, padding: 0 }}>
-            <Splash isDay={isDay} mousePos={mousePos} />
-            <Section
-              title={'About'}
-              data={sectionItem.about} />
-            <Section
-              title={'Projects'}
-              data={sectionItem.projects}
-              linkText={'View all projects on Medium ➔'} />
-            <Section
-              title={'Fellowship'}
-              data={sectionItem.fellowship}
-              linkText={'Read more + apply ➔'} />
-          </div>
-        </Route>
-      </Switch>
-      <Navbar isDay={isDay} />
-      <Footer />
-    </Router>
-  </div>);
+  return(
+    <div
+      id='app'
+      className={isDay ? 'day' : 'night'}
+      onMouseMove={onMouseMove}>
+      <Router>
+        <Switch>
+          <Route exact path='/'>
+            <div style={{ margin: 0, padding: 0 }}>
+              <Splash isDay={isDay} mousePos={mousePos} />
+              <Section
+                title={'About'}
+                data={sectionItem.about} />
+              <Section
+                title={'Projects'}
+                data={sectionItem.projects}
+                linkText={'View all projects on Medium ➔'} />
+              <Section
+                title={'Fellowship'}
+                data={sectionItem.fellowship}
+                linkText={'Read more + apply ➔'} />
+            </div>
+          </Route>
+        </Switch>
+        <Navbar isDay={isDay} />
+        <Footer />
+      </Router>
+    </div>
+  );
 }
 
 export default App;
