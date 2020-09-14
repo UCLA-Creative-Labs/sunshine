@@ -36,3 +36,31 @@
 #footer-nav a {
   padding-left: 6%;
 }
+
+@media only screen and (max-width: 600px) {
+  #footer {
+    width: 100vw;
+    display: inline-block;
+    text-align: center;
+    height: $footer-height-mobile;
+  }
+
+  #footer-tag {
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  #footer-nav {
+    text-align: center;
+    padding: 0 0 1em;
+    margin-right: 0;
+    padding-right: 4%;
+    overflow: scroll;
+  }
+
+  #footer-nav a {
+    text-decoration: none;
+    font-size: 0.9em;
+  }
+}

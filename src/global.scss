@@ -4,6 +4,11 @@ body {
   padding: 0;
   margin: 0;
   font: $body-reg-font;
+  background-color: map-get($colors, splashBgDay);
+}
+
+div {
+  color: #000;
 }
 
 h1 {
@@ -39,10 +44,23 @@ a:hover {
 }
 
 .section {
+  background-color: $section-bg;
   box-sizing: border-box;
   min-height: calc(100vh - #{$navbar-height});
   width: calc(100vw - 15px); // To avoid slight overflow
   padding: $section-padding;
   margin: 0;
-  border-top: 1px solid dimgray;
+  border-bottom: 1px solid dimgray;
+}
+
+@media only screen and (max-width: 600px) {
+  .section {
+    min-height: calc(100vh - #{$navbar-height-mobile});
+    width: 100vw;
+    padding: $section-padding-mobile;
+  }
+
+  .section h1 {
+    font-size: 36px;
+  }
 }

@@ -22,7 +22,7 @@ function SunMoon(props: SunMoonProps): React.Component {
   }, []);
 
   useEffect(() => {
-    if (!props.mousePos) return;
+    if (!props.mousePos || window.matchMedia('(max-width: 600px)').matches) return;
 
     const style = face.current.style;
 

@@ -1,7 +1,7 @@
 @import 'variables';
 
 #splash {
-  margin-top: calc(#{$navbar-height} - 1px); // To avoid artifacting
+  margin-top: calc(#{$navbar-height});
   transition: background-color $splash-transition, color $splash-transition;
 }
 
@@ -47,4 +47,25 @@
 #splash.night {
   background-color: map-get($colors, splashBgNight);
   color: map-get($colors, splashTextNight);
+}
+
+@media only screen and (max-width: 600px) {
+  #splash {
+    margin-top: calc(#{$navbar-height-mobile});
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #blurb {
+    width: 90%;
+    font-size: 28px;
+    bottom: $padding-vert-mobile;
+  }
+
+  #sunmoon {
+    background-size: cover;
+    margin-top: 0;
+    margin-right: calc(-1 * #{$padding-horiz-mobile});
+    right: 0;
+  }
 }

@@ -12,8 +12,12 @@ $heading-kerning: 0.1rem;
 
 // General
 $padding-horiz: 64px;
+$padding-horiz-mobile: 24px;
 $padding-vert:  48px;
+$padding-vert-mobile: 32px;
 $section-padding: $padding-vert $padding-horiz;
+$section-padding-mobile: $padding-vert-mobile $padding-horiz-mobile;
+$section-bg: #fff;
 
 // Colors
 $colors: (
@@ -29,7 +33,8 @@ $colors: (
 );
 
 // Navbar
-$navbar-height: 8vw;
+$navbar-height: 110px;
+$navbar-height-mobile: 120px;
 $navbar-transition: 0.3s;
 
 // Splash
@@ -42,7 +47,8 @@ $sm-face-height: 30px;
 $splash-transition: $navbar-transition;
 
 // Footer
-$footer-height: 8vw;
+$footer-height: 110px;
+$footer-height-mobile: 120px;
 
 // Export colors to JS
 :export {

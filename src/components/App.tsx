@@ -11,7 +11,7 @@ import Navbar      from './Navbar';
 import Section     from './Section';
 import Splash      from './Splash';
 
-import './styles/App.scss';
+import colors from './styles/_variables.scss';
 
 function App(): React.Component {
   const [ isDay, setIsDay ] = useState(true);
@@ -42,30 +42,38 @@ function App(): React.Component {
     }, () => { getIsDayDefault(); });
   }, []);
 
-  return(<div onMouseMove={onMouseMove}>
-    <Router>
-      <Switch>
-        <Route exact path='/'>
-          <div style={{ margin: 0, padding: 0 }}>
-            <Splash isDay={isDay} mousePos={mousePos} />
-            <Section
-              title={'About'}
-              data={sectionItem.about} />
-            <Section
-              title={'Projects'}
-              data={sectionItem.projects}
-              linkText={'View all projects on Medium ➔'} />
-            <Section
-              title={'Fellowship'}
-              data={sectionItem.fellowship}
-              linkText={'Read more + apply ➔'} />
-          </div>
-        </Route>
-      </Switch>
-      <Navbar isDay={isDay} />
-      <Footer />
-    </Router>
-  </div>);
+  useEffect(() => {
+    // For Safari browsers
+    if (isDay) document.body.style.backgroundColor = colors.splashBgDay;
+    else document.body.style.backgroundColor = colors.splashBgNight;
+  }, [ isDay ]);
+
+  return(
+    <div id='app' onMouseMove={onMouseMove}>
+      <Router>
+        <Switch>
+          <Route exact path='/'>
+            <div style={{ margin: 0, padding: 0 }}>
+              <Splash isDay={isDay} mousePos={mousePos} />
+              <Section
+                title={'About'}
+                data={sectionItem.about} />
+              <Section
+                title={'Projects'}
+                data={sectionItem.projects}
+                linkText={'View all projects on Medium ➔'} />
+              <Section
+                title={'Fellowship'}
+                data={sectionItem.fellowship}
+                linkText={'Read more + apply ➔'} />
+            </div>
+          </Route>
+        </Switch>
+        <Navbar isDay={isDay} />
+        <Footer />
+      </Router>
+    </div>
+  );
 }
 
 export default App;
