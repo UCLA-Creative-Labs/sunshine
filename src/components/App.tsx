@@ -37,7 +37,6 @@ function App(): React.Component {
         .then(data => {
           const sunrise = new Date(data.results.sunrise), sunset  = new Date(data.results.sunset);
           setIsDay(now >= sunrise && now <= sunset);
-          // setIsDay(false);
         })
         .catch(() => { getIsDayDefault(); });
     }, () => { getIsDayDefault(); });
