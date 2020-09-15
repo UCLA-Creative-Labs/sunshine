@@ -1,15 +1,14 @@
 import React from 'react';
 
-import { SectionItem } from './Section';
+import { SectionItem } from '../Section';
 
-import './styles/ItemBlock.scss';
+import '../styles/Section.scss';
 
 interface ItemBlockProps {
-  image: string;
   data: SectionItem;
 }
 
-function ItemBlock(props: ItemBlockProps): React.Component {
+function ItemBlock(props: ItemBlockProps): JSX.Element {
   return (
     <div className='item-block'>
       <img

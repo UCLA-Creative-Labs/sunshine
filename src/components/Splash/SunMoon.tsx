@@ -7,14 +7,16 @@ interface SunMoonProps {
   mousePos: number[];
 }
 
-function SunMoon(props: SunMoonProps): React.Component {
+function SunMoon(props: SunMoonProps): JSX.Element {
   const bg = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
-  const bgRect = useRef<DOMRect>(null);
-  const faceRect = useRef<DOMRect>(null);
+  const bgRect = useRef<DOMRect>(new DOMRect(0, 0, 0, 0));
+  const faceRect = useRef<DOMRect>(new DOMRect(0, 0, 0, 0));
   const radius = useRef<number>(0);
 
   useEffect(() => {
+    if (!bg.current || !face.current)
+      return;
     // perform one-time calculations here to save resources
     bgRect.current = bg.current.getBoundingClientRect();
     faceRect.current = face.current.getBoundingClientRect();
@@ -22,7 +24,7 @@ function SunMoon(props: SunMoonProps): React.Component {
   }, []);
 
   useEffect(() => {
-    if (!props.mousePos || window.matchMedia('(max-width: 600px)').matches) return;
+    if (!props.mousePos || !face.current || window.matchMedia('(max-width: 600px)').matches) return;
 
     const style = face.current.style;
 

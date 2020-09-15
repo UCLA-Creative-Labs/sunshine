@@ -7,17 +7,17 @@ interface NavbarProps {
   isDay: boolean;
 }
 
-function Navbar(props: NavbarProps): React.Component {
+function Navbar(props: NavbarProps): JSX.Element {
   const [ scrollTop, setScrollTop ] = useState<number>(0);
   const [ sectionScrollStates, setSectionScrollStates ]
-    = useState<boolean>([ true, false, false, false ]);
+    = useState<boolean[]>([ true, false, false, false ]);
 
-  const navbarRef = useRef(null);
-  const navigationRef = useRef(null);
-  const logoRef = useRef(null);
+  const navbarRef = useRef<HTMLDivElement>(null);
+  const navigationRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
   const sectionsRef = useRef<HTMLElement[]>([]);
 
-  const isElementInView: boolean = (el: HTMLElement) => {
+  const isElementInView = (el: HTMLElement): boolean => {
     const rect: DOMRect = el.getBoundingClientRect();
 
     return (rect.top >= 0 && rect.top <= window.innerHeight * 0.4)
@@ -25,6 +25,8 @@ function Navbar(props: NavbarProps): React.Component {
   };
 
   const toNightStyle = () => {
+    if (!navbarRef.current || !navigationRef.current || !logoRef.current)
+      return;
     const navbarStyle = navbarRef.current.style;
     const navigationStyle = navigationRef.current.style;
     const logoStyle = logoRef.current.style;
@@ -36,6 +38,8 @@ function Navbar(props: NavbarProps): React.Component {
   };
 
   const toDayStyle = () => {
+    if (navbarRef.current == null || navigationRef.current == null || logoRef.current == null)
+      return;
     const navbarStyle = navbarRef.current.style;
     const navigationStyle = navigationRef.current.style;
     const logoStyle = logoRef.current.style;
@@ -47,11 +51,12 @@ function Navbar(props: NavbarProps): React.Component {
   };
 
   useEffect(() => {
+    // default to body if the element can't be found
     sectionsRef.current = [
-      document.getElementById('splash'),
-      document.getElementById('about'),
-      document.getElementById('projects'),
-      document.getElementById('fellowship'),
+      document.getElementById('splash') || document.body,
+      document.getElementById('about') || document.body,
+      document.getElementById('projects') || document.body,
+      document.getElementById('fellowship') || document.body,
     ];
   }, []);
 
@@ -67,8 +72,8 @@ function Navbar(props: NavbarProps): React.Component {
     else
       toNightStyle();
 
-    const onScroll = ev => {
-      setScrollTop(ev.target.documentElement.scrollTop);
+    const onScroll = () => {
+      setScrollTop(document.documentElement.scrollTop);
 
       for (let i = 0; i < sectionsRef.current.length; i++) {
         if (isElementInView(sectionsRef.current[i])) {
@@ -86,7 +91,8 @@ function Navbar(props: NavbarProps): React.Component {
   }, [ scrollTop ]);
 
   const scrollToElement = (el: HTMLElement) => {
-    const navbarHeight = document.getElementById('navbar').offsetHeight;
+    const navbar = document.getElementById('navbar');
+    const navbarHeight = navbar?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
     window.scrollBy({
       top: el.getBoundingClientRect().top - navbarHeight,
       left: 0,

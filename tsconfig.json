@@ -16,6 +16,7 @@
     "noImplicitReturns": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "composite": true,
     "incremental": true,
     "typeRoots": [
@@ -23,5 +24,5 @@
       "./custom_typing"
     ]
   },
-  "includes": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "src/**/*.json"]
 }
