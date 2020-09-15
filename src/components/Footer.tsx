@@ -2,7 +2,7 @@ import React from 'react';
 
 import './styles/Footer.scss';
 
-function Footer(): React.Component {
+function Footer(): JSX.Element {
   return (
     <div id='footer'>
       <span id='footer-tag'>

@@ -13,11 +13,11 @@ import Splash      from './Splash';
 
 import colors from './styles/_variables.scss';
 
-function App(): React.Component {
+function App(): JSX.Element {
   const [ isDay, setIsDay ] = useState(true);
-  const [ mousePos, setMousePos ] = useState(null);
+  const [ mousePos, setMousePos ] = useState<number[]>([]);
 
-  const onMouseMove = e => {
+  const onMouseMove = (e: React.MouseEvent) => {
     setMousePos([ e.clientX, e.clientY ]);
   };
 

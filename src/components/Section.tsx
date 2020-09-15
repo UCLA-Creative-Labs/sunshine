@@ -17,7 +17,7 @@ interface SectionProps {
   linkPath?: string;
 }
 
-function Section(props: SectionProps): React.Component {
+function Section(props: SectionProps): JSX.Element {
   props.data.forEach(data => data.image.indexOf('/assets/') == -1 ? data.image = `/assets/${data.image}` : data.image);
 
   return (

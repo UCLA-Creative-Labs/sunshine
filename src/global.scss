@@ -46,7 +46,7 @@ a:hover {
 .section {
   background-color: $section-bg;
   box-sizing: border-box;
-  min-height: calc(100vh - #{$navbar-height});
+  min-height: calc(100vh - #{$navbar-height} + 1px);
   width: calc(100vw - 15px); // To avoid slight overflow
   padding: $section-padding;
   margin: 0;
