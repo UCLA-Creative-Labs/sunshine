@@ -92,8 +92,7 @@ function Navbar(props: NavbarProps): JSX.Element {
 
   const scrollToElement = (el: HTMLElement) => {
     const navbar = document.getElementById('navbar');
-    const navbarHeight
-      = navbar ? navbar.offsetHeight : document.body.offsetHeight - el.offsetHeight;
+    const navbarHeight = navbar?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
     window.scrollBy({
       top: el.getBoundingClientRect().top - navbarHeight,
       left: 0,
