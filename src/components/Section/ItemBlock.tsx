@@ -17,7 +17,7 @@ function ItemBlock(props: ItemBlockProps): JSX.Element {
         alt={props.data.title} />
       <h3 className='item-title'>{props.data.title}</h3>
       <p className='item-body'>{props.data.body}</p>
-      { props.data.linkText && <a>{props.data.linkText.toUpperCase()}</a>}
+      { props.data.linkText && <a href={props.data.linkPath} >{props.data.linkText.toUpperCase()}</a>}
     </div>
   );
 }
