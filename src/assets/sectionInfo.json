@@ -4,14 +4,14 @@
       "image": "who-are-we.svg",
       "title": "Welcome to Our Lab",
       "body": "Just some UCLA kids with skills in dev, design, and project management trying to make something cool, together. We were founded on the dream that with the right group of people, any idea can come to life.",
-      "linkText": "Join our Community ->",
+      "linkText": "Join our Community ➔",
       "linkPath": ""
     },
     {
       "image": "what-we-do.svg",
       "title": "Creativity for All",
       "body": "We bring students from all disciplines and backgrounds together to work on technical & creative projects.",
-      "linkText": "Our History & Team ->",
+      "linkText": "Our History & Team ➔",
       "linkPath": ""
     }
   ],
