@@ -14,7 +14,7 @@ function Splash(props: SplashProps): JSX.Element {
     <div id='splash' className={'section' + (props.isDay ? ' day' : ' night')}>
       <SunMoon isDay={props.isDay} mousePos={props.mousePos} />
       <h2 id='blurb'>
-        We are a community of students at UCLA working together to discover and pursue our creative passions.
+      UCLA’s only community of creatives—working on cool projects every quarter.
       </h2>
     </div>
   );

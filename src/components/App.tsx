@@ -65,7 +65,7 @@ function App(): JSX.Element {
               <Section
                 title={'Fellowship'}
                 data={sectionItem.fellowship}
-                linkText={'Read more + apply ➔'} />
+                linkText={'Bloom with Us ➔'} />
             </div>
           </Route>
         </Switch>
