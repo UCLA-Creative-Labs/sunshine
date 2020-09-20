@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
 
 import colors from './styles/_variables.scss';
 import './styles/Navbar.scss';
@@ -11,6 +12,8 @@ function Navbar(props: NavbarProps): JSX.Element {
   const [ scrollTop, setScrollTop ] = useState<number>(0);
   const [ sectionScrollStates, setSectionScrollStates ]
     = useState<boolean[]>([ true, false, false, false ]);
+  const history = useHistory();
+  const location = useLocation();
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
@@ -90,7 +93,15 @@ function Navbar(props: NavbarProps): JSX.Element {
     return () => window.removeEventListener('scroll', onScroll);
   }, [ scrollTop ]);
 
+  /**
+   * Scroll to section if on the root path
+   *
+   * @param el the section element to scroll to
+   */
   const scrollToElement = (el: HTMLElement) => {
+    if (location.pathname !== '/') {
+      history.push('/');
+    }
     const navbar = document.getElementById('navbar');
     const navbarHeight = navbar?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
     window.scrollBy({
