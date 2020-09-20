@@ -3,6 +3,7 @@
 .item-block {
   break-inside: avoid-column;
   page-break-inside: avoid-column; // For Firefox
+  overflow: hidden;
 }
 
 .item-img {
