@@ -31,7 +31,7 @@ function Section(props: SectionProps): JSX.Element {
         }}>
         { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
       </div>
-      {props.linkText && <a>{props.linkText.toUpperCase()}</a>}
+      {props.linkText && <a target='_blank' rel='noreferrer' href={props.linkPath} >{props.linkText.toUpperCase()}</a>}
     </div>
   );
 }

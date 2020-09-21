@@ -6,7 +6,6 @@ import {
 } from 'react-router-dom';
 
 import sectionItem  from '../assets/sectionInfo.json';
-import Construction from './Construction';
 import Footer       from './Footer';
 import Navbar       from './Navbar';
 import Section      from './Section';
@@ -62,15 +61,14 @@ function App(): JSX.Element {
               <Section
                 title={'Projects'}
                 data={sectionItem.projects}
+                linkPath={'https://medium.com/creative-labs'}
                 linkText={'View all projects on Medium ➔'} />
               <Section
                 title={'Fellowship'}
                 data={sectionItem.fellowship}
+                linkPath={'https://bloom.creativelabsucla.com/'}
                 linkText={'Bloom with Us ➔'} />
             </div>
-          </Route>
-          <Route exact path='/team'>
-            <Construction isDay={isDay} mousePos={mousePos} />
           </Route>
         </Switch>
         <Navbar isDay={isDay} />
