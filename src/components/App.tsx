@@ -6,7 +6,6 @@ import {
 } from 'react-router-dom';
 
 import sectionItem  from '../assets/sectionInfo.json';
-import Construction from './Construction';
 import Footer       from './Footer';
 import Navbar       from './Navbar';
 import Section      from './Section';
@@ -70,9 +69,6 @@ function App(): JSX.Element {
                 linkPath={'https://bloom.creativelabsucla.com/'}
                 linkText={'Bloom with Us ➔'} />
             </div>
-          </Route>
-          <Route exact path='/team'>
-            <Construction isDay={isDay} mousePos={mousePos} />
           </Route>
         </Switch>
         <Navbar isDay={isDay} />
