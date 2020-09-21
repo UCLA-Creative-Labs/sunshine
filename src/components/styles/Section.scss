@@ -15,7 +15,8 @@
   transition: box-shadow 0.1s;
 }
 
-.section-link-text:hover, .item-link:hover .item-link-text {
+.section-link-text:hover,
+.item-link:hover .item-link-text {
   text-decoration: underline;
 }
 
