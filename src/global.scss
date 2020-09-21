@@ -34,10 +34,6 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
-}
-
 .logotype {
   font: $logo-font;
   letter-spacing: $logo-kerning;
@@ -51,6 +47,11 @@ a:hover {
   padding: $section-padding;
   margin: 0;
   border-bottom: 1px solid dimgray;
+}
+
+.section > div {
+  max-width: $max-section-width;
+  margin: 0 auto;
 }
 
 @media only screen and (max-width: 600px) {
