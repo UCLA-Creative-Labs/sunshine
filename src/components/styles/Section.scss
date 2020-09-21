@@ -26,7 +26,8 @@
   }
 }
 
-.section-link-text, .item-link-text {
+.section-link-text,
+.item-link-text {
   position: relative;
 }
 
@@ -36,19 +37,19 @@
   right: 0;
 }
 
-.section-link-text:hover::after,
-.item-link:hover .item-link-text::after {
-  right: 0;
-}
-
 .section-link-text::after,
 .item-link-text::after {
   border-radius: 1em;
-  border-top: .1em solid;
+  border-top: 0.1em solid;
   content: "";
   position: absolute;
   right: 100%;
-  bottom: .05em;
+  bottom: 0.05em;
   left: 0;
-  transition: right .4s cubic-bezier(0,.5,0,1);
+  transition: right 0.4s cubic-bezier(0, 0.5, 0, 1);
+}
+
+.section-link-text:hover::after,
+.item-link:hover .item-link-text::after {
+  right: 0;
 }
