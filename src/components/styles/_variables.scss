@@ -18,6 +18,7 @@ $padding-vert-mobile: 32px;
 $section-padding: $padding-vert $padding-horiz;
 $section-padding-mobile: $padding-vert-mobile $padding-horiz-mobile;
 $section-bg: #fff;
+$max-section-width: 1440px;
 
 // Colors
 $colors: (
@@ -45,6 +46,9 @@ $sm-face: url('../../assets/sunmoon-face.svg');
 $sm-face-width:  88px;
 $sm-face-height: 30px;
 $splash-transition: $navbar-transition;
+
+// Item Block
+$hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 
 // Footer
 $footer-height: 110px;
