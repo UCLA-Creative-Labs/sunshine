@@ -22,16 +22,20 @@ function Section(props: SectionProps): JSX.Element {
 
   return (
     <div className='section' id={props.title.toLowerCase()}>
-      <h1>{props.title.toUpperCase()}</h1>
-      <div
-        id='section-items'
-        style={{
-          columns: window.matchMedia('(max-width: 600px)').matches ? '1 auto' : `${props.data.length} auto`,
-          marginBottom: 42,
-        }}>
-        { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
+      <div>
+        <h1>{props.title.toUpperCase()}</h1>
+        <div
+          id='section-items'
+          style={{
+            columns: window.matchMedia('(max-width: 600px)').matches ? '1 auto' : `${props.data.length} auto`,
+            marginBottom: 42,
+          }}>
+          { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
+        </div>
+        <a className='section-link-text' target='_blank' rel='noreferrer' href={props.linkPath} >
+          {props.linkText && props.linkText.toUpperCase()}
+        </a>
       </div>
-      {props.linkText && <a target='_blank' href={props.linkPath} >{props.linkText.toUpperCase()}</a>}
     </div>
   );
 }

@@ -71,7 +71,7 @@ function App(): JSX.Element {
                 linkText={'Bloom with Us ➔'} />
             </div>
           </Route>
-          <Route exact path='/team'>
+          <Route path='/construction'>
             <Construction isDay={isDay} mousePos={mousePos} />
           </Route>
         </Switch>
