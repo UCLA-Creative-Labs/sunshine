@@ -62,10 +62,12 @@ function App(): JSX.Element {
               <Section
                 title={'Projects'}
                 data={sectionItem.projects}
+                linkPath={'https://medium.com/creative-labs'}
                 linkText={'View all projects on Medium ➔'} />
               <Section
                 title={'Fellowship'}
                 data={sectionItem.fellowship}
+                linkPath={'https://bloom.creativelabsucla.com/'}
                 linkText={'Bloom with Us ➔'} />
             </div>
           </Route>
