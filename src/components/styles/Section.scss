@@ -3,7 +3,6 @@
 .item-block {
   break-inside: avoid-column;
   page-break-inside: avoid-column; // For Firefox
-  overflow: hidden;
 }
 
 .item-img {
@@ -13,6 +12,15 @@
   max-height: 324;
   user-select: none;
   pointer-events: none;
+  transition: box-shadow 0.1s;
+}
+
+.section-link-text:hover, .item-link:hover .item-link-text {
+  text-decoration: underline;
+}
+
+.item-link:hover .item-img {
+  box-shadow: $hover-shadow;
 }
 
 @media only screen and (max-width: 600px) {
