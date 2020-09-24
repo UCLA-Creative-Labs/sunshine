@@ -39,12 +39,14 @@
   background-image: $moon-bg;
 }
 
-#splash.day, #splash.day > div {
+#splash.day,
+#splash.day > div {
   background-color: map-get($colors, splashBgDay);
   color: map-get($colors, splashTextDay);
 }
 
-#splash.night, #splash.night > div {
+#splash.night,
+#splash.night > div {
   background-color: map-get($colors, splashBgNight);
   color: map-get($colors, splashTextNight);
 }
