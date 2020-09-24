@@ -19,13 +19,6 @@
   box-shadow: $hover-shadow;
 }
 
-@media only screen and (max-width: 600px) {
-  .item-block {
-    padding-top: $padding-vert-mobile;
-    padding-bottom: $padding-vert-mobile;
-  }
-}
-
 .section-link-text,
 .item-link-text {
   position: relative;
@@ -44,7 +37,7 @@
   content: "";
   position: absolute;
   right: 100%;
-  bottom: 0.05em;
+  bottom: -0.05em;
   left: 0;
   transition: right 0.4s cubic-bezier(0, 0.5, 0, 1);
 }
@@ -52,4 +45,19 @@
 .section-link-text:hover::after,
 .item-link:hover .item-link-text::after {
   right: 0;
+}
+
+.item-title {
+  margin-bottom: $heading-margin-bottom;
+}
+
+.item-body {
+  margin-top: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .item-block {
+    padding-top: $padding-vert-mobile;
+    padding-bottom: $padding-vert-mobile;
+  }
 }
