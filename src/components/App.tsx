@@ -7,8 +7,8 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import sectionItem   from '../assets/sectionInfo.json';
 import notifications from '../assets/notifications.json';
+import sectionItem   from '../assets/sectionInfo.json';
 import Construction  from './Construction';
 import Footer        from './Footer';
 import Navbar        from './Navbar';
@@ -47,7 +47,7 @@ function App(): JSX.Element {
 
     setTimeout(() => {
       notifications.map((info) => toast(info.notification, {
-        position: "bottom-right",
+        position: 'bottom-right',
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -56,7 +56,7 @@ function App(): JSX.Element {
         progress: undefined,
         onClick: () => {
           if (info.invite) {
-            var win = window.open(info.invite, '_blank');
+            const win = window.open(info.invite, '_blank');
             if (win != null) win.focus();
           }
         },
