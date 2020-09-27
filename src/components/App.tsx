@@ -4,13 +4,16 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
-import sectionItem  from '../assets/sectionInfo.json';
-import Construction from './Construction';
-import Footer       from './Footer';
-import Navbar       from './Navbar';
-import Section      from './Section';
-import Splash       from './Splash';
+import notifications from '../assets/notifications.json';
+import sectionItem   from '../assets/sectionInfo.json';
+import Construction  from './Construction';
+import Footer        from './Footer';
+import Navbar        from './Navbar';
+import Section       from './Section';
+import Splash        from './Splash';
 
 import colors from './styles/_variables.scss';
 
@@ -41,6 +44,24 @@ function App(): JSX.Element {
         })
         .catch(() => { getIsDayDefault(); });
     }, () => { getIsDayDefault(); });
+
+    setTimeout(() => {
+      notifications.map((info) => toast(info.notification, {
+        position: 'bottom-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        onClick: () => {
+          if (info.invite) {
+            const win = window.open(info.invite, '_blank');
+            if (win != null) win.focus();
+          }
+        },
+      }));
+    }, 1000);
   }, []);
 
   useEffect(() => {
@@ -76,6 +97,7 @@ function App(): JSX.Element {
           </Route>
         </Switch>
         <Navbar isDay={isDay} />
+        <ToastContainer />
         <Footer />
       </Router>
     </div>
