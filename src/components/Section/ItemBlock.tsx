@@ -22,7 +22,7 @@ function ItemBlock(props: ItemBlockProps): JSX.Element {
           alt={props.data.title} />
         <h3 className='item-title'>{props.data.title}</h3>
         <p className='item-body'>{props.data.body}</p>
-        <p className='item-link-text'>{ props.data.linkText && props.data.linkText.toUpperCase()}</p>
+        <a className='item-link-text'>{ props.data.linkText && props.data.linkText.toUpperCase()}</a>
       </div>
     </a>
   );
