@@ -46,9 +46,10 @@ function App(): JSX.Element {
     }, () => { getIsDayDefault(); });
 
     setTimeout(() => {
-      notifications.map((info) => toast(info.notification, {
+      notifications.map((info, i) => toast(info.notification, {
         position: 'bottom-right',
-        autoClose: 5000,
+        delay: i * 1500,
+        autoClose: 6000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
