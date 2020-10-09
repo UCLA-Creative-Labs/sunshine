@@ -16,6 +16,7 @@ function Footer(): JSX.Element {
           <a target='_blank' rel='noreferrer' href='https://www.facebook.com/uclacreatives'>FACEBOOK</a>
           <a target='_blank' rel='noreferrer' href='https://www.instagram.com/creativelabsucla/'>INSTAGRAM</a>
           <a target='_blank' rel='noreferrer' href='https://medium.com/creative-labs'>MEDIUM</a>
+          <a target='_blank' rel='noreferrer' href='https://www.youtube.com/channel/UC917WXknuSu1IMn34PdJr3Q'>YOUTUBE</a>
         </nav>
       </div>
     </div>
