@@ -1,4 +1,4 @@
 export interface Sheet {
-    notification?: string,
-    invite?: string,
+  notification?: string,
+  invite?: string,
 }

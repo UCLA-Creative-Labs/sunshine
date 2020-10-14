@@ -53,7 +53,7 @@ function App(): JSX.Element {
 
   function connect_to_sheets() {
     window.gapi.load('client', () => window.gapi.client.init({
-      apiKey: 'AIzaSyCdzmSe7AgcC3TUHKeQtOKahKYXRlmUReU',
+      apiKey: process.env.SHEETS_API_KEY,
       discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
     }).then(() => load()));
   }
