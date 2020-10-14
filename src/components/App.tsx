@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: 0 */
 import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
@@ -5,16 +6,16 @@ import {
   Route,
 } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css'
+import 'react-toastify/dist/ReactToastify.min.css';
 
 import sectionItem   from '../assets/sectionInfo.json';
+import { Sheet }     from '../utils/Utils';
+
 import Construction  from './Construction';
 import Footer        from './Footer';
 import Navbar        from './Navbar';
 import Section       from './Section';
 import Splash        from './Splash';
-
-import { Sheet }     from '../utils/Utils';
 
 import colors from './styles/_variables.scss';
 
@@ -53,16 +54,16 @@ function App(): JSX.Element {
   function connect_to_sheets() {
     window.gapi.load('client', () => window.gapi.client.init({
       apiKey: 'AIzaSyCdzmSe7AgcC3TUHKeQtOKahKYXRlmUReU',
-      discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+      discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
     }).then(() => load()));
   }
 
   function load() {
-    window.gapi.client.load("sheets", "v4", () => {
+    window.gapi.client.load('sheets', 'v4', () => {
       return window.gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: '11UPoREQxLhipshR4jXAGFuYfGen0WairLoxYvV9p1u4',
         range: 'Notifications!A:B',
-      }).then((response: any) => formatResponse(response))
+      }).then((response: any) => formatResponse(response));
     });
   }
 
@@ -71,7 +72,7 @@ function App(): JSX.Element {
     if (!values) return;
     const labels = values[0];
     setNotifications(values.slice(1).map((row: string[]) => {
-      var notif: Sheet = {};
+      const notif: Sheet = {};
       labels.map((l: string, i: number) => {
         (notif as any)[l] = row[i];
       });
