@@ -10,8 +10,8 @@ import 'react-toastify/dist/ReactToastify.min.css';
 
 import sectionItem   from '../assets/sectionInfo.json';
 import {
-  openWindow, 
-  Sheet 
+  openWindow,
+  Sheet,
 } from '../utils/Utils';
 
 import Construction  from './Construction';
