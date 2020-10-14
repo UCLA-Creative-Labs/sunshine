@@ -9,7 +9,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import sectionItem   from '../assets/sectionInfo.json';
-import { Sheet }     from '../utils/Utils';
+import {
+  openWindow, 
+  Sheet 
+} from '../utils/Utils';
 
 import Construction  from './Construction';
 import Footer        from './Footer';
@@ -86,10 +89,7 @@ function App(): JSX.Element {
       delay: i * 1500,
       autoClose: 6000,
       onClick: () => {
-        if (info.invite) {
-          const win = window.open(info.invite, '_blank');
-          if (win != null) win.focus();
-        }
+        if (info.invite) openWindow(info.invite);
       },
     }));
   }, [notifications]);
