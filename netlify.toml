@@ -1,6 +1,6 @@
 [build]
   publish = 'dist/'
-  command = 'yarn build'
+  command = 'node scripts/create-dotenv.js && yarn build'
 
 [[redirects]]
   from = '/*'
