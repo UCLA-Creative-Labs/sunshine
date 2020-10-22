@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-explicit-any: 0 */
 import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
@@ -7,8 +8,12 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import notifications from '../assets/notifications.json';
 import sectionItem   from '../assets/sectionInfo.json';
+import {
+  openWindow,
+  Sheet,
+} from '../utils/Utils';
+
 import Construction  from './Construction';
 import Footer        from './Footer';
 import Navbar        from './Navbar';
@@ -20,6 +25,7 @@ import colors from './styles/_variables.scss';
 function App(): JSX.Element {
   const [ isDay, setIsDay ] = useState(true);
   const [ mousePos, setMousePos ] = useState<number[]>([]);
+  const [ notifications, setNotifications ] = useState<Sheet[]>([]);
 
   const onMouseMove = (e: React.MouseEvent) => {
     setMousePos([ e.clientX, e.clientY ]);
@@ -45,25 +51,48 @@ function App(): JSX.Element {
         .catch(() => { getIsDayDefault(); });
     }, () => { getIsDayDefault(); });
 
-    setTimeout(() => {
-      notifications.map((info, i) => toast(info.notification, {
-        position: 'bottom-right',
-        delay: i * 1500,
-        autoClose: 6000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        onClick: () => {
-          if (info.invite) {
-            const win = window.open(info.invite, '_blank');
-            if (win != null) win.focus();
-          }
-        },
-      }));
-    }, 1000);
+    connect_to_sheets();
   }, []);
+
+  function connect_to_sheets() {
+    window.gapi.load('client', () => window.gapi.client.init({
+      apiKey: process.env.SHEETS_API_KEY,
+      discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+    }).then(() => load()));
+  }
+
+  function load() {
+    window.gapi.client.load('sheets', 'v4', () => {
+      return window.gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: '11UPoREQxLhipshR4jXAGFuYfGen0WairLoxYvV9p1u4',
+        range: 'Notifications!A:B',
+      }).then((response: any) => formatResponse(response));
+    });
+  }
+
+  function formatResponse(response: any){
+    const values = response.result.values;
+    if (!values) return;
+    const labels = values[0];
+    setNotifications(values.slice(1).map((row: string[]) => {
+      const notif: Sheet = {};
+      labels.map((l: string, i: number) => {
+        (notif as any)[l] = row[i];
+      });
+      return notif;
+    }));
+  }
+
+  useEffect(() => {
+    notifications.map((info, i) => toast(info.notification, {
+      position: 'bottom-right',
+      delay: i * 1500,
+      autoClose: 6000,
+      onClick: () => {
+        if (info.invite) openWindow(info.invite);
+      },
+    }));
+  }, [notifications]);
 
   useEffect(() => {
     // For Safari browsers
