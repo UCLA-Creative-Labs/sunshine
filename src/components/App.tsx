@@ -9,6 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import sectionItem   from '../assets/sectionInfo.json';
+import teamData from '../assets/teamInfo.json';
 import {
   openWindow,
   Sheet,
@@ -19,6 +20,7 @@ import Footer        from './Footer';
 import Navbar        from './Navbar';
 import Section       from './Section';
 import Splash        from './Splash';
+import Team          from './Team';
 
 import colors from './styles/_variables.scss';
 
@@ -124,6 +126,9 @@ function App(): JSX.Element {
           </Route>
           <Route path='/construction'>
             <Construction isDay={isDay} mousePos={mousePos} />
+          </Route>
+          <Route path='/team'>
+            <Team data={teamData} />
           </Route>
         </Switch>
         <Navbar isDay={isDay} />

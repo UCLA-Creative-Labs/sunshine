@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Lucy Huo",
+    "class": 2022,
+    "roles": ["Developer"],
+    "image": "winter.svg"
+  },
+  {
+    "name": "Bryan Pan",
+    "class": 2022,
+    "roles": ["Director", "Developer"],
+    "image": "spring.svg"
+  }
+]
