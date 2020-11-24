@@ -3,12 +3,38 @@
     "name": "Lucy Huo",
     "class": 2022,
     "roles": ["Developer"],
-    "image": "winter.svg"
+    "image": "winter.svg",
+    "link": "https://whgdk.github.io/personal-site/"
   },
   {
     "name": "Bryan Pan",
     "class": 2022,
     "roles": ["Director", "Developer"],
     "image": "spring.svg"
+  },
+  {
+    "name": "Sam Chai",
+    "class": 2022,
+    "roles": ["Director", "Designer"],
+    "image": "fall.svg"
+  },
+  {
+    "name": "Lucy Huo",
+    "class": 2022,
+    "roles": ["Developer"],
+    "image": "winter.svg",
+    "link": "https://whgdk.github.io/personal-site/"
+  },
+  {
+    "name": "Bryan Pan",
+    "class": 2022,
+    "roles": ["Director", "Developer"],
+    "image": "spring.svg"
+  },
+  {
+    "name": "Sam Chai",
+    "class": 2022,
+    "roles": ["Director", "Designer"],
+    "image": "fall.svg"
   }
 ]
