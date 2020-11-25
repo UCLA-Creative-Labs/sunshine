@@ -1,5 +1,11 @@
 @import 'variables';
 
+.__react_component_tooltip.show {
+  opacity: 1 !important;        // have to override the library styles
+  border-radius: 0;
+  padding: 8px 32px;
+}
+
 .team-page {
   margin-top: calc(#{$navbar-height});
   background-color: #fff;
@@ -41,6 +47,10 @@
 .team-card p {
   margin: 2px 0;
   font-size: 1.1rem;
+}
+
+.team-tooltip {
+  font-size: 1rem !important;   // have to override the library styles
 }
 
 .team-title {

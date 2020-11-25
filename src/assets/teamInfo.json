@@ -4,13 +4,14 @@
     "class": 2022,
     "roles": ["Developer"],
     "image": "winter.svg",
-    "link": "https://whgdk.github.io/personal-site/"
+    "link": "https://whgdk.github.io/personal-site"
   },
   {
     "name": "Bryan Pan",
     "class": 2022,
     "roles": ["Director", "Developer"],
-    "image": "spring.svg"
+    "image": "spring.svg",
+    "link": "https://bryanpan.co"
   },
   {
     "name": "Sam Chai",
@@ -19,22 +20,33 @@
     "image": "fall.svg"
   },
   {
-    "name": "Lucy Huo",
-    "class": 2022,
+    "name": "Don Le",
+    "class": 2021,
+    "roles": ["Developer", "Projects"],
+    "image": "winter.svg"
+  },
+  {
+    "name": "Arjun Raghavan",
+    "class": 2021,
     "roles": ["Developer"],
-    "image": "winter.svg",
-    "link": "https://whgdk.github.io/personal-site/"
-  },
-  {
-    "name": "Bryan Pan",
-    "class": 2022,
-    "roles": ["Director", "Developer"],
     "image": "spring.svg"
   },
   {
-    "name": "Sam Chai",
-    "class": 2022,
-    "roles": ["Director", "Designer"],
+    "name": "Jason Luna",
+    "class": 2021,
+    "roles": ["External"],
     "image": "fall.svg"
+  },
+  {
+    "name": "Joseph Clegg",
+    "class": 2021,
+    "roles": ["Developer"],
+    "image": "winter.svg"
+  },
+  {
+    "name": "Alum Ni",
+    "class": 2019,
+    "roles": ["External"]
+    // "image": "spring.svg"
   }
 ]
