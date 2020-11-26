@@ -13,6 +13,7 @@
     "eslint": "^7.6.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-react": "^7.20.5",
+    "googleapis": "^65.0.0",
     "path": "^0.12.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
