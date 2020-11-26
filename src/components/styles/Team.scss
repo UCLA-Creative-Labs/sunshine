@@ -1,0 +1,104 @@
+@import 'variables';
+
+.__react_component_tooltip.show {
+  opacity: 1 !important;        // have to override the library styles
+  border-radius: 0;
+  padding: 8px 32px;
+}
+
+.team-page {
+  margin-top: calc(#{$navbar-height});
+  background-color: #fff;
+  padding: 24px $padding-horiz;
+}
+
+.team-content {
+  display: flex;
+}
+
+.team-left {
+  width: 20vw;
+  min-width: 200px;
+  min-height: calc(100vh - #{$navbar-height} + 1px);
+  display: flex;
+  flex-direction: column;
+}
+
+.team-select {
+  width: 200px;
+  margin: 12px 0;
+}
+
+.team-cards {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 25%);
+  justify-items: end;
+}
+
+.team-card {
+  margin-bottom: 40px;
+}
+
+.team-card p {
+  margin: 2px 0;
+  font-size: 1.1rem;
+}
+
+.team-tooltip {
+  font-size: 1rem !important;   // have to override the library styles
+}
+
+.team-title {
+  margin-top: 16px;
+  margin-bottom: 4px;
+}
+
+.team-img {
+  height: 228px;
+  width: 228px;
+  object-fit: cover;
+}
+
+@media only screen and (max-width: 1300px) {
+  .team-cards {
+    grid-template-columns: repeat(3, 33.33%);
+  }
+}
+
+@media only screen and (max-width: 1060px) {
+  .team-cards {
+    grid-template-columns: repeat(2, 50%);
+  }
+}
+
+@media only screen and (max-width: 860px) {
+  .team-page {
+    padding: 24px 5%;
+  }
+
+  .team-content {
+    flex-direction: column;
+  }
+
+  .team-left {
+    min-height: 72px;
+    width: auto;
+    flex-direction: row;
+  }
+
+  .team-select {
+    margin-right: 24px;
+    margin-bottom: 48px;
+  }
+
+  .team-cards {
+    justify-items: center;
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  .team-cards {
+    grid-template-columns: repeat(1, 100%);
+  }
+}
