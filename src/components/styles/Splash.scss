@@ -3,12 +3,13 @@
 #splash {
   margin-top: calc(#{$navbar-height});
   transition: background-color $splash-transition, color $splash-transition;
+  min-height: calc(100vh - #{$splash-bottom-gap} - #{$navbar-height} + 1px);
 }
 
 #blurb {
   width: 60vw;
   position: absolute;
-  bottom: $padding-vert;
+  bottom: calc(#{$padding-vert} + #{$splash-bottom-gap});
 }
 
 #sunmoon {
@@ -16,7 +17,7 @@
   height: $sm-diam;
   position: absolute;
   right: $padding-horiz;
-  margin-top: calc(2 * #{$padding-vert});
+  margin-top: calc(2 * #{$padding-vert} - 0.5 * #{$splash-bottom-gap});
   margin-right: calc(2.5 * #{$padding-horiz});
   border-radius: 50%;
   overflow: hidden;
@@ -66,7 +67,7 @@
 
   #sunmoon {
     background-size: cover;
-    margin-top: 0;
+    margin-top: calc(-0.2 * #{$splash-bottom-gap});
     margin-right: calc(-1 * #{$padding-horiz-mobile});
     right: 0;
   }
