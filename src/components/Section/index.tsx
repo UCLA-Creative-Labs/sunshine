@@ -25,10 +25,13 @@ function Section(props: SectionProps): JSX.Element {
       <div>
         <h1>{props.title.toUpperCase()}</h1>
         <div
-          id='section-items'
+          className='section-items'
           style={{
-            columns: window.matchMedia('(max-width: 600px)').matches ? '1 auto' : `${props.data.length} auto`,
             marginBottom: 42,
+            ...(window.matchMedia('(max-width: 600px)').matches ? {
+              display: 'inline-block',
+              columns: '1 auto'
+            } : {})
           }}>
           { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
         </div>

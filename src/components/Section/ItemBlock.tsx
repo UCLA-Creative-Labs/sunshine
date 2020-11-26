@@ -11,11 +11,26 @@ interface ItemBlockProps {
 function ItemBlock(props: ItemBlockProps): JSX.Element {
   return (
     <a
-      className={props.data.linkPath && 'item-link'}
+      className={props.data.linkPath && ' item-link'}
+      style={{
+        ...(!window.matchMedia('(max-width: 600px)').matches ? {
+          flex: 1,
+          margin: '5px',
+          border: '1px solid black'
+        } : {})
+      }}
       target='_blank'
       rel='noreferrer'
       href={props.data.linkPath} >
-      <div className='item-block'>
+      <div
+        className='item-block'
+        style={{
+          ...(window.matchMedia('(max-width: 600px)').matches ? {
+            margin: '5px',
+            marginBottom: '15px',
+            border: '1px solid black'
+          } : {})
+        }}>
         <img
           className='item-img'
           src={props.data.image}

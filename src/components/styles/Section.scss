@@ -1,8 +1,18 @@
 @import 'variables';
 
+.section-items {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.item-a {
+  flex: 1;
+  margin: 5px;
+  border: 1px solid black;
+}
+
 .item-block {
-  break-inside: avoid-column;
-  page-break-inside: avoid-column; // For Firefox
+  padding: 20px;
 }
 
 .item-img {
