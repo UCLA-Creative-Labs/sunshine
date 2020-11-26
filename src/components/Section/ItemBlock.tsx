@@ -6,6 +6,7 @@ import '../styles/Section.scss';
 
 interface ItemBlockProps {
   data: SectionItem;
+  newTab?: boolean;
 }
 
 function ItemBlock(props: ItemBlockProps): JSX.Element {
@@ -19,8 +20,8 @@ function ItemBlock(props: ItemBlockProps): JSX.Element {
           border: '1px solid black',
         } : {}
       }
-      target='_blank'
-      rel='noreferrer'
+      target={props.newTab ? '_blank' : undefined}
+      rel={props.newTab ? 'noreferrer' : undefined}
       href={props.data.linkPath} >
       <div
         className='item-block'
