@@ -79,6 +79,7 @@ function Team(props: TeamProps): JSX.Element {
             value={year}
             placeholder="Year"
             options={yearOptions}
+            isSearchable={false}
             aria-label="Filter by Year"
           />
           <Select
@@ -89,6 +90,7 @@ function Team(props: TeamProps): JSX.Element {
             value={role}
             placeholder="Role"
             options={roleOptions}
+            isSearchable={false}
             aria-label="Filter by Role"
           />
         </div>
