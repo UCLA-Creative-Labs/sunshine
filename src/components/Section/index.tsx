@@ -30,8 +30,8 @@ function Section(props: SectionProps): JSX.Element {
             marginBottom: 42,
             ...(window.matchMedia('(max-width: 600px)').matches ? {
               display: 'inline-block',
-              columns: '1 auto'
-            } : {})
+              columns: '1 auto',
+            } : {}),
           }}>
           { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
         </div>
