@@ -22,14 +22,11 @@
   min-height: calc(100vh - #{$navbar-height} + 1px);
   display: flex;
   flex-direction: column;
-  // border: 1px solid dimgray;
 }
 
 .team-select {
-  // max-width: 80%;
   width: 200px;
   margin: 12px 0;
-  // font: $body-reg-font;
 }
 
 .team-cards {
@@ -40,7 +37,6 @@
 }
 
 .team-card {
-  // margin-left: 16px;
   margin-bottom: 40px;
 }
 

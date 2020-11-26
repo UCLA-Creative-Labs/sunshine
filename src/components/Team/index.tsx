@@ -45,7 +45,11 @@ function Team(props: TeamProps): JSX.Element {
   const [role, setRole] = useState({ value: 'All Roles', label: 'All Roles' });
 
   // if there's no image, use 'winter.svg'
-  props.data.forEach((data) => (data.image && data.image.indexOf('/assets/') == -1 ? (data.image = `/assets/${data.image}`) : data.image) || (data.image = '/assets/winter.svg'));
+  props.data.forEach(
+    (data) =>
+      (data.image && data.image.indexOf('/assets/') == -1
+        ? (data.image = `/assets/${data.image}`)
+        : data.image) || (data.image = '/assets/winter.svg'));
 
   let filteredData = props.data;
 
@@ -66,7 +70,7 @@ function Team(props: TeamProps): JSX.Element {
     <div className="team-page">
       <h1>THE TEAM</h1>
       <div className="team-content">
-        <form className="team-left">
+        <div className="team-left">
           <Select
             className="team-select"
             styles={selectStyles}
@@ -75,6 +79,7 @@ function Team(props: TeamProps): JSX.Element {
             value={year}
             placeholder="Year"
             options={yearOptions}
+            aria-label="Filter by Year"
           />
           <Select
             className="team-select"
@@ -84,8 +89,9 @@ function Team(props: TeamProps): JSX.Element {
             value={role}
             placeholder="Role"
             options={roleOptions}
+            aria-label="Filter by Role"
           />
-        </form>
+        </div>
         <div className="team-cards">
           {filteredData.length
             ? filteredData.map((person) => (
