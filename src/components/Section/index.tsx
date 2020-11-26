@@ -30,7 +30,11 @@ function Section(props: SectionProps): JSX.Element {
             columns: window.matchMedia('(max-width: 600px)').matches ? '1 auto' : `${props.data.length} auto`,
             marginBottom: 42,
           }}>
-          { props.data.map(data => <ItemBlock data={data} key={data.title} />) }
+          { props.data.map(data =>
+            <ItemBlock
+              data={data}
+              key={data.title}
+              newTab={data.linkPath != undefined && !data.linkPath.startsWith('/')} />) }
         </div>
         <a className='section-link-text' target='_blank' rel='noreferrer' href={props.linkPath} >
           {props.linkText && props.linkText.toUpperCase()}
