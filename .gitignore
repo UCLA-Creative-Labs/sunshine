@@ -15,3 +15,4 @@ dist/
 
 # Never commit environment variables
 .env
+.export
