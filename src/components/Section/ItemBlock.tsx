@@ -6,14 +6,15 @@ import '../styles/Section.scss';
 
 interface ItemBlockProps {
   data: SectionItem;
+  newTab?: boolean;
 }
 
 function ItemBlock(props: ItemBlockProps): JSX.Element {
   return (
     <a
       className={props.data.linkPath && 'item-link'}
-      target='_blank'
-      rel='noreferrer'
+      target={props.newTab ? '_blank' : undefined}
+      rel={props.newTab ? 'noreferrer' : undefined}
       href={props.data.linkPath} >
       <div className='item-block'>
         <img
