@@ -5,7 +5,7 @@ import TeamCard from './TeamCard';
 
 interface Person {
   name: string;
-  class: number;
+  class: string;
   roles: string[];
   image?: string;
 }
@@ -55,10 +55,10 @@ function Team(props: TeamProps): JSX.Element {
 
   if (year.value !== 'All Years') {
     if (year.value === 'Alumni') {
-      filteredData = filteredData.filter((person) => person.class <= currYear);
+      filteredData = filteredData.filter((person) => +person.class <= currYear);
     }
     else {
-      filteredData = filteredData.filter((person) => person.class === year.value);
+      filteredData = filteredData.filter((person) => +person.class === +year.value);
     }
   }
 
