@@ -7,6 +7,11 @@
   padding: 24px $padding-horiz;
 }
 
+.join-page > * {
+ max-width: $max-section-width;
+ margin: 0 auto;
+}
+
 // should also be part of a body text component refactor
 // don't forget the media query at the bottom for this
 .join-body {
