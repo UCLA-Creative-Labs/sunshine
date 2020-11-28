@@ -13,6 +13,7 @@ interface SectionItem {
 interface SectionProps {
   title: string;
   data: SectionItem[];
+  body?: string;
   linkText?: string;
   linkPath?: string;
 }
@@ -24,6 +25,7 @@ function Section(props: SectionProps): JSX.Element {
     <div className='section' id={props.title.toLowerCase()}>
       <div>
         <h1>{props.title.toUpperCase()}</h1>
+        {props.body && <p className='item-body'>{props.body}</p>}
         <div
           className='section-items'
           style={{
