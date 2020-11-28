@@ -10,24 +10,28 @@ function Page(): JSX.Element {
       <div>
         <h1>{joinItem.title_1}</h1>
         <p className="join-body">{joinItem.body_1}</p>
+        <a className="section-link-text" href="#roles">
+          VIEW ROLES ➔
+        </a>
       </div>
       <div>
         <h1>{joinItem.title_2}</h1>
         <p className="join-body">{joinItem.body_2}</p>
         <div className="indented join-body">
           <p>
-            (1) <strong>Workshops:</strong> Anyone can attend workshops! We teach a variety of
-            topics from basic design skills to illustration.
+            (1) <strong>Workshops:</strong> Anyone can attend workshops! We
+            teach a variety of topics from basic design skills to illustration.
           </p>
           <p>
-            (2) <strong>Events:</strong> Anyone can attend events! Famous professionals drop by
-            to talk about their passions and companies come with recruitment
-            opportunities.
+            (2) <strong>Events:</strong> Anyone can attend events! Famous
+            professionals drop by to talk about their passions and companies
+            come with recruitment opportunities.
           </p>
           <p>
-            (3) <strong>Projects:</strong> Students must apply to projects as either a Lead or
-            Member. Together, everyone will work to complete a project by the
-            end of the quarter. To find out more about our projects, visit our{' '}
+            (3) <strong>Projects:</strong> Students must apply to projects as
+            either a Lead or Member. Together, everyone will work to complete a
+            project by the end of the quarter. To find out more about our
+            projects, visit our{' '}
             <a
               target="_blank"
               rel="noreferrer"
@@ -40,7 +44,7 @@ function Page(): JSX.Element {
           </p>
         </div>
       </div>
-      <div className="join-roles">
+      <div id="roles" className="join-roles">
         <h1>Roles</h1>
         <div className="role-cards">
           {joinItem.roles.map((role) => (
