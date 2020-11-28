@@ -50,7 +50,7 @@ function Page(): JSX.Element {
           {joinItem.roles.map((role) => (
             <div key={role.title} className="role-card">
               <div className="role-img-container">
-                <img className="role-img" src={'/assets/' + role.image} />
+                <img className="role-img" src={'/assets/' + role.image} alt={role.image}/>
               </div>
               <h3>{role.title}</h3>
               <h4>{role.subtitle}</h4>
