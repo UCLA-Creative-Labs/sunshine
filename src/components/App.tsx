@@ -16,6 +16,7 @@ import { openWindow } from '../utils/Utils';
 
 import Construction  from './Construction';
 import Footer        from './Footer';
+import Join          from './Join';
 import Navbar        from './Navbar';
 import Section       from './Section';
 import Splash        from './Splash';
@@ -92,6 +93,9 @@ function App(): JSX.Element {
                 linkPath={'https://bloom.creativelabsucla.com/'}
                 linkText={'Bloom with Us ➔'} />
             </div>
+          </Route>
+          <Route path='/join'>
+            <Join />
           </Route>
           <Route path='/construction'>
             <Construction isDay={isDay} mousePos={mousePos} />
