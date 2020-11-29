@@ -31,6 +31,7 @@
   margin-right: 5%;
   margin-left: auto;
   color: map-get($colors, footerText);
+  overflow: hidden;
 }
 
 #footer-nav a {
