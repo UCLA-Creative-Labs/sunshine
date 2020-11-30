@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
-
 import TeamCard from './TeamCard';
-
-interface Person {
-  name: string;
-  class: string;
-  roles: string[];
-  image?: string;
-}
+import {Person} from '../../utils/Utils';
 
 interface TeamProps {
   data: Person[];
@@ -44,14 +37,7 @@ function Team(props: TeamProps): JSX.Element {
   const [year, setYear] = useState({ value: 'All Years', label: 'All Years' });
   const [role, setRole] = useState({ value: 'All Roles', label: 'All Roles' });
 
-  // if there's no image, use 'winter.svg'
-  props.data.forEach(
-    (data) =>
-      (data.image && data.image.indexOf('/assets/') == -1
-        ? (data.image = `/assets/${data.image}`)
-        : data.image) || (data.image = '/assets/winter.svg'));
-
-  let filteredData = props.data;
+  let filteredData = props.data.filter((person) => person.class && person.name && person.roles);
 
   if (year.value !== 'All Years') {
     if (year.value === 'Alumni') {
