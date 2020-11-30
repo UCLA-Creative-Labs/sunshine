@@ -7,11 +7,10 @@ const { info } = require('console');
 /* Write .env file */
 function env() {
   process.stdout.write('Writing to dotenv file .. ');
-  fs.writeFileSync(path.resolve(__dirname, '../.env'),
-    `SHEETS_API_KEY=${process.env.SHEETS_API_KEY}
-     CONTENTFUL_ACCESS_TOKEN=${process.env.CONTENTFUL_ACCESS_TOKEN}
-     SPACE_ID=${process.env.SPACE_ID}`
-  );
+  const sheets = `SHEETS_API_KEY=${process.env.SHEETS_API_KEY}`;
+  const token = `CONTENTFUL_ACCESS_TOKEN=${process.env.CONTENTFUL_ACCESS_TOKEN}`;
+  const id = `SPACE_ID=${process.env.SPACE_ID}`;
+  fs.writeFileSync(path.resolve(__dirname, '../.env'), `${sheets}\n${token}\n${id}`);
   process.stdout.write('done\n');
 }
 
