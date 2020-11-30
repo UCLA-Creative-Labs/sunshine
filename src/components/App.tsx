@@ -60,24 +60,23 @@ function App(): JSX.Element {
         if (info.invite) openWindow(info.invite);
       },
     }));
-  
-    window.fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
+
+    void window.fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`, 
+        Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({query}),
-    })
-    .then((res) => res.json())
-    .then(({data, error}) => {
-      if (error) console.error(error)
-      setTeam(data['teamMembersCollection']['items'].map((data: any) => {
-        data.image = data?.photo?.url ?? '/assets/winter.svg';
-        data.link = data.website ? data.website : data.instagram
-        return data;
-      }));
-    })
+    }).then((res) => res.json())
+      .then(({data, error}) => {
+        if (error) return;
+        setTeam(data.teamMembersCollection.items.map((person: any) => {
+          person.image = person?.photo?.url ?? '/assets/winter.svg';
+          person.link = person.website ? person.website : person.instagram;
+          return person;
+        }));
+      });
   }, []);
 
   useEffect(() => {
