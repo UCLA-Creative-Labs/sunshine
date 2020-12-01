@@ -10,7 +10,8 @@ interface TeamProps {
 const roles = ['All Roles', 'Designer', 'Developer', 'Director', 'External', 'Projects'];
 const roleOptions = roles.map(item => ({ value: item, label: item }));
 
-const currYear = new Date().getFullYear();
+// Set June to be the cut off day for the start of a new year
+const currYear = Math.floor(new Date().getFullYear() + ((new Date().getMonth() - 5 ) / 12));
 const yearOptions = ['All Years', currYear + 1, currYear + 2, currYear + 3, currYear + 4, 'Alumni'].map(item => ({ value: item, label: item }));
 
 const selectStyles = {
