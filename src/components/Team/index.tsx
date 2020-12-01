@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import TeamCard from './TeamCard';
-import {Person} from '../../utils/Utils';
+import {Person, roles_index} from '../../utils/Utils';
 
 interface TeamProps {
   data: Person[];
@@ -39,6 +39,15 @@ function Team(props: TeamProps): JSX.Element {
 
   let filteredData = props.data.filter((person) => person.class && person.name && person.roles);
 
+  filteredData.forEach(person =>
+    person.roles.sort((a, b) => roles_index.indexOf(a) - roles_index.indexOf(b)));
+
+  filteredData.sort((a, b) => {
+    const min_a = Math.min(...a.roles.map((r) => roles_index.indexOf(r)));
+    const min_b = Math.min(...b.roles.map((r) => roles_index.indexOf(r)));
+    return min_a - min_b || (a.name < b.name ? -1 : 1);
+  });
+
   if (year.value !== 'All Years') {
     if (year.value === 'Alumni') {
       filteredData = filteredData.filter((person) => +person.class <= currYear);
@@ -49,7 +58,8 @@ function Team(props: TeamProps): JSX.Element {
   }
 
   if (role.value !== 'All Roles') {
-    filteredData = filteredData.filter((person) => person.roles.includes(role.value));
+    filteredData = filteredData.filter((person) =>
+      person.roles.some((r) => r === role.value || r.includes(role.value)));
   }
 
   return (
