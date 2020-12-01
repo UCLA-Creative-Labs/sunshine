@@ -1,15 +1,8 @@
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
+import { Person } from '../../utils/Utils';
 import '../styles/Team.scss';
-
-interface Person {
-  name: string;
-  class: number;
-  roles: string[];
-  image?: string;
-  link?: string;
-}
 
 interface TeamCardProps {
   data: Person;

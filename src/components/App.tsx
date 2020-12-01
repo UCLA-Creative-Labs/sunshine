@@ -10,9 +10,8 @@ import 'react-toastify/dist/ReactToastify.min.css';
 
 import notifications from '../assets/notifications.json';
 import sectionItem   from '../assets/sectionInfo.json';
-import teamData from '../assets/teamInfo.json';
 
-import { openWindow } from '../utils/Utils';
+import { openWindow, Person, query } from '../utils/Utils';
 
 import Construction  from './Construction';
 import Footer        from './Footer';
@@ -27,6 +26,7 @@ import colors from './styles/_variables.scss';
 function App(): JSX.Element {
   const [ isDay, setIsDay ] = useState(true);
   const [ mousePos, setMousePos ] = useState<number[]>([]);
+  const [team, setTeam] = useState<Person[]>([]);
 
   const onMouseMove = (e: React.MouseEvent) => {
     setMousePos([ e.clientX, e.clientY ]);
@@ -60,6 +60,22 @@ function App(): JSX.Element {
         if (info.invite) openWindow(info.invite);
       },
     }));
+    void window.fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
+      },
+      body: JSON.stringify({query}),
+    }).then((res) => res.json())
+      .then(({data, error}) => {
+        if (error) return;
+        setTeam(data.teamMembersCollection.items.map((person: any) => {
+          person.image = person?.photo?.url ?? '/assets/winter.svg';
+          person.link = person.website ?? person.github ?? person.instagram;
+          return person;
+        }));
+      });
   }, []);
 
   useEffect(() => {
@@ -101,7 +117,7 @@ function App(): JSX.Element {
             <Construction isDay={isDay} mousePos={mousePos} />
           </Route>
           <Route path='/team'>
-            <Team data={teamData} />
+            <Team data={team} />
           </Route>
         </Switch>
         <Navbar isDay={isDay} />

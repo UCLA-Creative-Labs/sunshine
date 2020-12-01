@@ -100,7 +100,7 @@ function Navbar(props: NavbarProps): JSX.Element {
    */
   const scrollToElement = (el: HTMLElement) => {
     if (location.pathname !== '/') {
-      history.push('/');
+      window.location.href = '/';
     }
     const navbar = document.getElementById('navbar');
     const navbarHeight = navbar?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
