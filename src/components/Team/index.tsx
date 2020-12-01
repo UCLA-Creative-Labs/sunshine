@@ -41,10 +41,18 @@ function Team(props: TeamProps): JSX.Element {
 
   filteredData.forEach(person =>
     person.roles.sort((a, b) => roles_index.indexOf(a) - roles_index.indexOf(b)));
-
+  
+  filteredData = filteredData.filter((person) => person.class >= currYear)
+  
   filteredData.sort((a, b) => {
+    const isAlumni_a = a.class == currYear;
+    const isAlumni_b = b.class == currYear;
+    if (+isAlumni_a ^ +isAlumni_b && isAlumni_b) return -1;
+    if (+isAlumni_a ^ +isAlumni_b && isAlumni_a) return 1;
+
     const min_a = Math.min(...a.roles.map((r) => roles_index.indexOf(r)));
     const min_b = Math.min(...b.roles.map((r) => roles_index.indexOf(r)));
+
     return min_a - min_b || (a.name < b.name ? -1 : 1);
   });
 
