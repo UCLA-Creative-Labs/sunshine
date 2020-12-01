@@ -60,12 +60,11 @@ function App(): JSX.Element {
         if (info.invite) openWindow(info.invite);
       },
     }));
-    console.log(process.env)
     void window.fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        "Authorization": `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
+        'Authorization': `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({query}),
     }).then((res) => res.json())
