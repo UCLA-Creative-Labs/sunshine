@@ -26,6 +26,7 @@ export const query = `{
         url
       }
       website
+      github
       instagram
     }
   }

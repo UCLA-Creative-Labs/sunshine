@@ -72,7 +72,7 @@ function App(): JSX.Element {
         if (error) return;
         setTeam(data.teamMembersCollection.items.map((person: any) => {
           person.image = person?.photo?.url ?? '/assets/winter.svg';
-          person.link = person.website ? person.website : person.instagram;
+          person.link = person.website ?? person.github ?? person.instagram;
           return person;
         }));
       });
