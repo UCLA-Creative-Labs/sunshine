@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import Select from 'react-select';
-import TeamCard from './TeamCard';
 import {Person, roles_index} from '../../utils/Utils';
+import TeamCard from './TeamCard';
 
 interface TeamProps {
   data: Person[];
@@ -15,20 +15,20 @@ const currYear = Math.floor(new Date().getFullYear() + ((new Date().getMonth() -
 const yearOptions = ['All Years', currYear + 1, currYear + 2, currYear + 3, currYear + 4, 'Alumni'].map(item => ({ value: item, label: item }));
 
 const selectStyles = {
-  control: (provided, _) => ({
+  control: (provided: CSSProperties, _) => ({
     ...provided,
     borderRadius: '0',
     padding: '8px 4px 8px 8px',
   }),
-  menu: (provided, _) => ({
+  menu: (provided: CSSProperties, _) => ({
     ...provided,
     borderRadius: '0',
   }),
-  dropdownIndicator: (provided, _) => ({
+  dropdownIndicator: (provided: CSSProperties, _) => ({
     ...provided,
     color: 'black',
   }),
-  indicatorSeparator: (provided, _) => ({
+  indicatorSeparator: (provided: CSSProperties, _) => ({
     ...provided,
     display: 'none',
   }),
