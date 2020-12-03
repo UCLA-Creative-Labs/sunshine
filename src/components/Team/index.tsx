@@ -15,20 +15,20 @@ const currYear = Math.floor(new Date().getFullYear() + ((new Date().getMonth() -
 const yearOptions = ['All Years', currYear + 1, currYear + 2, currYear + 3, currYear + 4, 'Alumni'].map(item => ({ value: item, label: item }));
 
 const selectStyles = {
-  control: (provided: CSSProperties[], _) => ({
+  control: (provided: CSSProperties, _) => ({
     ...provided,
     borderRadius: '0',
     padding: '8px 4px 8px 8px',
   }),
-  menu: (provided: CSSProperties[], _) => ({
+  menu: (provided: CSSProperties, _) => ({
     ...provided,
     borderRadius: '0',
   }),
-  dropdownIndicator: (provided: CSSProperties[], _) => ({
+  dropdownIndicator: (provided: CSSProperties, _) => ({
     ...provided,
     color: 'black',
   }),
-  indicatorSeparator: (provided: CSSProperties[], _) => ({
+  indicatorSeparator: (provided: CSSProperties, _) => ({
     ...provided,
     display: 'none',
   }),
