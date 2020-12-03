@@ -113,7 +113,7 @@ function Navbar(props: NavbarProps): JSX.Element {
 
   return (
     <div id={'navbar'} ref={navbarRef}>
-      <h3 id={'title'} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0], 'home')}>
+      <h3 id={'title'} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0])}>
         <div id={'logo'} ref={logoRef} />
         CREATIVE LABS
       </h3>
