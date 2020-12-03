@@ -33,6 +33,11 @@ module.exports = {
 
     '@typescript-eslint/no-require-imports': [ 'error' ],
 
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: '^_' }
+    ],
+
     // 2 space indentation
     '@typescript-eslint/indent': [ 'error', 2 ],
 
@@ -57,7 +62,7 @@ module.exports = {
     // Require an ordering on all imports
     'import/order': ['warn', {
       groups: ['builtin', 'external'],
-      alphabetize: { order: 'asc', caseInsensitive: true },
+      alphabetize: { order: 'asc' },
     }],
 
     // Cannot import from the same module twice
