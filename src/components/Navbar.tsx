@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation} from 'react-router-dom';
 
 import colors from './styles/_variables.scss';
 import './styles/Navbar.scss';
@@ -12,19 +12,18 @@ function Navbar(props: NavbarProps): JSX.Element {
   const [ scrollTop, setScrollTop ] = useState<number>(0);
   const [ sectionScrollStates, setSectionScrollStates ]
     = useState<boolean[]>([ true, false, false, false ]);
-  const history = useHistory();
   const location = useLocation();
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
-  const sectionsRef = useRef<HTMLElement[]>([]);
+  const sectionsRef = useRef<(HTMLElement | null)[]>([]);
 
-  const isElementInView = (el: HTMLElement): boolean => {
+  const isElementInView = (el: HTMLElement | null): boolean => {
+    if (!el) return false;
     const rect: DOMRect = el.getBoundingClientRect();
-
     return (rect.top >= 0 && rect.top <= window.innerHeight * 0.4)
-    || (rect.bottom <= window.innerHeight && rect.bottom >= window.innerHeight * 0.4);
+      || (rect.bottom <= window.innerHeight && rect.bottom >= window.innerHeight * 0.4);
   };
 
   const toNightStyle = () => {
@@ -56,10 +55,10 @@ function Navbar(props: NavbarProps): JSX.Element {
   useEffect(() => {
     // default to body if the element can't be found
     sectionsRef.current = [
-      document.getElementById('splash') || document.body,
-      document.getElementById('about') || document.body,
-      document.getElementById('projects') || document.body,
-      document.getElementById('fellowship') || document.body,
+      document.getElementById('splash'),
+      document.getElementById('about'),
+      document.getElementById('projects'),
+      document.getElementById('fellowship'),
     ];
   }, []);
 
@@ -98,10 +97,11 @@ function Navbar(props: NavbarProps): JSX.Element {
    *
    * @param el the section element to scroll to
    */
-  const scrollToElement = (el: HTMLElement) => {
+  const scrollToElement = (el: HTMLElement | null) => {
     if (location.pathname !== '/') {
       window.location.href = '/';
     }
+    if (!el) return;
     const navbar = document.getElementById('navbar');
     const navbarHeight = navbar?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
     window.scrollBy({
@@ -113,7 +113,7 @@ function Navbar(props: NavbarProps): JSX.Element {
 
   return (
     <div id={'navbar'} ref={navbarRef}>
-      <h3 id={'title'} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0])}>
+      <h3 id={'title'} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0], 'home')}>
         <div id={'logo'} ref={logoRef} />
         CREATIVE LABS
       </h3>
