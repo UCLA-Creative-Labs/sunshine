@@ -1,6 +1,6 @@
 # Creative Labs Website
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](code_of_conduct.md)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/5cefdb30-4f2d-44d7-96ec-e9cf2fcdb961/deploy-status)](https://app.netlify.com/sites/creative-labs-new-website/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/012ef078-61ea-4d5e-988e-aa24b5428c9d/deploy-status)](https://app.netlify.com/sites/cl-official/deploys)
 [![Mergify Status][mergify-status]][mergify]
 
 [mergify]: https://mergify.io
