@@ -101,13 +101,6 @@ function App(): JSX.Element {
                       ' Below are some projects that were created in the past quarters.'}
                 linkPath={'https://medium.com/creative-labs'}
                 linkText={'View all projects on Medium ➔'} />
-              <Section
-                title={'Fellowship'}
-                data={sectionItem.fellowship}
-                body={'We\'ve teamed up with other clubs at UCLA to bring you classes that teach' +
-                      ' you how to create your own web project from start to finish.'}
-                linkPath={'https://bloom.creativelabsucla.com/'}
-                linkText={'Bloom with Us ➔'} />
             </div>
           </Route>
           <Route path='/join'>

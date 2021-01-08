@@ -58,7 +58,6 @@ function Navbar(props: NavbarProps): JSX.Element {
       document.getElementById('splash'),
       document.getElementById('about'),
       document.getElementById('projects'),
-      document.getElementById('fellowship'),
     ];
   }, []);
 
@@ -133,11 +132,6 @@ function Navbar(props: NavbarProps): JSX.Element {
             onClick={() => scrollToElement(sectionsRef.current[2])}
             style={{ fontWeight: sectionScrollStates[2] ? 700 : 400 }}>
             PROJECTS
-          </a>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[3])}
-            style={{ fontWeight: sectionScrollStates[3] ? 700 : 400 }}>
-            FELLOWSHIP
           </a>
         </nav>
       </div>

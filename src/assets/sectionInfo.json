@@ -33,19 +33,5 @@
       "body": "Start the new school year by joining one of our brand new projects.",
       "linkPath": "https://dinner.creativelabsucla.com/"
     }
-  ],
-  "fellowship": [
-    {
-      "image": "design-fellow.svg",
-      "title": "Design",
-      "body": "Learn best practices in UI/UX and make fresh designs & layouts developers will be able to make reality.",
-      "linkPath": "https://bloom.creativelabsucla.com/track/design"
-    },
-    {
-      "image": "develop-fellow.svg",
-      "title": "Develop",
-      "body": "Learn how to turn beautiful prototypes and specs into web pages with all the essential tools needed for web dev.",
-      "linkPath": "https://bloom.creativelabsucla.com/track/development"
-    }
   ]
 }
