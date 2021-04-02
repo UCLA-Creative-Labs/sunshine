@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 import styles from '../../styles/Splash.module.scss';
+import { _DOMRect } from '../../utils';
 
 interface SunMoonProps {
   isDay: boolean;
@@ -10,8 +11,8 @@ interface SunMoonProps {
 function SunMoon(props: SunMoonProps): JSX.Element {
   const bg = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
-  const bgRect = useRef<DOMRect>(null);
-  const faceRect = useRef<DOMRect>(null);
+  const bgRect = useRef<DOMRect>(new _DOMRect());
+  const faceRect = useRef<DOMRect>(new _DOMRect());
   const radius = useRef<number>(0);
 
   useEffect(() => {

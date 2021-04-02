@@ -1,9 +1,10 @@
+import { GetStaticProps } from 'next';
 import React, { CSSProperties, useState } from 'react';
 import Select from 'react-select';
-import {Person, roles_index, fetchTeam} from '../utils';
+import Layout from '../components/Layout';
 import TeamCard from '../components/TeamCard';
 import styles from '../styles/Team.module.scss';
-import Layout from '../components/Layout';
+import {Person, roles_index, fetchTeam} from '../utils';
 
 interface TeamProps {
   data: Person[];
@@ -120,7 +121,7 @@ function Team(props: TeamProps): JSX.Element {
   );
 }
 
-export const getStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const res = await fetchTeam();
   const data = res?.map((person: any) => {
     person.image = person?.photo?.url ?? '/assets/winter.svg';
@@ -129,7 +130,7 @@ export const getStaticProps = async () => {
   });
   return {
     props: {data},
-  }
-}
+  };
+};
 
 export default Team;

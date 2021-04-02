@@ -1,3 +1,11 @@
+export interface Person {
+  name: string;
+  class: number;
+  roles: string[];
+  image?: string;
+  link?: string;
+}
+
 export const query = `{
   teamMembersCollection {
     items {
@@ -14,7 +22,7 @@ export const query = `{
   }
 }`;
 
-export const fetchTeam = async () => {
+export const fetchTeam = async (): Promise<any[] | undefined> => {
   const res = await fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
     method: 'POST',
     headers: {
@@ -25,4 +33,4 @@ export const fetchTeam = async () => {
   });
   const {data} = await res.json();
   return data?.teamMembersCollection?.items ?? [];
-}
+};

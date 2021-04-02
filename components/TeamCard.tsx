@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
 
-import { Person } from '../utils';
 import styles from '../styles/Team.module.scss';
+import { Person } from '../utils';
 
 interface TeamCardProps {
   data: Person;

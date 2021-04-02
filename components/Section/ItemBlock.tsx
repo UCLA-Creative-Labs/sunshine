@@ -14,23 +14,14 @@ function ItemBlock(props: ItemBlockProps): JSX.Element {
     <a
       className={[props.data.linkPath, styles['item-link']].join(' ')}
       style={{
-          flex: 1,
-          margin: '5px',
-          border: '1px solid black',
-        }}
+        flex: 1,
+        margin: '5px',
+        border: '1px solid black',
+      }}
       target={props.newTab ? '_blank' : undefined}
-      rel={props.newTab ? 'noreferrer' : undefined}
+      rel={'noreferrer'}
       href={props.data.linkPath} >
-      <div
-        className={styles['item-block']}
-        // style={
-        //   window.matchMedia('(max-width: 600px)').matches ? {
-            // margin: '5px',
-            // marginBottom: '15px',
-            // border: '1px solid black',
-        //   } : {}
-        //  }}>
-        >
+      <div className={styles['item-block']}>
         <img
           className={styles['item-img']}
           src={props.data.image}

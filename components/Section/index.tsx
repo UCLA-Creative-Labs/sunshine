@@ -1,7 +1,7 @@
 import React from 'react';
 
-import ItemBlock from './ItemBlock';
 import styles from '../../styles/Section.module.scss';
+import ItemBlock from './ItemBlock';
 
 export interface SectionItem {
   image: string;
@@ -20,22 +20,13 @@ interface SectionProps {
 }
 
 function Section(props: SectionProps): JSX.Element {
-  const { data } = props;
   return (
     <div className={'section'} id={props.title.toLowerCase()}>
       <div>
         <h1>{props.title.toUpperCase()}</h1>
         {props.body && <p className='item-body'>{props.body}</p>}
-        <div
-          className={styles['section-items']}
-          style={{
-            marginBottom: 42,
-            // ...(window.matchMedia('(max-width: 600px)').matches ? {
-              // display: 'inline-block',
-              // columns: '1 auto',
-            // } : {}),
-          }}>
-          { data.map(data =>
+        <div className={styles['section-items']}>
+          {props.data.map(data =>
             <ItemBlock
               data={data}
               key={data.title}

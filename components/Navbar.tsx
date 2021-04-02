@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
 import {useRouter} from 'next/router';
+import React, { useState, useEffect, useRef } from 'react';
 
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Navbar.module.scss';
-import {splash} from '../styles/Splash.module.scss';
+import splash from '../styles/Splash.module.scss';
 
 interface NavbarProps {
   isDay: boolean;
@@ -54,10 +54,9 @@ function Navbar(props: NavbarProps): JSX.Element {
   };
 
   useEffect(() => {
-    console.log(splash);
     // default to body if the element can't be found
     sectionsRef.current = [
-      document.getElementById(splash),
+      document.getElementById(splash.splash),
       document.getElementById('about'),
       document.getElementById('projects'),
     ];
@@ -100,7 +99,7 @@ function Navbar(props: NavbarProps): JSX.Element {
    */
   const scrollToElement = (el: HTMLElement | null) => {
     if (router.pathname !== '/') {
-      router.push('/');
+      void router.push('/');
     }
     if (!el) return;
     const navbarHeight = navbarRef.current?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;

@@ -1,22 +1,36 @@
-export interface Sheet {
-  notification?: string,
-  invite?: string,
-}
-
-export interface Person {
-  name: string;
-  class: number;
-  roles: string[];
-  image?: string;
-  link?: string;
-}
-
 export const roles_index = [
   'Executive Director', 'Design Director', 'External Director',
   'Projects Director', 'Tech Director', 'Designer', 'Developer',
-  'External', 'Projects'];
+  'External', 'Projects',
+];
 
 export function openWindow(url: string): void{
   const win = window.open(url, '_blank');
   if (win != null) win.focus();
+}
+
+export class _DOMRect {
+  public readonly x: number;
+  public readonly y: number;
+  public readonly top: number;
+  public readonly right: number;
+  public readonly bottom: number;
+  public readonly left: number;
+  public readonly width: number;
+  public readonly height: number;
+
+  public constructor(){
+    this.x = 0;
+    this.y = 0;
+    this.top = 0;
+    this.right = 0;
+    this.bottom = 0;
+    this.left = 0;
+    this.width = 0;
+    this.height = 0;
+  }
+
+  public toJSON(): string  {
+    return JSON.stringify(this);
+  }
 }

@@ -2,7 +2,7 @@
 
 .section-items {
   display: flex;
-  margin-bottom: 15px;
+  margin-bottom: 42px,
 }
 
 .item-a {
@@ -69,5 +69,13 @@
   .item-block {
     padding-top: $padding-vert-mobile;
     padding-bottom: $padding-vert-mobile;
+    margin: 5px;
+    margin-bottom: 15px;
+    border: 1px solid black;
+  }
+
+  .section-items {
+    display: inline-block;
+    columns: 1 auto;
   }
 }
