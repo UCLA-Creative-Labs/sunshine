@@ -1,0 +1,73 @@
+@use 'variables.module' as *;
+
+.section-items {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.item-a {
+  flex: 1;
+  margin: 5px;
+  border: 1px solid black;
+}
+
+.item-block {
+  padding: 20px;
+}
+
+.item-img {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-height: 324;
+  user-select: none;
+  pointer-events: none;
+  transition: box-shadow 0.1s;
+}
+
+.item-link:hover .item-img {
+  box-shadow: $hover-shadow;
+}
+
+.section-link-text,
+.item-link-text {
+  position: relative;
+}
+
+.section-link-text:hover,
+.item-link:hover .item-link-text {
+  text-decoration: none;
+  right: 0;
+}
+
+.section-link-text::after,
+.item-link-text::after {
+  border-radius: 1em;
+  border-top: 0.1em solid;
+  content: "";
+  position: absolute;
+  right: 100%;
+  bottom: -0.05em;
+  left: 0;
+  transition: right 0.4s cubic-bezier(0, 0.5, 0, 1);
+}
+
+.section-link-text:hover::after,
+.item-link:hover .item-link-text::after {
+  right: 0;
+}
+
+.item-title {
+  margin-bottom: $heading-margin-bottom;
+}
+
+.item-body {
+  margin-top: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .item-block {
+    padding-top: $padding-vert-mobile;
+    padding-bottom: $padding-vert-mobile;
+  }
+}

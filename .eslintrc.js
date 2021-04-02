@@ -23,11 +23,6 @@ module.exports = {
     'react',
     '@typescript-eslint',
   ],
-  settings: {
-    react: {
-      version: 'detect',
-    }
-  },
   rules: {
     'linebreak-style': [ 'error', 'unix' ],
 
@@ -62,7 +57,7 @@ module.exports = {
     // Require an ordering on all imports
     'import/order': ['warn', {
       groups: ['builtin', 'external'],
-      alphabetize: { order: 'asc' },
+      alphabetize: { order: 'asc', caseInsensitive: true },
     }],
 
     // Cannot import from the same module twice
