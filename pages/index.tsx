@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import Section from '../components/Section';
 import Splash from '../components/Splash';
 import sectionItem   from '../public/sectionInfo.json';
 
 import colors from '../styles/_variables.module.scss';
+import { AppContext } from './_app';
 
 export default function Home(): JSX.Element {
-  const [ isDay, setIsDay ] = useState(true);
+  const {isDay} = useContext(AppContext);
   const [ mousePos, setMousePos ] = useState<number[]>([]);
   const onMouseMove = (e: React.MouseEvent) => {
     setMousePos([ e.clientX, e.clientY ]);
@@ -22,7 +23,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout>
       <div style={{ margin: 0, padding: 0 }} onMouseMove={onMouseMove}>
-        <Splash isDay={isDay} mousePos={mousePos} />
+        <Splash mousePos={mousePos} />
         <Section
           title={'About'}
           data={sectionItem.about} />

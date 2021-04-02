@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React from 'react';
 import Footer from './Footer';
 import Navbar from './Navbar';
 
@@ -8,8 +8,6 @@ interface LayoutProps {
 }
 
 function Layout(props: LayoutProps): JSX.Element {
-  const [ isDay, setIsDay ] = useState(true);
-
   return (
     <>
       <Head>
@@ -32,7 +30,7 @@ function Layout(props: LayoutProps): JSX.Element {
         <title>Creative Labs</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Navbar isDay={isDay}/>
+      <Navbar />
       <main>
         {props.children}
       </main>

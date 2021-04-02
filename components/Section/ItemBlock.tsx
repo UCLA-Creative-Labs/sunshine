@@ -10,6 +10,10 @@ interface ItemBlockProps {
 }
 
 function ItemBlock(props: ItemBlockProps): JSX.Element {
+  const newTab = props.newTab ? {
+    target: '_blank',
+    rel: 'noreferrer',
+  } : {};
   return (
     <a
       className={[props.data.linkPath, styles['item-link']].join(' ')}
@@ -18,8 +22,7 @@ function ItemBlock(props: ItemBlockProps): JSX.Element {
         margin: '5px',
         border: '1px solid black',
       }}
-      target={props.newTab ? '_blank' : undefined}
-      rel={'noreferrer'}
+      {...newTab}
       href={props.data.linkPath} >
       <div className={styles['item-block']}>
         <img

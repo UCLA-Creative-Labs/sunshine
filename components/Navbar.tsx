@@ -1,15 +1,13 @@
 import {useRouter} from 'next/router';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 
+import { AppContext } from '../pages/_app';
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Navbar.module.scss';
 import splash from '../styles/Splash.module.scss';
 
-interface NavbarProps {
-  isDay: boolean;
-}
-
-function Navbar(props: NavbarProps): JSX.Element {
+function Navbar(): JSX.Element {
+  const {isDay} = useContext(AppContext);
   const [ scrollTop, setScrollTop ] = useState<number>(0);
   const [ sectionScrollStates, setSectionScrollStates ]
     = useState<boolean[]>([ true, false, false, false ]);
@@ -63,13 +61,13 @@ function Navbar(props: NavbarProps): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (!props.isDay) toNightStyle();
-  }, [ props.isDay ]);
+    if (!isDay) toNightStyle();
+  }, [ isDay ]);
 
   useEffect(() => {
     const vpHeight = window.innerHeight;
 
-    if ((scrollTop < 0.2 * vpHeight) && props.isDay)
+    if ((scrollTop < 0.2 * vpHeight) && isDay)
       toDayStyle();
     else
       toNightStyle();
@@ -112,7 +110,7 @@ function Navbar(props: NavbarProps): JSX.Element {
 
   return (
     <div id={styles.navbar} ref={navbarRef}>
-      <h3 id={styles.title} className={styles.logotype} onClick={() => scrollToElement(sectionsRef.current[0])}>
+      <h3 id={styles.title} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0])}>
         <div id={styles.logo} ref={logoRef} />
         CREATIVE LABS
       </h3>

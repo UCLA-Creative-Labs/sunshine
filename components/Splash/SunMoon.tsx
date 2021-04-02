@@ -1,14 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
+import { AppContext } from '../../pages/_app';
 
 import styles from '../../styles/Splash.module.scss';
 import { _DOMRect } from '../../utils';
 
 interface SunMoonProps {
-  isDay: boolean;
   mousePos: number[];
 }
 
 function SunMoon(props: SunMoonProps): JSX.Element {
+  const {isDay} = useContext(AppContext);
   const bg = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
   const bgRect = useRef<DOMRect>(new _DOMRect());
@@ -49,7 +50,7 @@ function SunMoon(props: SunMoonProps): JSX.Element {
   }, [ props.mousePos ]);
 
   return (
-    <div id={styles.sunmoon} ref={bg} className={props.isDay ? styles.day : styles.night}>
+    <div id={styles.sunmoon} ref={bg} className={isDay ? styles.day : styles.night}>
       <div id={styles['sunmoon-face']} ref={face} />
     </div>
   );
