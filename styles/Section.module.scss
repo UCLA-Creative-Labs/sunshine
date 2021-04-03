@@ -11,6 +11,12 @@
   border: 1px solid black;
 }
 
+.item-block-wrapper {
+  flex: 1;
+  margin: 5px;
+  border: 1px solid black;
+}
+
 .item-block {
   padding: 20px;
 }
@@ -66,6 +72,12 @@
 }
 
 @media only screen and (max-width: 600px) {
+  .item-block-wrapper {
+    flex: none;
+    margin: none;
+    border: none;
+  }
+
   .item-block {
     padding-top: $padding-vert-mobile;
     padding-bottom: $padding-vert-mobile;

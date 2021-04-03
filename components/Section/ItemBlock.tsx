@@ -16,12 +16,7 @@ function ItemBlock(props: ItemBlockProps): JSX.Element {
   } : {};
   return (
     <a
-      className={[props.data.linkPath, styles['item-link']].join(' ')}
-      style={{
-        flex: 1,
-        margin: '5px',
-        border: '1px solid black',
-      }}
+      className={[props.data.linkPath, styles['item-link'], styles['item-block-wrapper']].join(' ')}
       {...newTab}
       href={props.data.linkPath} >
       <div className={styles['item-block']}>
