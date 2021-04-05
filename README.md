@@ -21,7 +21,7 @@ The basic commands to get this repository and start are:
 $ git clone https://github.com/UCLA-Creative-Labs/sunshine.git
 $ cd sunshine
 $ yarn install
-$ yarn start
+$ yarn dev
 ```
 
 If you run into an issue, feel free to make an issue [here](https://github.com/UCLA-Creative-Labs/sunshine/issues). If you have a fix, even better! Check out the follow section to learn how to contribute!
@@ -48,4 +48,3 @@ If you ever need help with a feature or bug fix, no worries! Feel free to mark t
 ## License
 
 [MIT](LICENSE.md)
-
