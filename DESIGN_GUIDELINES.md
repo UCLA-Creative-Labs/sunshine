@@ -11,8 +11,17 @@ As such, whenever you commit code, we recommend you run `yarn lint` to ensure th
 
 - [General Syntax and Format](#General-Syntax-and-Format)
 - [Repository Architecture](#Repository-Architecture)
+  - [components/](#components/)
+  - [pages/](#pages/)
+  - [public/](#public/)
+  - [scripts/](#scripts/)
+  - [styles/](#styles/)
+  - [utils/](#utils/)
 - [Component Design](#Component-Design)
+  - [Adding a new component](#adding-a-new-component)
+  - [Writing a component module](#writing-a-component-module)
 - [Styling](#Styling)
+  - [Module based Styling](#module-based-styling/)
 - [Utilities](#Hooks-and-Utilities)
 - [Assets](#Assets)
 
