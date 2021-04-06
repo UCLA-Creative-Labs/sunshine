@@ -2,7 +2,7 @@ export interface Person {
   name: string;
   class: number;
   roles: string[];
-  image?: string;
+  image: string;
   link?: string;
 }
 
