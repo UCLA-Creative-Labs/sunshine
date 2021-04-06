@@ -1,139 +1,67 @@
-import {useRouter} from 'next/router';
+import Link from 'next/link'
+import {Router, useRouter} from 'next/router';
 import React, { useState, useEffect, useRef, useContext } from 'react';
 
 import { AppContext } from '../pages/_app';
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Navbar.module.scss';
-import splash from '../styles/Splash.module.scss';
+
+const path2Display = {
+  '/team': 'About',
+  '/projects': 'Projects',
+  '/blog': 'Blog',
+  '/join': 'Apply',
+};
 
 function Navbar(): JSX.Element {
   const {isDay} = useContext(AppContext);
+  const pathname = useRouter().pathname;
   const [ scrollTop, setScrollTop ] = useState<number>(0);
-  const [ sectionScrollStates, setSectionScrollStates ]
-    = useState<boolean[]>([ true, false, false, false ]);
-  const router = useRouter();
 
   const navbarRef = useRef<HTMLDivElement>(null);
-  const navigationRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
-  const sectionsRef = useRef<(HTMLElement | null)[]>([]);
 
-  const isElementInView = (el: HTMLElement | null): boolean => {
-    if (!el) return false;
-    const rect: DOMRect = el.getBoundingClientRect();
-    return (rect.top >= 0 && rect.top <= window.innerHeight * 0.4)
-      || (rect.bottom <= window.innerHeight && rect.bottom >= window.innerHeight * 0.4);
-  };
-
-  const toNightStyle = () => {
-    if (!navbarRef.current || !navigationRef.current || !logoRef.current)
+  // Thinking this should be a useCallback...
+  const setNavStyle = (setDay: boolean) => {
+    if (!navbarRef.current || !logoRef.current)
       return;
     const navbarStyle = navbarRef.current.style;
-    const navigationStyle = navigationRef.current.style;
     const logoStyle = logoRef.current.style;
 
-    navbarStyle.backgroundColor = colors.navbarBgScroll;
-    navbarStyle.color = colors.navbarTextScroll;
-    navigationStyle.color = colors.navbarTextScroll;
-    logoStyle.filter = 'invert(100%)';
-  };
-
-  const toDayStyle = () => {
-    if (navbarRef.current == null || navigationRef.current == null || logoRef.current == null)
-      return;
-    const navbarStyle = navbarRef.current.style;
-    const navigationStyle = navigationRef.current.style;
-    const logoStyle = logoRef.current.style;
-
-    navbarStyle.backgroundColor = colors.splashBgDay;
-    navbarStyle.color = colors.navbarText;
-    navigationStyle.color = colors.navbarText;
-    logoStyle.filter = 'invert(0%)';
-  };
+    navbarStyle.backgroundColor = setDay ? colors.splashBgDay : colors.navbarBgScroll;
+    navbarStyle.color = setDay ? colors.navbarText : colors.navbarTextScroll;
+    logoStyle.filter = setDay ? 'invert(0%)' : 'invert(100%)';
+  }
 
   useEffect(() => {
-    // default to body if the element can't be found
-    sectionsRef.current = [
-      document.getElementById(splash.splash),
-      document.getElementById('about'),
-      document.getElementById('projects'),
-    ];
-  }, []);
+    const onScroll = () => {
+      setScrollTop(document.documentElement.scrollTop);
+    };
+
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [])
 
   useEffect(() => {
-    if (!isDay) toNightStyle();
+    setNavStyle(isDay);
   }, [ isDay ]);
 
   useEffect(() => {
     const vpHeight = window.innerHeight;
-
-    if ((scrollTop < 0.2 * vpHeight) && isDay)
-      toDayStyle();
-    else
-      toNightStyle();
-
-    const onScroll = () => {
-      setScrollTop(document.documentElement.scrollTop);
-
-      for (let i = 0; i < sectionsRef.current.length; i++) {
-        if (isElementInView(sectionsRef.current[i])) {
-          const scrollState: boolean[] = new Array(sectionsRef.current.length).fill(false);
-          scrollState[i] = true;
-          setSectionScrollStates(scrollState);
-        }
-      }
-
-    };
-
-    window.addEventListener('scroll', onScroll);
-
-    return () => window.removeEventListener('scroll', onScroll);
+    setNavStyle((scrollTop < 0.2 * vpHeight) && isDay);
   }, [ scrollTop ]);
 
-  /**
-   * Scroll to section if on the root path
-   *
-   * @param el the section element to scroll to
-   */
-  const scrollToElement = (el: HTMLElement | null) => {
-    if (router.pathname !== '/') {
-      void router.push('/');
-    }
-    if (!el) return;
-    const navbarHeight = navbarRef.current?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
-    window.scrollBy({
-      top: el.getBoundingClientRect().top - navbarHeight,
-      left: 0,
-      behavior: 'smooth',
-    });
-  };
-
   return (
-    <div id={styles.navbar} ref={navbarRef}>
-      <h3 id={styles.title} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0])}>
+    <nav id={styles.navbar} ref={navbarRef}>
+      <Link href='/'>
         <div id={styles.logo} ref={logoRef} />
-        CREATIVE LABS
-      </h3>
-      <div id={styles.navigation} ref={navigationRef}>
-        <nav>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[0])}
-            style={{ fontWeight: sectionScrollStates[0] ? 700 : 400 }}>
-            HOME
-          </a>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[1])}
-            style={{ fontWeight: sectionScrollStates[1] ? 700 : 400 }}>
-            ABOUT
-          </a>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[2])}
-            style={{ fontWeight: sectionScrollStates[2] ? 700 : 400 }}>
-            PROJECTS
-          </a>
-        </nav>
-      </div>
-    </div>
+      </Link>
+      {Object.entries(path2Display).map(([path, display]) =>
+        <Link href={path}>
+          <h4 style={{fontWeight: path === pathname ? 700 : 400}}>{display}</h4>
+        </Link>
+      )}
+    </nav>
   );
 }
 

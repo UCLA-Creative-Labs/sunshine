@@ -1,37 +1,54 @@
 @use 'variables.module' as *;
+@use 'mixins.module' as mixin;
 
 #footer {
   display: flex;
   align-items: center;
-  height: $footer-height;
-  width: 100%;
+  padding: $padding-vert $padding-horiz;
   background-color: map-get($colors, footerBg);
   color: map-get($colors, footerText);
   user-select: none;
+
+  #footer-tag, a {
+    cursor: pointer;
+  }
 }
 
 #footer-tag {
   display: flex;
+  place-self: flex-start;
   align-items: center;
-  padding-left: $padding-horiz;
   font-weight: 800;
   font-size: 20px;
   text-align: left;
 }
 
-#footer-tag > p {
-  font-weight: 400;
-  margin-right: 0.8ch;
+#logo {
+  @include mixin.logo;
+  margin-right: 10px;
+  filter: invert(100%);
 }
 
-#footer-nav {
-  text-align: right;
-  flex: 1;
-  justify-content: center;
-  margin-right: 5%;
+#footer-links {
+  display: flex;
   margin-left: auto;
+}
+
+.footer-col {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  margin-right: $padding-horiz;
   color: map-get($colors, footerText);
-  overflow: hidden;
+
+  .title {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  a {
+    margin-top: 1.4rem;
+  }
 }
 
 #footer-nav a {
@@ -40,28 +57,36 @@
 
 @media only screen and (max-width: 600px) {
   #footer {
-    width: 100vw;
-    display: inline-block;
-    text-align: center;
-    height: $footer-height-mobile;
+    padding: $padding-vert-mobile $padding-horiz-mobile;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  #footer-tag {
-    align-items: center;
-    justify-content: center;
-    padding: 0;
+  #footer-links {
+    margin: 0;
   }
 
-  #footer-nav {
-    text-align: center;
-    padding: 0 0 1em;
-    margin-right: 0;
-    padding-right: 4%;
-    overflow: scroll;
+  .footer-col {
+    margin: right;
+    
   }
 
-  #footer-nav a {
-    text-decoration: none;
-    font-size: 0.9em;
-  }
+  // #footer-tag {
+  //   align-items: center;
+  //   justify-content: center;
+  //   padding: 0;
+  // }
+
+  // #footer-nav {
+  //   text-align: center;
+  //   padding: 0 0 1em;
+  //   margin-right: 0;
+  //   padding-right: 4%;
+  //   overflow: scroll;
+  // }
+
+  // #footer-nav a {
+  //   text-decoration: none;
+  //   font-size: 0.9em;
+  // }
 }
