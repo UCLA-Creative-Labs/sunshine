@@ -22,6 +22,7 @@
 
 #logo {
   @include mixin.logo;
+
   margin-right: 10px;
   filter: invert(100%);
 }
