@@ -8,10 +8,6 @@
   background-color: map-get($colors, footerBg);
   color: map-get($colors, footerText);
   user-select: none;
-
-  #footer-tag, a {
-    cursor: pointer;
-  }
 }
 
 #footer-tag {
@@ -21,6 +17,7 @@
   font-weight: 800;
   font-size: 20px;
   text-align: left;
+  cursor: pointer;
 }
 
 #logo {
@@ -47,6 +44,7 @@
   }
 
   a {
+    cursor: pointer;
     margin-top: 1.4rem;
   }
 }
@@ -68,25 +66,5 @@
 
   .footer-col {
     margin: right;
-    
   }
-
-  // #footer-tag {
-  //   align-items: center;
-  //   justify-content: center;
-  //   padding: 0;
-  // }
-
-  // #footer-nav {
-  //   text-align: center;
-  //   padding: 0 0 1em;
-  //   margin-right: 0;
-  //   padding-right: 4%;
-  //   overflow: scroll;
-  // }
-
-  // #footer-nav a {
-  //   text-decoration: none;
-  //   font-size: 0.9em;
-  // }
 }

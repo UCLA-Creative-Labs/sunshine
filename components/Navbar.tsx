@@ -1,5 +1,5 @@
-import Link from 'next/link'
-import {Router, useRouter} from 'next/router';
+import Link from 'next/link';
+import {useRouter} from 'next/router';
 import React, { useState, useEffect, useRef, useContext } from 'react';
 
 import { AppContext } from '../pages/_app';
@@ -31,7 +31,7 @@ function Navbar(): JSX.Element {
     navbarStyle.backgroundColor = setDay ? colors.splashBgDay : colors.navbarBgScroll;
     navbarStyle.color = setDay ? colors.navbarText : colors.navbarTextScroll;
     logoStyle.filter = setDay ? 'invert(0%)' : 'invert(100%)';
-  }
+  };
 
   useEffect(() => {
     const onScroll = () => {
@@ -40,7 +40,7 @@ function Navbar(): JSX.Element {
 
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
-  }, [])
+  }, []);
 
   useEffect(() => {
     setNavStyle(isDay);
@@ -57,9 +57,9 @@ function Navbar(): JSX.Element {
         <div id={styles.logo} ref={logoRef} />
       </Link>
       {Object.entries(path2Display).map(([path, display]) =>
-        <Link href={path}>
+        <Link href={path} key={display}>
           <h4 style={{fontWeight: path === pathname ? 700 : 400}}>{display}</h4>
-        </Link>
+        </Link>,
       )}
     </nav>
   );

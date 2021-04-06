@@ -16,8 +16,8 @@ const footerLinks = {
     ['https://www.instagram.com/creativelabsucla', 'Instagram'],
     ['https://www.youtube.com/channel/UC917WXknuSu1IMn34PdJr3Q', 'Youtube'],
     ['https://medium.com/creative-labs', 'Medium'],
-  ]
-}
+  ],
+};
 
 function Footer(): JSX.Element {
   return (
@@ -30,21 +30,20 @@ function Footer(): JSX.Element {
       </Link>
       <div id={styles['footer-links']}>
         {Object.entries(footerLinks).map(([title, links]) =>
-            <div className={styles['footer-col']}>
-              <div className={styles.title}>{title}</div>
-              {links.map(([path, display]) => {
-                const external = path.charAt(0) === '/'
-                  ? {}
-                  : {target: '_blank', rel: 'noreferrer'};
-                console.log(external);
-                return (
-                  <Link href={path} passHref={true}>
-                    <a {...external}>{display}</a>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
+          <div className={styles['footer-col']} key={title}>
+            <div className={styles.title}>{title}</div>
+            {links.map(([path, display]) => {
+              const external = path.charAt(0) === '/'
+                ? {}
+                : {target: '_blank', rel: 'noreferrer'};
+              return (
+                <Link href={path} passHref={true} key={`${title}-${display}`}>
+                  <a {...external}>{display}</a>
+                </Link>
+              );
+            })}
+          </div>,
+        )}
       </div>
     </footer>
   );
