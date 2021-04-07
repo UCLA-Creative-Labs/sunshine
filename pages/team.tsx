@@ -124,7 +124,7 @@ function Team(props: TeamProps): JSX.Element {
 export const getStaticProps: GetStaticProps = async () => {
   const res = await fetchTeam();
   const data = res?.map((person: any) => {
-    person.image = person?.photo?.url ?? '/assets/winter.svg';
+    person.image = person?.photo?.url ?? '/spring.svg';
     person.link = person.website ?? person.github ?? person.instagram;
     return person;
   });

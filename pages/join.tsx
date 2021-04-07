@@ -44,7 +44,7 @@ function Join(): JSX.Element {
             </p>
           </div>
         </div>
-        <div id={styles.roles} className={styles['join-roles']}>
+        <div id={'roles'} className={styles['join-roles']}>
           <h1>Roles</h1>
           <div className={styles['role-cards']}>
             {joinItem.roles.map((role) => (
