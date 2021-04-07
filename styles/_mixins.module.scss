@@ -1,0 +1,20 @@
+@use 'variables.module' as *;
+
+@mixin logo {
+  // Fixed Properties
+  background-image: url('../public/cl-logo.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  filter: invert(0%);
+  transition: filter $navbar-transition;
+
+  // Responsive Properties
+  width: 33px;
+  height: 33px;
+
+  @media screen and (max-width: 600px) {
+    width: 25px;
+    height: 25px;
+  }
+}

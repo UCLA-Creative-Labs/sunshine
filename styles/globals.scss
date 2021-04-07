@@ -25,6 +25,10 @@ h3 {
   font: $body-bold-font;
 }
 
+h4 {
+  font: $body-reg-font;
+}
+
 p {
   line-height: 1.6em;
 }
@@ -64,8 +68,4 @@ a {
   .section h1 {
     font-size: 36px;
   }
-}
-
-.Toastify__toast-body {
-  font-family: 'Lato', sans-serif;
 }
