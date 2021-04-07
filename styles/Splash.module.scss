@@ -1,0 +1,74 @@
+@use 'variables.module' as *;
+
+#splash {
+  margin-top: calc(#{$navbar-height});
+  transition: background-color $splash-transition, color $splash-transition;
+  min-height: calc(100vh - #{$splash-bottom-gap} - #{$navbar-height} + 1px);
+}
+
+#blurb {
+  width: 60vw;
+  position: absolute;
+  bottom: calc(#{$padding-vert} + #{$splash-bottom-gap});
+}
+
+#sunmoon {
+  width: $sm-diam;
+  height: $sm-diam;
+  position: absolute;
+  right: $padding-horiz;
+  margin-top: calc(2 * #{$padding-vert} - 0.5 * #{$splash-bottom-gap});
+  margin-right: calc(2.5 * #{$padding-horiz});
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#sunmoon-face {
+  width: $sm-face-width;
+  height: $sm-face-height;
+  background-image: $sm-face;
+  position: absolute;
+  top: 55%;
+  left: 30%;
+}
+
+#sunmoon.day {
+  background-image: $sun-bg;
+}
+
+#sunmoon.night {
+  background-image: $moon-bg;
+}
+
+#splash.day,
+#splash.day > div {
+  background-color: map-get($colors, splashBgDay);
+  color: map-get($colors, splashTextDay);
+}
+
+#splash.night,
+#splash.night > div {
+  background-color: map-get($colors, splashBgNight);
+  color: map-get($colors, splashTextNight);
+}
+
+@media only screen and (max-width: 600px) {
+  #splash {
+    margin-top: calc(#{$navbar-height-mobile});
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  #blurb {
+    width: 90%;
+    font-size: 28px;
+    bottom: $padding-vert-mobile;
+  }
+
+  #sunmoon {
+    background-size: cover;
+    margin-top: calc(-0.2 * #{$splash-bottom-gap});
+    margin-right: calc(-1 * #{$padding-horiz-mobile});
+    right: 0;
+  }
+}

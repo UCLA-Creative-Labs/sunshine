@@ -35,15 +35,14 @@ $ yarn install
 To expedite local development, run locally:
 
 ```
-$ yarn start
+$ yarn dev
 ```
 
 To test the production build, run:
 
 ```
 $ yarn build
-$ cd dist
-$ python3 -m http.server
+$ yarn start
 ```
 
 ## Contribution Workflow

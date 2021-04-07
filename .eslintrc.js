@@ -62,7 +62,7 @@ module.exports = {
     // Require an ordering on all imports
     'import/order': ['warn', {
       groups: ['builtin', 'external'],
-      alphabetize: { order: 'asc' },
+      alphabetize: { order: 'asc', caseInsensitive: true },
     }],
 
     // Cannot import from the same module twice

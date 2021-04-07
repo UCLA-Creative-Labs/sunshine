@@ -1,9 +1,9 @@
-name: Simple Lint
+name: No Package-Lock :(
 on: pull_request
 
 jobs:
   run-linters:
-    name: Run Linters
+    name: No Package-Lock
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,5 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Run linters
-        run: yarn lint
+      - name: Make sure there are no package-lock.json
+        run: yarn no-lock

@@ -1,9 +1,11 @@
 [build]
-  publish = 'dist/'
-  command = 'node scripts/pre-build.js && yarn build'
+  command = "npm run build"
+  publish = "out"
 
 [[redirects]]
   from = '/*'
-  to = '/index.html'
+  to = '/'
   status = 200
-  force = false
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
