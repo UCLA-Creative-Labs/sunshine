@@ -1,0 +1,45 @@
+@use 'variables.module' as *;
+
+.container {
+  display: flex;
+  flex: 1 1 500px;
+  width: 605px;
+  height: 362px;
+  border: 3.5px solid black;
+  background-color: map-get($colors, 'blue');
+  justify-content: center;
+  overflow: hidden;
+}
+
+// .boys {
+//   display: flex;
+//   justify-content: center;
+//   overflow: hidden;
+  
+//   // width: 1000px;
+// }
+
+.ellipse,
+.circle,
+.triangle {
+  position: relative;
+}
+
+.default {
+  .ellipse {
+    margin-left: 20px;
+    z-index: 2;
+    bottom: -140px;
+  }
+  
+  .circle {
+    z-index: 1;
+    margin-left: -40px;
+    bottom: -140px;
+  }
+  
+  .triangle {
+    margin-left: -60px;
+    bottom: -170px;
+  }
+}

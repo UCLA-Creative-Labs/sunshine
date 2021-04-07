@@ -1,0 +1,45 @@
+@use 'variables.module' as *;
+
+#who-container {
+  min-height: unset;
+  & > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  & > div > div {
+    margin: 30px 1.5%;
+  }
+}
+
+#who-img {
+  border: 3.5px outset black;
+  overflow: hidden;
+  background-color: map-get($colors, 'blue');
+  display: grid;
+  place-items: center;
+}
+
+#who-description {
+  flex: 1 1 400px;
+
+  h3 {
+    margin: 0;
+    font-size: 3rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #who-container > div > div {
+    margin: 30px 0px;
+  }
+
+  #who-description {
+    font-size: 1rem;
+
+    h3 {
+      font-size: 2rem;
+    }
+  }
+}

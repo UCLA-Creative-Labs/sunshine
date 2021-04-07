@@ -2,7 +2,7 @@
 
 // Fonts
 $heading-bold-font:  normal 700 2.6rem 'Mukta', sans-serif;
-$heading-xbold-font: normal 800 2.2rem 'Mukta', sans-serif;
+$heading-xbold-font: normal 800 3.2rem 'Mukta', sans-serif;
 $logo-font: normal 700 1rem 'Mukta', sans-serif;
 $body-reg-font:  normal 400 1.2rem 'Lato', sans-serif;
 $body-bold-font: normal 700 1.4rem 'Lato', sans-serif;
@@ -13,11 +13,12 @@ $heading-kerning: 0.1rem;
 // General
 $padding-horiz: 64px;
 $padding-horiz-mobile: 24px;
-$padding-vert:  48px;
-$padding-vert-mobile: 32px;
+$padding-vert:  120px;
+$padding-vert-mobile: 60px;
 
 // Colors
 $colors: (
+  'blue': #75B0EB,
   splashBgDay: #e3f2ff,
   splashBgNight: #212024,
   splashTextDay: #212024,

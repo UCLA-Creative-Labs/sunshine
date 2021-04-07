@@ -3,6 +3,7 @@
 
 #splash {
   margin-top: calc(#{$navbar-height});
+  padding-top: 48px;
   transition: background-color $splash-transition, color $splash-transition;
   overflow: hidden;
 }
@@ -14,7 +15,7 @@
 
 #blurb {
   position: absolute;
-  bottom: calc(3 * #{$padding-vert});
+  bottom: calc(#{$padding-vert});
 }
 
 #heading {
