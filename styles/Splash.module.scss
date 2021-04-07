@@ -1,29 +1,71 @@
 @use 'variables.module' as *;
+@use 'mixins.module' as mixin;
 
 #splash {
   margin-top: calc(#{$navbar-height});
   transition: background-color $splash-transition, color $splash-transition;
-  min-height: calc(100vh - #{$splash-bottom-gap} - #{$navbar-height} + 1px);
+  overflow: hidden;
+}
+
+#blurb, #btn-container {
+  color: inherit;
 }
 
 #blurb {
-  width: 60vw;
   position: absolute;
-  bottom: calc(#{$padding-vert} + #{$splash-bottom-gap});
+  bottom: calc(3 * #{$padding-vert});
+}
+
+#heading {
+  font-size: 5rem;
+  margin: 0;
+}
+
+#description {
+  margin: 1rem 0 3rem;
+  width: 40vw;
+  line-height: 160%;
+  font: $body-reg-font;
+  font-size: 1.5rem;
+}
+
+.btn {
+  // Fixed Properties
+  color: inherit;
+  background: none;
+  width: 188px;
+  height: 64px;
+  border-radius: 10px;
+  margin-right: 32px;
+  cursor: pointer;
+  font: $body-bold-font;
+  font-size: 1.13rem;
+
+  &:focus {
+    outline: none;
+  }
+
+  // Dynamic Properties
+  border: 1.5px solid map-get($colors, splashBgNight);
+  &:hover {
+    background-color: map-get($colors, splashBgNight);
+    color: map-get($colors, splashTextNight);
+  }
 }
 
 #sunmoon {
+  @include mixin.background;
   width: $sm-diam;
   height: $sm-diam;
   position: absolute;
   right: $padding-horiz;
-  margin-top: calc(2 * #{$padding-vert} - 0.5 * #{$splash-bottom-gap});
   margin-right: calc(2.5 * #{$padding-horiz});
   border-radius: 50%;
   overflow: hidden;
 }
 
 #sunmoon-face {
+  @include mixin.background;
   width: $sm-face-width;
   height: $sm-face-height;
   background-image: $sm-face;
@@ -42,7 +84,7 @@
 
 #splash.day,
 #splash.day > div {
-  background-color: map-get($colors, splashBgDay);
+  background: $splash-gradient;
   color: map-get($colors, splashTextDay);
 }
 
@@ -52,23 +94,50 @@
   color: map-get($colors, splashTextNight);
 }
 
+#splash.night .btn {
+  border: 1.5px solid map-get($colors, splashTextNight);
+
+  &:hover {
+    background-color: map-get($colors, splashTextNight);
+    color: map-get($colors, splashTextDay);
+  }
+}
+
 @media only screen and (max-width: 600px) {
   #splash {
     margin-top: calc(#{$navbar-height-mobile});
-    overflow-x: hidden;
     position: relative;
   }
 
   #blurb {
-    width: 90%;
-    font-size: 28px;
-    bottom: $padding-vert-mobile;
+    width: calc(100vw - 2 * #{$padding-horiz-mobile});
+  }
+
+  #heading {
+    font-size: 3rem;
+    line-height: 135%;
+  }
+
+  #description {
+    width: 100%;
+    font-size: 1rem;
   }
 
   #sunmoon {
     background-size: cover;
-    margin-top: calc(-0.2 * #{$splash-bottom-gap});
     margin-right: calc(-1 * #{$padding-horiz-mobile});
     right: 0;
+  }
+  
+  #btn-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .btn {
+    width: 156px;
+    height: 54px;
+    font-size: 1rem;
+    margin: 0;
   }
 }

@@ -1,0 +1,46 @@
+@use 'variables.module' as *;
+@use 'mixins.module' as mixin;
+
+#star-container > div:nth-child(1) {
+  right: 50px;
+  top: calc(#{$navbar-height} - 24px);
+  transform: rotateZ(15deg);
+}
+
+#star-container > div:nth-child(2) {
+  right: 82px;
+  top: calc(3 * #{$navbar-height});
+  transform: rotateZ(-30deg);
+}
+
+#star-container > div:nth-child(3) {
+  right: 185px;
+  top: calc(5 * #{$navbar-height});
+  transform: rotateZ(-50deg);
+}
+
+#star-container > div:nth-child(4) {
+  right: 350px;
+  top: calc(3.75 * #{$navbar-height});
+  transform: rotateZ(-160deg);
+}
+
+#star-container > div:nth-child(5) {
+  right: 476px;
+  top: calc(1.75 * #{$navbar-height});
+  transform: rotateZ(10deg);
+}
+
+.star {
+  @include mixin.background;
+  height: 102px;
+  width: 102px;
+  background-image: url('../public/star.svg');
+  position: absolute;
+}
+
+@media only screen and (max-width: 600px) {
+  #star-container {
+    display: none;
+  }
+}

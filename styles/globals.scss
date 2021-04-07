@@ -46,7 +46,7 @@ a {
 .section {
   background-color: $section-bg;
   box-sizing: border-box;
-  min-height: calc(100vh - #{$navbar-height} + 1px);
+  min-height: $section-height;
   width: calc(100vw - 15px); // To avoid slight overflow
   padding: $section-padding;
   margin: 0;
@@ -60,8 +60,8 @@ a {
 
 @media only screen and (max-width: 600px) {
   .section {
-    min-height: calc(100vh - #{$navbar-height-mobile});
     width: 100vw;
+    min-height: $section-height-mobile;
     padding: $section-padding-mobile;
   }
 
