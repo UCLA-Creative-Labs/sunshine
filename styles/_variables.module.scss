@@ -16,10 +16,9 @@ $padding-horiz-mobile: 24px;
 $padding-vert:  48px;
 $padding-vert-mobile: 32px;
 
-
 // Colors
 $colors: (
-  splashBgDay: #E3F2FF,
+  splashBgDay: #e3f2ff,
   splashBgNight: #212024,
   splashTextDay: #212024,
   splashTextNight: #fff,
@@ -43,7 +42,7 @@ $sm-face: url('../public/sunmoon-face.svg');
 $sm-face-width:  64.5px;
 $sm-face-height: 22.17px;
 $splash-transition: $navbar-transition;
-$splash-gradient: linear-gradient(to top, #FFF3E0, map-get($colors, splashBgDay));
+$splash-gradient: linear-gradient(to top, #fff3e0, map-get($colors, splashBgDay));
 
 // Item Block
 $heading-margin-bottom: 10px;

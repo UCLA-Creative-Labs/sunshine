@@ -36,12 +36,11 @@
     height: $navbar-height-mobile;
     padding: 0 $padding-horiz-mobile;
     width: calc(100vw - 2 * #{$padding-horiz-mobile});
-
     justify-content: space-between;
 
     h4 {
       font-size: 1rem;
-      margin-left: 0px;
+      margin-left: 0;
     }
   }
 }

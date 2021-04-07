@@ -18,7 +18,7 @@ function Stars(): JSX.Element {
       <div className={styles.star}/>
       <div className={styles.star}/>
     </div>
-  )
+  );
 }
 
 export default Stars;

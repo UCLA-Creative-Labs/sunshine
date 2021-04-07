@@ -33,6 +33,7 @@
 
 .star {
   @include mixin.background;
+
   height: 102px;
   width: 102px;
   background-image: url('../public/star.svg');

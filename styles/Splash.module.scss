@@ -7,7 +7,8 @@
   overflow: hidden;
 }
 
-#blurb, #btn-container {
+#blurb,
+#btn-container {
   color: inherit;
 }
 
@@ -24,9 +25,9 @@
 #description {
   margin: 1rem 0 3rem;
   width: 40vw;
-  line-height: 160%;
   font: $body-reg-font;
   font-size: 1.5rem;
+  line-height: 160%;
 }
 
 .btn {
@@ -47,6 +48,7 @@
 
   // Dynamic Properties
   border: 1.5px solid map-get($colors, splashBgNight);
+
   &:hover {
     background-color: map-get($colors, splashBgNight);
     color: map-get($colors, splashTextNight);
@@ -128,7 +130,7 @@
     margin-right: calc(-1 * #{$padding-horiz-mobile});
     right: 0;
   }
-  
+
   #btn-container {
     display: flex;
     justify-content: space-between;
