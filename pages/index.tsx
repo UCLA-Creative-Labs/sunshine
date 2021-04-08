@@ -2,13 +2,33 @@ import React, { useContext, useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import Section from '../components/Section';
 import Splash from '../components/Splash';
-import sectionItem   from '../public/sectionInfo.json';
 
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Home.module.scss';
 import { AppContext } from './_app';
 import {Portrait} from '../components/Boys';
 import Link from 'next/link';
+
+const opportunities = [
+  {
+    portrait: <Portrait.default />,
+    title: 'Projects',
+    description: 'Our projects are a quarter-long and open to all majors.',
+    link: '/projects',
+  },
+  {
+    portrait: <Portrait.default />,
+    title: 'Events',
+    description: 'We invite industry professionals or companies to talk about the field.',
+    link: '/events',
+  },
+  {
+    portrait: <Portrait.default />,
+    title: 'Workshops',
+    description: 'Learn something new at one of our workshops.',
+    link: '/workshops',
+  },
+];
 
 export default function Home(): JSX.Element {
   const {isDay} = useContext(AppContext);
@@ -31,7 +51,7 @@ export default function Home(): JSX.Element {
           <div>
             <Portrait.default />
             <div id={styles['who-description']}>
-              <h3>Who are we?</h3>
+              <h2>Who are we?</h2>
               <p>
                 The Creative Labs community is managed by a small team of developers, designers,
                 and project managers.
@@ -46,11 +66,19 @@ export default function Home(): JSX.Element {
         </div>
         <Section
           title={'So, what can I do?'}
-          data={sectionItem.projects}
-          body={'Every quarter we have student teams collaborate and execute an idea.' +
-                ' Below are some projects that were created in the past quarters.'}
-          linkPath={'https://medium.com/creative-labs'}
-          linkText={'View all projects on Medium ➔'} />
+          body={'Whether you’re in a project or not, you are still a part of the Creative Labs community. We have new events, quarters, and workshops every quarter.'}>
+          <>
+            {opportunities.map(({title, description, link, portrait}) => 
+              <Link href={link}>
+                <div className={styles['section-item']}>
+                  {portrait}
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </div>
+              </Link>
+            )}
+          </>
+        </Section>
       </div>
     </Layout>
   );

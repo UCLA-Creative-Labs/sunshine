@@ -20,9 +20,13 @@
   cursor: pointer;
 }
 
+.logotype {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
 #logo {
   @include mixin.logo;
-
   margin-right: 10px;
   filter: invert(100%);
 }

@@ -78,7 +78,7 @@ function Team(props: TeamProps): JSX.Element {
   return (
     <Layout>
       <div className={styles['team-page']}>
-        <h1>THE TEAM</h1>
+        <h3>THE TEAM</h3>
         <div className={styles['team-content']}>
           <div className={styles['team-left']}>
             <Select

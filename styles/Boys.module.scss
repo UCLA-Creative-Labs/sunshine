@@ -3,43 +3,44 @@
 .container {
   display: flex;
   flex: 1 1 500px;
-  width: 605px;
-  height: 362px;
+  width: inherit;
+  height: auto;
   border: 3.5px solid black;
   background-color: map-get($colors, 'blue');
   justify-content: center;
   overflow: hidden;
 }
 
-// .boys {
-//   display: flex;
-//   justify-content: center;
-//   overflow: hidden;
-  
-//   // width: 1000px;
-// }
+.boys {
+  display: flex;
+  flex-wrap: nowrap;
+}
 
 .ellipse,
 .circle,
 .triangle {
+  height: auto;
   position: relative;
 }
 
 .default {
   .ellipse {
-    margin-left: 20px;
+    width: clamp(60px, 20vw, 131px);
+    margin-left: 10%;
     z-index: 2;
-    bottom: -140px;
+    bottom: -30%;
   }
   
   .circle {
+    width: clamp(80px, 20vw, 143px);
     z-index: 1;
-    margin-left: -40px;
-    bottom: -140px;
+    margin-left: -7%;
+    bottom: -50%;
   }
   
   .triangle {
-    margin-left: -60px;
-    bottom: -170px;
+    width: clamp(150px, 35vw, 242px);
+    margin-left: -10%;
+    bottom: -42%;
   }
 }

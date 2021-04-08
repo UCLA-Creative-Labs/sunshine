@@ -2,10 +2,15 @@
 @use 'mixins.module' as mixin;
 
 #splash {
+  height: $section-height;
   margin-top: calc(#{$navbar-height});
   padding-top: 48px;
   transition: background-color $splash-transition, color $splash-transition;
   overflow: hidden;
+}
+
+#heading {
+  margin: 0px;
 }
 
 #blurb,
@@ -16,11 +21,6 @@
 #blurb {
   position: absolute;
   bottom: calc(#{$padding-vert});
-}
-
-#heading {
-  font-size: 5rem;
-  margin: 0;
 }
 
 #description {
@@ -58,7 +58,6 @@
 
 #sunmoon {
   @include mixin.background;
-
   width: $sm-diam;
   height: $sm-diam;
   position: absolute;
@@ -70,7 +69,6 @@
 
 #sunmoon-face {
   @include mixin.background;
-
   width: $sm-face-width;
   height: $sm-face-height;
   background-image: $sm-face;
@@ -110,6 +108,7 @@
 
 @media only screen and (max-width: 600px) {
   #splash {
+    height: $section-height-mobile;
     margin-top: calc(#{$navbar-height-mobile});
     position: relative;
   }

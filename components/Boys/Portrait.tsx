@@ -7,6 +7,7 @@ interface PortraitProps {
 
 export default function Portrait(props: PortraitProps): JSX.Element {
   const {style} = props;
+
   return (
     <div className={styles.container} style={style}>
       <div className={[styles.boys, styles.default].join(' ')}>

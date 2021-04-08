@@ -8,14 +8,14 @@ function Join(): JSX.Element {
     <Layout>
       <div className={styles['join-page']}>
         <div>
-          <h1>{joinItem.title_1}</h1>
+          <h2>{joinItem.title_1}</h2>
           <p className={styles['join-body']}>{joinItem.body_1}</p>
           <a className={styles['section-link-text']} href='#roles'>
             VIEW ROLES ➔
           </a>
         </div>
         <div>
-          <h1>{joinItem.title_2}</h1>
+          <h2>{joinItem.title_2}</h2>
           <p className={styles['join-body']}>{joinItem.body_2}</p>
           <div className={[styles.indented, styles['join-body']].join(' ')}>
             <p>
@@ -45,7 +45,7 @@ function Join(): JSX.Element {
           </div>
         </div>
         <div id={'roles'} className={styles['join-roles']}>
-          <h1>Roles</h1>
+          <h2>Roles</h2>
           <div className={styles['role-cards']}>
             {joinItem.roles.map((role) => (
               <div key={role.title} className={styles['role-card']}>

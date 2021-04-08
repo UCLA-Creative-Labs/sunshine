@@ -19,6 +19,7 @@ $padding-vert-mobile: 60px;
 // Colors
 $colors: (
   'blue': #75B0EB,
+  'beige': #F8F7F2,
   splashBgDay: #e3f2ff,
   splashBgNight: #212024,
   splashTextDay: #212024,
@@ -52,7 +53,7 @@ $hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 // Section
 $section-padding: $padding-vert $padding-horiz;
 $section-padding-mobile: $padding-vert-mobile $padding-horiz-mobile;
-$section-bg: #fff;
+$section-bg: #F8F7F2;
 $max-section-width: 1440px;
 $section-height: calc(100vh - #{$navbar-height});
 $section-height-mobile: calc(100vh - #{$navbar-height-mobile});
