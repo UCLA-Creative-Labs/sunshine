@@ -61,7 +61,9 @@ export default function Home(): JSX.Element {
                 We give students the platform that allows them to make their ideas come to
                 life. We were founded on the dream to just make cool things.
               </p>
-              <Link href='/team'>LEARN MORE</Link>
+              <span>
+                <Link href='/team'>LEARN MORE</Link>
+              </span>
             </div>
           </div>
         </div>
@@ -70,13 +72,14 @@ export default function Home(): JSX.Element {
           body={'Whether you’re in a project or not, you are still a part of the Creative Labs community. We have new events, quarters, and workshops every quarter.'}>
           <>
             {opportunities.map(({title, description, link, portrait}) =>
-              <Link href={link} key={title}>
-                <div className={styles['section-item']}>
-                  {portrait}
-                  <h3>{title}</h3>
-                  <p>{description}</p>
-                </div>
-              </Link>,
+              <div className={styles['section-item']} key={title}>
+                {portrait}
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <span>
+                  <Link href={link}>LEARN MORE</Link>
+                </span>
+              </div>,
             )}
           </>
         </Section>
