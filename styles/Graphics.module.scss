@@ -28,21 +28,20 @@
 .default {
   .ellipse {
     width: clamp(60px, 20vw, 131px);
-    margin-left: 10%;
+    left: 12%;
     z-index: 2;
     bottom: -30%;
   }
 
   .circle {
-    width: clamp(80px, 20vw, 143px);
+    width: clamp(80px, 22vw, 143px);
     z-index: 1;
-    margin-left: -7%;
+    left: 8%;
     bottom: -50%;
   }
 
   .triangle {
-    width: clamp(150px, 35vw, 242px);
-    margin-left: -10%;
+    width: clamp(150px, 40vw, 242px);
     bottom: -42%;
   }
 }
@@ -71,7 +70,7 @@
 }
 
 #phone, #lecture {
-  width: 415px;
+  width: 400px;
 }
 
 #phone {
