@@ -10,7 +10,7 @@
 }
 
 #heading {
-  margin: 0px;
+  margin: 0;
 }
 
 #blurb,
@@ -58,6 +58,7 @@
 
 #sunmoon {
   @include mixin.background;
+
   width: $sm-diam;
   height: $sm-diam;
   position: absolute;
@@ -69,6 +70,7 @@
 
 #sunmoon-face {
   @include mixin.background;
+
   width: $sm-face-width;
   height: $sm-face-height;
   background-image: $sm-face;

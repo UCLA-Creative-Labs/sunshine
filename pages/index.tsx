@@ -1,4 +1,7 @@
+import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
+
+import {Portrait} from '../components/Boys';
 import Layout from '../components/Layout';
 import Section from '../components/Section';
 import Splash from '../components/Splash';
@@ -6,8 +9,6 @@ import Splash from '../components/Splash';
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Home.module.scss';
 import { AppContext } from './_app';
-import {Portrait} from '../components/Boys';
-import Link from 'next/link';
 
 const opportunities = [
   {
@@ -58,7 +59,7 @@ export default function Home(): JSX.Element {
               </p>
               <p>
                 We give students the platform that allows them to make their ideas come to
-                life. We were founded on the dream to just make cool things. 
+                life. We were founded on the dream to just make cool things.
               </p>
               <Link href='/team'>LEARN MORE</Link>
             </div>
@@ -68,14 +69,14 @@ export default function Home(): JSX.Element {
           title={'So, what can I do?'}
           body={'Whether you’re in a project or not, you are still a part of the Creative Labs community. We have new events, quarters, and workshops every quarter.'}>
           <>
-            {opportunities.map(({title, description, link, portrait}) => 
-              <Link href={link}>
+            {opportunities.map(({title, description, link, portrait}) =>
+              <Link href={link} key={title}>
                 <div className={styles['section-item']}>
                   {portrait}
                   <h3>{title}</h3>
                   <p>{description}</p>
                 </div>
-              </Link>
+              </Link>,
             )}
           </>
         </Section>

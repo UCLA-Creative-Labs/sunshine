@@ -16,5 +16,5 @@ export default function Portrait(props: PortraitProps): JSX.Element {
         <img src={'mascots/triangle-boy.svg'} className={styles.triangle}/>
       </div>
     </div>
-  )
+  );
 }

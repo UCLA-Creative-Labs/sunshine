@@ -40,13 +40,13 @@
   }
 
   &:hover {
-    box-shadow: 4px 4px 20px -3px rgba(0,0,0,.2);
+    box-shadow: 4px 4px 20px -3px rgba(0, 0, 0, 0.2);
   }
 }
 
 @media screen and (max-width: 600px) {
   #who-container > div > div {
-    margin: 30px 0px;
+    margin: 30px 0;
   }
 
   #who-description {
