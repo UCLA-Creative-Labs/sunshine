@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
 
-import {Portrait} from '../components/Boys';
+import {Lecture, Portrait, Phone} from '../components/Graphics';
 import Layout from '../components/Layout';
 import Section from '../components/Section';
 import Splash from '../components/Splash';
@@ -12,19 +12,19 @@ import { AppContext } from './_app';
 
 const opportunities = [
   {
-    portrait: <Portrait.default />,
+    portrait: <Phone.default />,
     title: 'Projects',
     description: 'Our projects are a quarter-long and open to all majors.',
     link: '/projects',
   },
   {
-    portrait: <Portrait.default />,
+    portrait: <Portrait.Events />,
     title: 'Events',
     description: 'We invite industry professionals or companies to talk about the field.',
     link: '/events',
   },
   {
-    portrait: <Portrait.default />,
+    portrait: <Lecture.default />,
     title: 'Workshops',
     description: 'Learn something new at one of our workshops.',
     link: '/workshops',
