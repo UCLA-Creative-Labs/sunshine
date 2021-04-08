@@ -4,7 +4,7 @@
   display: flex;
   flex: 1 1 500px;
   width: inherit;
-  height: 300px;
+  height: 360px;
   border: 3.5px solid black;
   background-color: map-get($colors, 'blue');
   justify-content: center;
@@ -67,6 +67,10 @@
     transform: rotateZ(-20deg);
     bottom: -44%;
   }
+}
+
+#lecture-container, #phone-container, #events {
+  height: 300px;
 }
 
 #phone, #lecture {
