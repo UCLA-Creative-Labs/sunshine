@@ -1,14 +1,7 @@
-import React, { useContext } from 'react';
-
-import { AppContext } from '../../pages/_app';
+import React from 'react';
 import styles from '../../styles/Stars.module.scss';
 
 function Stars(): JSX.Element {
-  const {isDay} = useContext(AppContext);
-
-  if (isDay) {
-    return <></>;
-  }
 
   return (
     <div id={styles['star-container']}>

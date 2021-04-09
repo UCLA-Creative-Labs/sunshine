@@ -15,7 +15,7 @@ function Splash(props: SplashProps): JSX.Element {
     <div id={styles.splash} className={['section', (isDay ? styles.day : styles.night)].join(' ')}>
       <div>
         <SunMoon mousePos={props.mousePos} />
-        <Stars />
+        {!isDay && <Stars />}
         <div id={styles.blurb}>
           <h1 id={styles.heading}>
             Let&apos;s get creative.
