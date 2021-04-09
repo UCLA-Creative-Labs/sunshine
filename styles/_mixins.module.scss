@@ -18,3 +18,8 @@
     height: 25px;
   }
 }
+
+@mixin background {
+  background-repeat: no-repeat;
+  background-size: contain;
+}

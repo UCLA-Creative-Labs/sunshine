@@ -13,16 +13,19 @@ div {
 
 h1 {
   font: $heading-xbold-font;
+  font-size: 5rem;
   letter-spacing: $heading-kerning;
 }
 
 h2 {
-  font: $heading-bold-font;
+  font: $body-bold-font;
+  font-size: 3rem;
   letter-spacing: $heading-kerning;
 }
 
 h3 {
-  font: $body-bold-font;
+  font: $heading-bold-font;
+  font-size: 2.5rem;
 }
 
 h4 {
@@ -46,11 +49,9 @@ a {
 .section {
   background-color: $section-bg;
   box-sizing: border-box;
-  min-height: calc(100vh - #{$navbar-height} + 1px);
   width: calc(100vw - 15px); // To avoid slight overflow
   padding: $section-padding;
   margin: 0;
-  border-bottom: 1px solid dimgray;
 }
 
 .section > div {
@@ -60,12 +61,20 @@ a {
 
 @media only screen and (max-width: 600px) {
   .section {
-    min-height: calc(100vh - #{$navbar-height-mobile});
     width: 100vw;
+    min-height: $section-height-mobile;
     padding: $section-padding-mobile;
   }
 
-  .section h1 {
-    font-size: 36px;
+  h1 {
+    font-size: 3rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
   }
 }
