@@ -11,6 +11,7 @@ import styles from '../styles/Home.module.scss';
 import { AppContext } from './_app';
 import SunMoon from '../components/Splash/SunMoon';
 import Stars from '../components/Splash/Stars';
+import { PORTRAIT_MODE } from '../components/Graphics/Portrait';
 
 const opportunities = [
   {
@@ -23,7 +24,7 @@ const opportunities = [
     }
   },
   {
-    portrait: <Portrait.Events />,
+    portrait: <Portrait.default mode={PORTRAIT_MODE.PLAY} />,
     title: 'Events',
     body: 'We invite industry professionals or companies to talk about the field.',
     link: {
@@ -72,7 +73,7 @@ export default function Home(): JSX.Element {
         </Splash>
         <div id={styles['who-container']} className={'section'}>
           <div>
-            <Portrait.default />
+            <Portrait.default mode={PORTRAIT_MODE.FAMILY} />
             <div id={styles['who-description']}>
               <h2>Who are we?</h2>
               <p>

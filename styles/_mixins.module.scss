@@ -35,7 +35,7 @@
     transition: right 0.3s ease-out;
   }
 
-  a:hover::after { /* stylelint-disable no-descending-specificity */
+  a:hover::after {
     right: 100%;
   }
 }

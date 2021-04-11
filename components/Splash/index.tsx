@@ -8,17 +8,22 @@ interface SplashProps {
   heading: string;
   description: string;
   children: JSX.Element;
-  buttons?: ILink[]; 
+  buttons?: ILink[];
+  halve?: boolean;
 }
 
 function Splash(props: SplashProps): JSX.Element {
-  const {heading, description, children, buttons} = props;
+  const {heading, description, children, buttons, halve} = props;
   const {isDay} = useContext(AppContext);
+
+  const containerStyle = halve && { height: '50vh', minHeight: 'unset' };
+  const blurbStyle = halve && { bottom: '0px'};
+
   return (
-    <div id={styles.splash} className={['section', (isDay ? styles.day : styles.night)].join(' ')}>
+    <div id={styles.splash} className={['section', (isDay ? styles.day : styles.night)].join(' ')} style={containerStyle}>
       <div>
         {children}
-        <div id={styles.blurb}>
+        <div id={styles.blurb} style={blurbStyle}>
           <h1 id={styles.heading}>
             {heading}
           </h1>
