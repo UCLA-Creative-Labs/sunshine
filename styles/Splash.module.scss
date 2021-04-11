@@ -3,7 +3,7 @@
 
 #splash {
   height: $section-height;
-  margin-top: calc(#{$navbar-height});
+  margin-top: $navbar-height;
   padding-top: 48px;
   transition: background-color $splash-transition, color $splash-transition;
   overflow: hidden;

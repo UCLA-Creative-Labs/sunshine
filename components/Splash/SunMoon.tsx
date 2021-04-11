@@ -5,7 +5,7 @@ import styles from '../../styles/Splash.module.scss';
 import { _DOMRect } from '../../utils';
 
 interface SunMoonProps {
-  mousePos: number[];
+  mousePos?: number[];
 }
 
 function SunMoon(props: SunMoonProps): JSX.Element {

@@ -9,25 +9,36 @@ import Splash from '../components/Splash';
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Home.module.scss';
 import { AppContext } from './_app';
+import SunMoon from '../components/Splash/SunMoon';
+import Stars from '../components/Splash/Stars';
 
 const opportunities = [
   {
     portrait: <Phone.default />,
     title: 'Projects',
-    description: 'Our projects are a quarter-long and open to all majors.',
-    link: '/projects',
+    body: 'Our projects are a quarter-long and open to all majors.',
+    link: {
+      url: '/projects',
+      displayText: 'LEARN MORE'
+    }
   },
   {
     portrait: <Portrait.Events />,
     title: 'Events',
-    description: 'We invite industry professionals or companies to talk about the field.',
-    link: '/events',
+    body: 'We invite industry professionals or companies to talk about the field.',
+    link: {
+      url: '/events',
+      displayText: 'LEARN MORE'
+    },
   },
   {
     portrait: <Lecture.default />,
     title: 'Workshops',
-    description: 'Learn something new at one of our workshops.',
-    link: '/workshops',
+    body: 'Learn something new at one of our workshops.',
+    link: {
+      url: '/workshops',
+      displayText: 'LEARN MORE'
+    },
   },
 ];
 
@@ -47,7 +58,18 @@ export default function Home(): JSX.Element {
   return (
     <Layout>
       <div style={{ margin: 0, padding: 0 }} onMouseMove={onMouseMove}>
-        <Splash mousePos={mousePos} />
+        <Splash
+          heading={'Let\'s get creative.'}
+          description={'Creative Labs is a community of students at UCLA working together on cool projects to discover even cooler passions.'}
+          buttons={[
+            {url: `#${styles['who-container']}`, displayText: 'EXPLORE ↗︎'},
+            {url: '/join', displayText: 'JOIN ↗︎'},
+          ]}>
+          <>
+            <SunMoon mousePos={mousePos} />
+            {!isDay && <Stars />}
+          </>
+        </Splash>
         <div id={styles['who-container']} className={'section'}>
           <div>
             <Portrait.default />
@@ -69,20 +91,8 @@ export default function Home(): JSX.Element {
         </div>
         <Section
           title={'So, what can I do?'}
-          body={'Whether you’re in a project or not, you are still a part of the Creative Labs community. We have new events, quarters, and workshops every quarter.'}>
-          <>
-            {opportunities.map(({title, description, link, portrait}) =>
-              <div className={styles['section-item']} key={title}>
-                {portrait}
-                <h3>{title}</h3>
-                <p>{description}</p>
-                <span>
-                  <Link href={link}>LEARN MORE</Link>
-                </span>
-              </div>,
-            )}
-          </>
-        </Section>
+          body={'Whether you’re in a project or not, you are still a part of the Creative Labs community. We have new events, quarters, and workshops every quarter.'}
+          items={opportunities} />
       </div>
     </Layout>
   );

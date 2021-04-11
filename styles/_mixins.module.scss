@@ -23,3 +23,19 @@
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+@mixin anchor-hover {
+  a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    right: 0;
+    border-bottom: 2px solid map-get($colors, 'black');
+    transition: right 0.3s ease-out;
+  }
+
+  a:hover::after { /* stylelint-disable no-descending-specificity */
+    right: 100%;
+  }
+}
