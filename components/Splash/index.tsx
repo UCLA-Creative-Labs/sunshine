@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import React, { useContext } from 'react';
 import { AppContext } from '../../pages/_app';
-import styles from '../../styles/Splash.module.scss';
 import colors from '../../styles/_variables.module.scss';
+import styles from '../../styles/Splash.module.scss';
 import { ILink } from '../../utils';
 
 interface SplashProps {

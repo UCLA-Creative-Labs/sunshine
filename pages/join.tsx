@@ -40,7 +40,8 @@ function Join(): JSX.Element {
         <Section
           title={'We have 3 roles!'}
           body={'Everyone is already part of the Creative Labs community!  We also have various roles that students can apply to every quarter. Before applying, we recommend reading the respective guides written by the Internal Team.'}
-          items={roles}/>
+          items={roles}
+          hasBackdrop={true}/>
       </>
     </Layout>
   );
