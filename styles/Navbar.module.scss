@@ -6,7 +6,6 @@
   z-index: 100;
   width: 100%;
   top: 0;
-
   box-sizing: border-box;
   color: map-get($colors, navbarText);
   transition: background-color $navbar-transition, color $navbar-transition;
