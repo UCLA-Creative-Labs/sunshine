@@ -20,7 +20,7 @@ const AppWrapper = ({children}: {children: JSX.Element}) => {
 
   return (
     <AppContext.Provider
-      value={{ isDay }}>
+      value={{ isDay: true }}>
       {children}
     </AppContext.Provider>
   );

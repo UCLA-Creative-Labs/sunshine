@@ -30,7 +30,7 @@ function Navbar(): JSX.Element {
     const navbarStyle = navbarRef.current.style;
     const logoStyle = logoRef.current.style;
 
-    navbarWrapperStyle.backgroundColor = setDay ? colors.splashBgDay : colors.navbarBgScroll;
+    navbarWrapperStyle.backgroundColor = setDay ? colors.opaqueWhite : colors.navbarBgScroll;
     navbarStyle.color = setDay ? colors.navbarText : colors.navbarTextScroll;
     logoStyle.filter = setDay ? 'invert(0%)' : 'invert(100%)';
   };

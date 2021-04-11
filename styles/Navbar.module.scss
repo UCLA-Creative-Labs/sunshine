@@ -8,7 +8,6 @@
   top: 0;
 
   box-sizing: border-box;
-  background-color: map-get($colors, splashBgDay);
   color: map-get($colors, navbarText);
   transition: background-color $navbar-transition, color $navbar-transition;
   user-select: none;
