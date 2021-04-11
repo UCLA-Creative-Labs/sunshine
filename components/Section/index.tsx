@@ -17,8 +17,8 @@ function Section(props: SectionProps): JSX.Element {
         <h2 className={styles.heading}>{title}</h2>
         {body && <p className={styles['section-body']}>{body}</p>}
         <div className={styles['section-items']}>
-          {items.map((props) => 
-            <Item {...props} />
+          {items.map((itemProps) =>
+            <Item {...itemProps} key={itemProps.title}/>,
           )}
         </div>
       </div>

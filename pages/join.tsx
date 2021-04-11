@@ -5,7 +5,6 @@ import Section from '../components/Section';
 import { ItemProps } from '../components/Section/Item';
 import Splash from '../components/Splash';
 import SunMoon from '../components/Splash/SunMoon';
-import styles from '../styles/Join.module.scss';
 
 const roles: ItemProps[] = [
   {

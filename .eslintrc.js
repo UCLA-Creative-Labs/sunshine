@@ -69,7 +69,8 @@ module.exports = {
     'no-duplicate-imports': ['error'],
 
     // Cannot shadow names
-    'no-shadow': ['error'],
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
 
     // Required spacing in property declarations (copied from TSLint, defaults are good)
     'key-spacing': ['error'],
@@ -121,7 +122,7 @@ module.exports = {
         'field',
 
         // Constructors
-        'constructor', // = ["public-constructor", "protected-constructor", "private-constructor"]
+        'constructor', // = ['public-constructor', 'protected-constructor', 'private-constructor']
 
         // Methods
         'method',

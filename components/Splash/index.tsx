@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React, { useContext } from 'react';
 import { AppContext } from '../../pages/_app';
 import styles from '../../styles/Splash.module.scss';
+import colors from '../../styles/_variables.module.scss';
 import { ILink } from '../../utils';
 
 interface SplashProps {
@@ -16,11 +17,12 @@ function Splash(props: SplashProps): JSX.Element {
   const {heading, description, children, buttons, halve} = props;
   const {isDay} = useContext(AppContext);
 
-  const containerStyle = halve && { height: '50vh', minHeight: 'unset' };
+  const splashClass = !halve ? (isDay ? styles.day : styles.night) : '';
+  const containerStyle = halve && { height: '50vh', minHeight: 'unset', backgroundColor: colors.lightBlue };
   const blurbStyle = halve && { bottom: '0px'};
 
   return (
-    <div id={styles.splash} className={['section', (isDay ? styles.day : styles.night)].join(' ')} style={containerStyle}>
+    <div id={styles.splash} className={['section', splashClass].join(' ')} style={containerStyle}>
       <div>
         {children}
         <div id={styles.blurb} style={blurbStyle}>
@@ -30,12 +32,12 @@ function Splash(props: SplashProps): JSX.Element {
           <p id={styles.description}>
             {description}
           </p>
-          {buttons && 
+          {buttons &&
             <div id={styles['btn-container']}>
-              {buttons.map(({url, displayText}) => 
-                <Link href={url}>
+              {buttons.map(({url, displayText}) =>
+                <Link href={url} key={displayText}>
                   <button className={styles.btn}>{displayText}</button>
-                </Link>
+                </Link>,
               )}
             </div>
           }

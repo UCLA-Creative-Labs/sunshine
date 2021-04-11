@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
-import { ILink } from '../../utils';
 import styles from '../../styles/Section.module.scss';
+import { ILink } from '../../utils';
 
 export interface ItemProps {
   title: string;
@@ -16,6 +16,7 @@ function Item(props: ItemProps): JSX.Element {
   return (
     <div className={styles['section-item']}>
       {portrait}
+      {preface && <p className={styles.preface}>{preface}</p>}
       <h3>{title}</h3>
       <p>{body}</p>
       {link &&

@@ -1,33 +1,31 @@
 import React from 'react';
 import styles from '../../styles/Graphics.module.scss';
 
-export enum PORTRAIT_MODE {
-  FAMILY='FAMILY',
-  PLAY='PLAY',
-};
-
-export enum SPOTLIGHT {
-  ELLIPSE='ELLIPSE',
-  CIRCLE='CIRCLE',
-  TRIANGLE='TRIANGLE',
-};
-
 interface PortraitProps {
   mode: PORTRAIT_MODE;
   style?: React.CSSProperties;
   spotlight?: SPOTLIGHT;
 }
 
+export enum PORTRAIT_MODE {
+  FAMILY='FAMILY',
+  PLAY='PLAY',
+}
+
+export enum SPOTLIGHT {
+  ELLIPSE='ELLIPSE',
+  CIRCLE='CIRCLE',
+  TRIANGLE='TRIANGLE',
+}
+
 export default function Portrait(props: PortraitProps): JSX.Element {
   const {mode, style, spotlight} = props;
-  const portraitId = mode === PORTRAIT_MODE.PLAY ? styles.play : '';
 
+  const portraitId = mode === PORTRAIT_MODE.PLAY ? styles.play : '';
   const grayBackground = spotlight && {backgroundColor: '#C4C4C4'};
-  const filter = (t_spotlight: SPOTLIGHT) => {
-    return spotlight && t_spotlight !== spotlight
-      ? {filter: 'grayscale(1)'}
-      : {};
-  }
+  const filter = (t_spotlight: SPOTLIGHT) => spotlight && t_spotlight !== spotlight
+    ? {filter: 'grayscale(1)'}
+    : {};
 
   return (
     <div id={portraitId} className={styles.container} style={{...style, ...grayBackground}}>

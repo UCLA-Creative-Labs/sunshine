@@ -2,16 +2,16 @@ import Link from 'next/link';
 import React, { useContext, useEffect, useState } from 'react';
 
 import {Lecture, Portrait, Phone} from '../components/Graphics';
+import { PORTRAIT_MODE } from '../components/Graphics/Portrait';
 import Layout from '../components/Layout';
 import Section from '../components/Section';
 import Splash from '../components/Splash';
 
+import Stars from '../components/Splash/Stars';
+import SunMoon from '../components/Splash/SunMoon';
 import colors from '../styles/_variables.module.scss';
 import styles from '../styles/Home.module.scss';
 import { AppContext } from './_app';
-import SunMoon from '../components/Splash/SunMoon';
-import Stars from '../components/Splash/Stars';
-import { PORTRAIT_MODE } from '../components/Graphics/Portrait';
 
 const opportunities = [
   {
@@ -20,8 +20,8 @@ const opportunities = [
     body: 'Our projects are a quarter-long and open to all majors.',
     link: {
       url: '/projects',
-      displayText: 'LEARN MORE'
-    }
+      displayText: 'LEARN MORE',
+    },
   },
   {
     portrait: <Portrait.default mode={PORTRAIT_MODE.PLAY} />,
@@ -29,7 +29,7 @@ const opportunities = [
     body: 'We invite industry professionals or companies to talk about the field.',
     link: {
       url: '/events',
-      displayText: 'LEARN MORE'
+      displayText: 'LEARN MORE',
     },
   },
   {
@@ -38,7 +38,7 @@ const opportunities = [
     body: 'Learn something new at one of our workshops.',
     link: {
       url: '/workshops',
-      displayText: 'LEARN MORE'
+      displayText: 'LEARN MORE',
     },
   },
 ];

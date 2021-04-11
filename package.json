@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "npx eslint '**/*.tsx' '**/*.ts' && npx stylelint '**/*.css' '**/*.scss'",
+    "eslint": "npx eslint '**/*.tsx' '**/*.ts'",
+    "stylelint": "npx stylelint '**/*.css' '**/*.scss'",
+    "lint": "yarn run eslint && yarn run stylelint",
     "no-lock": "scripts/noPackageLock.sh"
   },
   "dependencies": {
