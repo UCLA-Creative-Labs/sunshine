@@ -3,11 +3,17 @@
 
 #footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  padding: $padding-vert $padding-horiz;
+
+  box-sizing: border-box;
+  width: 100%;
   background-color: map-get($colors, footerBg);
   color: map-get($colors, footerText);
   user-select: none;
+
+  // Responsive Properties
+  padding: $padding-vert $padding-horiz;
 }
 
 #footer-tag {
@@ -27,13 +33,14 @@
 
 #logo {
   @include mixin.logo;
-
   margin-right: 10px;
   filter: invert(100%);
 }
 
 #footer-links {
   display: flex;
+
+  // Responsive Properties
   margin-left: auto;
 }
 
@@ -41,9 +48,10 @@
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  margin-right: $padding-horiz;
   color: map-get($colors, footerText);
 
+  // Responsive Properties
+  margin-right: $padding-horiz;
   .title {
     color: inherit;
     text-decoration: underline;
@@ -63,14 +71,17 @@
   #footer {
     padding: $padding-vert-mobile $padding-horiz-mobile;
     flex-direction: column;
-    align-items: flex-start;
   }
 
   #footer-links {
     margin: 0;
+    width: 100%;
+    flex-wrap: wrap;
   }
 
   .footer-col {
-    margin: right;
+    margin: 0;
+    flex: 1 1 120px;
+    margin-top: 30px;
   }
 }
