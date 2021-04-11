@@ -5,7 +5,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-
   box-sizing: border-box;
   width: 100%;
   background-color: map-get($colors, footerBg);
@@ -33,6 +32,7 @@
 
 #logo {
   @include mixin.logo;
+
   margin-right: 10px;
   filter: invert(100%);
 }
@@ -52,6 +52,7 @@
 
   // Responsive Properties
   margin-right: $padding-horiz;
+
   .title {
     color: inherit;
     text-decoration: underline;
