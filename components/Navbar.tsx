@@ -18,6 +18,7 @@ function Navbar(): JSX.Element {
   const pathname = useRouter().pathname;
   const [ scrollTop, setScrollTop ] = useState<number>(0);
 
+  const navbarWrapperRef = useRef<HTMLDivElement>(null);
   const navbarRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
 
@@ -25,10 +26,11 @@ function Navbar(): JSX.Element {
   const setNavStyle = (setDay: boolean) => {
     if (!navbarRef.current || !logoRef.current)
       return;
+    const navbarWrapperStyle = navbarWrapperRef.current.style;
     const navbarStyle = navbarRef.current.style;
     const logoStyle = logoRef.current.style;
 
-    navbarStyle.backgroundColor = setDay ? colors.splashBgDay : colors.navbarBgScroll;
+    navbarWrapperStyle.backgroundColor = setDay ? colors.opaqueWhite : colors.navbarBgScroll;
     navbarStyle.color = setDay ? colors.navbarText : colors.navbarTextScroll;
     logoStyle.filter = setDay ? 'invert(0%)' : 'invert(100%)';
   };
@@ -52,16 +54,18 @@ function Navbar(): JSX.Element {
   }, [ scrollTop ]);
 
   return (
-    <nav id={styles.navbar} ref={navbarRef}>
-      <Link href='/'>
-        <div id={styles.logo} ref={logoRef} />
-      </Link>
-      {Object.entries(path2Display).map(([path, display]) =>
-        <Link href={path} key={display}>
-          <h4 style={{fontWeight: path === pathname ? 700 : 400}}>{display}</h4>
-        </Link>,
-      )}
-    </nav>
+    <div id={styles['nav-wrapper']} ref={navbarWrapperRef}>
+      <nav id={styles.navbar} ref={navbarRef}>
+        <Link href='/'>
+          <div id={styles.logo} ref={logoRef} />
+        </Link>
+        {Object.entries(path2Display).map(([path, display]) =>
+          <Link href={path} key={display}>
+            <h4 style={{fontWeight: path === pathname ? 700 : 400}}>{display}</h4>
+          </Link>,
+        )}
+      </nav>
+    </div>
   );
 }
 
