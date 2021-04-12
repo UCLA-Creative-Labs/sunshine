@@ -1,14 +1,12 @@
 @use 'variables.module' as *;
 @use '_mixins.module' as mixin;
 
-#navbar {
-  // Fixed Properties
-  display: flex;
+#nav-wrapper {
   position: fixed;
-  align-items: center;
-  top: 0;
   z-index: 100;
-  background-color: map-get($colors, splashBgDay);
+  width: 100%;
+  top: 0;
+  box-sizing: border-box;
   color: map-get($colors, navbarText);
   transition: background-color $navbar-transition, color $navbar-transition;
   user-select: none;
@@ -16,7 +14,17 @@
   // Responsive Properties
   height: $navbar-height;
   padding: 0 $padding-horiz;
-  width: 100%;
+}
+
+#navbar {
+  // Fixed Properties
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  max-width: $max-section-width;
+
+  // Responsive Properties
+  height: $navbar-height;
 
   * {
     cursor: pointer;
@@ -32,9 +40,13 @@
 }
 
 @media only screen and (max-width: 600px) {
-  #navbar {
+  #nav-wrapper {
     height: $navbar-height-mobile;
     padding: 0 $padding-horiz-mobile;
+  }
+
+  #navbar {
+    height: $navbar-height-mobile;
     width: calc(100vw - 2 * #{$padding-horiz-mobile});
     justify-content: space-between;
 
