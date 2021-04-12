@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import ReactTooltip from 'react-tooltip';
 
 import styles from '../styles/Team.module.scss';
@@ -15,7 +14,7 @@ function TeamCard(props: TeamCardProps): JSX.Element {
 
   return (
     <div className={styles['team-card']}>
-      <div className={styles['profile']}>
+      <div className={styles.profile}>
         {props.data.link ? (
           <>
             <a
