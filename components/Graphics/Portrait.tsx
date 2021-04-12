@@ -22,7 +22,7 @@ export default function Portrait(props: PortraitProps): JSX.Element {
   const {mode, style, spotlight} = props;
 
   const portraitId = mode === PORTRAIT_MODE.PLAY ? styles.play : '';
-  const grayBackground = spotlight && {backgroundColor: '#C4C4C4'};
+  const grayBackground = spotlight && {backgroundColor: '#C4C4C4', border: 'none'};
   const filter = (t_spotlight: SPOTLIGHT) => spotlight && t_spotlight !== spotlight
     ? {filter: 'grayscale(1)'}
     : {};

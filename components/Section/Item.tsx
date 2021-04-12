@@ -15,7 +15,7 @@ export interface ItemProps {
 
 function Item(props: ItemProps): JSX.Element {
   const {portrait, title, body, preface, link, hasBackdrop} = props;
-  const backdrop = hasBackdrop && {backgroundColor: colors.beige};
+  const backdrop = hasBackdrop && {backgroundColor: colors.beige, border: '3.5px solid #000'};
   return (
     <div className={styles['section-item']} style={backdrop}>
       {portrait}
