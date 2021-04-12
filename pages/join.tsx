@@ -8,7 +8,7 @@ import SunMoon from '../components/Splash/SunMoon';
 
 const roles: ItemProps[] = [
   {
-    portrait: <Portrait mode={PORTRAIT_MODE.PLAY} spotlight={SPOTLIGHT.ELLIPSE} />,
+    portrait: <Portrait mode={PORTRAIT_MODE.PLAY} spotlight={SPOTLIGHT.TRIANGLE} />,
     preface: 'BEFORE EACH QUARTER',
     title: 'Project Lead',
     body: 'Have a cool idea? Apply to be a Project Lead and make it happen.',
@@ -20,7 +20,7 @@ const roles: ItemProps[] = [
     body: 'Want to be a part of something wonderful? Apply as a Project Member. Experience varies per project.',
   },
   {
-    portrait: <Portrait mode={PORTRAIT_MODE.PLAY} spotlight={SPOTLIGHT.TRIANGLE} />,
+    portrait: <Portrait mode={PORTRAIT_MODE.PLAY} spotlight={SPOTLIGHT.ELLIPSE} />,
     preface: '24/7',
     title: 'Board Member',
     body: 'Interesting in helping the CL community? Apply as a board member.',

@@ -32,7 +32,7 @@ export default function Portrait(props: PortraitProps): JSX.Element {
       <div className={[styles.boys, styles.default].join(' ')}>
         <img src={'mascots/ellipse-boy.svg'} className={styles.ellipse} style={filter(SPOTLIGHT.ELLIPSE)}/>
         <img src={'mascots/circle-boy.svg'} className={styles.circle} style={filter(SPOTLIGHT.CIRCLE)}/>
-        <img src={'mascots/triangle-boy.svg'} className={styles.triangle} style={filter(SPOTLIGHT.TRIANGLE)}/>
+        <img src={spotlight ? 'mascots/blue-triangle.svg' : 'mascots/triangle-boy.svg'} className={styles.triangle} style={filter(SPOTLIGHT.TRIANGLE)}/>
       </div>
     </div>
   );
