@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import ReactTooltip from 'react-tooltip';
 
 import styles from '../styles/Team.module.scss';
@@ -14,24 +15,26 @@ function TeamCard(props: TeamCardProps): JSX.Element {
 
   return (
     <div className={styles['team-card']}>
-      {props.data.link ? (
-        <>
-          <a
-            data-tip
-            data-for={props.data.name}
-            target='_blank'
-            rel='noreferrer'
-            href={props.data.link}
-          >
-            {image}
-          </a>
-          <ReactTooltip id={props.data.name} className={styles['team-tooltip']} arrowColor='transparent' textColor='black' backgroundColor='#FFF740'>
-            {props.data.link.split('//').slice(-1)[0] + ' ↗'}
-          </ReactTooltip>
-        </>
-      ) : (
-        image
-      )}
+      <div className={styles['profile']}>
+        {props.data.link ? (
+          <>
+            <a
+              data-tip
+              data-for={props.data.name}
+              target='_blank'
+              rel='noreferrer'
+              href={props.data.link}
+            >
+              {image}
+            </a>
+            <ReactTooltip id={props.data.name} className={styles['team-tooltip']} arrowColor='transparent' textColor='black' backgroundColor='#FFF740'>
+              {props.data.link.split('//').slice(-1)[0] + ' ↗'}
+            </ReactTooltip>
+          </>
+        ) : (
+          image
+        )}
+      </div>
       <h4 className={styles['team-title']}>{props.data.name}</h4>
       <p>{props.alumni ? 'ALUMNI' : `CLASS OF ${props.data.class}`}</p>
       {props.data.roles.map((role) => (
