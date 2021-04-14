@@ -3,8 +3,9 @@
 
 #splash {
   height: $section-height;
-  margin-top: calc(#{$navbar-height});
+  margin-top: $navbar-height;
   padding-top: 48px;
+  position: relative;
   transition: background-color $splash-transition, color $splash-transition;
   overflow: hidden;
 }
@@ -117,6 +118,7 @@
 
   #blurb {
     width: calc(100vw - 2 * #{$padding-horiz-mobile});
+    margin-bottom: 60px; // Addresses weird spacing on mobile
   }
 
   #heading {

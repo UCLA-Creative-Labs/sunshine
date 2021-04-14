@@ -46,7 +46,11 @@
   }
 }
 
-#events {
+#play {
+  .boys {
+    width: 400px;
+  }
+
   .ellipse {
     width: 100px;
     left: 10%;
@@ -58,7 +62,7 @@
     width: 120px;
     z-index: 1;
     transform: rotateZ(-135deg);
-    left: 20%;
+    left: 15%;
     top: -50%;
   }
 
@@ -71,7 +75,7 @@
 
 #lecture-container,
 #phone-container,
-#events {
+#play {
   height: 300px;
 }
 
