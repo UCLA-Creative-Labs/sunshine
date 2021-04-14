@@ -49,7 +49,7 @@ a {
 .section {
   background-color: $section-bg;
   box-sizing: border-box;
-  width: calc(100vw - 15px); // To avoid slight overflow
+  width: calc(100%);
   padding: $section-padding;
   margin: 0;
 }

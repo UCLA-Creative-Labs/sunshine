@@ -1,35 +1,46 @@
 import Link from 'next/link';
 import React, { useContext } from 'react';
 import { AppContext } from '../../pages/_app';
+import colors from '../../styles/_variables.module.scss';
 import styles from '../../styles/Splash.module.scss';
-import Stars from './Stars';
-import SunMoon from './SunMoon';
+import { ILink } from '../../utils';
 
 interface SplashProps {
-  mousePos: number[];
+  heading: string;
+  description: string;
+  children: JSX.Element;
+  buttons?: ILink[];
+  halve?: boolean;
 }
 
 function Splash(props: SplashProps): JSX.Element {
+  const {heading, description, children, buttons, halve} = props;
   const {isDay} = useContext(AppContext);
+
+  const splashClass = !halve ? (isDay ? styles.day : styles.night) : '';
+  const containerStyle = halve && { height: '50vh', minHeight: 'unset', backgroundColor: colors.lightBlue };
+  const blurbStyle = halve && { bottom: '0px'};
+
   return (
-    <div id={styles.splash} className={['section', (isDay ? styles.day : styles.night)].join(' ')}>
+    <div id={styles.splash} className={['section', splashClass].join(' ')} style={containerStyle}>
       <div>
-        <SunMoon mousePos={props.mousePos} />
-        {!isDay && <Stars />}
-        <div id={styles.blurb}>
+        {children}
+        <div id={styles.blurb} style={blurbStyle}>
           <h1 id={styles.heading}>
-            Let&apos;s get creative.
+            {heading}
           </h1>
           <p id={styles.description}>
-            Creative Labs is a community of students at UCLA working together
-            on cool projects to discover even cooler passions.
+            {description}
           </p>
-          <div id={styles['btn-container']}>
-            <button className={styles.btn}>EXPLORE ↗︎</button>
-            <Link href='/join'>
-              <button className={styles.btn}>JOIN ↗︎</button>
-            </Link>
-          </div>
+          {buttons &&
+            <div id={styles['btn-container']}>
+              {buttons.map(({url, displayText}) =>
+                <Link href={url} key={displayText}>
+                  <button className={styles.btn}>{displayText}</button>
+                </Link>,
+              )}
+            </div>
+          }
         </div>
       </div>
     </div>

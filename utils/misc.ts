@@ -1,3 +1,8 @@
+export interface ILink {
+  url: string;
+  displayText: string;
+}
+
 export const roles_index = [
   'Executive Director', 'Design Director', 'External Director',
   'Projects Director', 'Tech Director', 'Designer', 'Developer',
