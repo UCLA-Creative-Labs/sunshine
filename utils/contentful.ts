@@ -1,3 +1,17 @@
+
+
+const query = async (query: string): Promise<any | undefined> => {
+  const res = await fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify({query}),
+  });
+  return await res.json();
+}
+
 export interface Person {
   name: string;
   class: number;
@@ -6,7 +20,7 @@ export interface Person {
   link?: string;
 }
 
-export const query = `{
+export const teamMemberQuery = `{
   teamMembersCollection {
     items {
       name
@@ -23,14 +37,35 @@ export const query = `{
 }`;
 
 export const fetchTeam = async (): Promise<any[] | undefined> => {
-  const res = await fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
-    },
-    body: JSON.stringify({query}),
-  });
-  const {data} = await res.json();
+  const {data} = await query(teamMemberQuery);
   return data?.teamMembersCollection?.items ?? [];
+};
+
+export interface Project {
+  title: string;
+  pleads: string[];
+  quarter: string;
+  url: string;
+  descipriton: string;
+}
+
+export const projectsQuery = `{
+  projectsCollection {
+    items {
+      projectTitle
+      projectLeads
+      projectQuarter
+      photo {
+        url
+      }
+      description {
+        json
+      }
+    }
+  }
+}`;
+
+export const fetchProjects = async (): Promise<any[] | undefined> => {
+  const {data} = await query(projectsQuery);
+  return data?.projectsCollection?.items ?? [];
 };
