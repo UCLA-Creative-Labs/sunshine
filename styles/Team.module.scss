@@ -78,7 +78,7 @@
     // background-color + mix-blend-mode (color) allows for a colored filter (in our case its black)
     background-color: #000;
     mix-blend-mode: color;
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.2s ease-in-out;
   }
 
   &:hover::after {
