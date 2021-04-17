@@ -46,6 +46,33 @@
   padding: 1rem 2rem;
 }
 
+// .itemImg {
+//   width: clamp(300px, 40vw, 400px);
+//   height: 300px;
+//   object-fit: cover;
+// }
+
+.section-project-item {
+  flex: 0 1 400px;
+  margin: 30px auto;
+
+  img {
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+  }
+
+  .preface {
+    font-size: 1rem;
+    margin: 1rem 0 0;
+  }
+
+  h3 {
+    margin: 1rem 0 0;
+    line-height: 2.2rem;
+  }
+}
+
 @media only screen and (max-width: 600px) {
   .section-items {
     width: calc(100vw - 2 * #{$padding-horiz-mobile});
@@ -68,6 +95,16 @@
 
     p {
       font-size: 1rem;
+    }
+  }
+
+  .section-project-item {
+    flex: 0 1 300px;
+    width: 100%;
+
+    img {
+      width: 100%;
+      height: calc(100% * 3 / 4);
     }
   }
 }

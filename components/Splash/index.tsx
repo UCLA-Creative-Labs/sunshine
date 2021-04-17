@@ -17,8 +17,8 @@ function Splash(props: SplashProps): JSX.Element {
   const {heading, description, children, buttons, halve} = props;
   const {isDay} = useContext(AppContext);
 
-  const splashClass = !halve ? (isDay ? styles.day : styles.night) : '';
-  const containerStyle = halve && { height: '50vh', minHeight: 'unset', backgroundColor: colors.lightBlue };
+  const splashClass = isDay ? styles.day : styles.night;
+  const containerStyle = halve && { height: '50vh', minHeight: 'unset'};
   const blurbStyle = halve && { bottom: '0px'};
 
   return (

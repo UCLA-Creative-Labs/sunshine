@@ -1,5 +1,3 @@
-
-
 const query = async (query: string): Promise<any | undefined> => {
   const res = await fetch(`https://graphql.contentful.com/content/v1/spaces/${process.env.SPACE_ID}/`, {
     method: 'POST',
@@ -45,8 +43,8 @@ export interface Project {
   title: string;
   pleads: string[];
   quarter: string;
-  url: string;
-  descipriton: string;
+  img: string;
+  description: string;
 }
 
 export const projectsQuery = `{

@@ -3,12 +3,6 @@ export interface ILink {
   displayText: string;
 }
 
-export const roles_index = [
-  'Executive Director', 'Design Director', 'External Director',
-  'Projects Director', 'Tech Director', 'Designer', 'Developer',
-  'External', 'Projects',
-];
-
 export function openWindow(url: string): void{
   const win = window.open(url, '_blank');
   if (win != null) win.focus();

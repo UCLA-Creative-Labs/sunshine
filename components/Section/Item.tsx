@@ -6,8 +6,8 @@ import { ILink } from '../../utils';
 
 export interface ItemProps {
   title: string;
-  portrait: JSX.Element;
   body: string;
+  portrait: JSX.Element;
   preface?: string;
   link?: ILink;
   hasBackdrop?: boolean;
