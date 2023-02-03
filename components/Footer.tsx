@@ -11,11 +11,8 @@ const footerLinks = {
     ['/projects', 'Projects'],
   ],
   'Stay Updated': [
-    ['https://www.facebook.com/uclacreatives', 'Facebook'],
     ['https://www.instagram.com/creativelabsucla', 'Discord'],
     ['https://www.instagram.com/creativelabsucla', 'Instagram'],
-    ['https://www.youtube.com/channel/UC917WXknuSu1IMn34PdJr3Q', 'Youtube'],
-    ['https://medium.com/creative-labs', 'Medium'],
   ],
 };
 
