@@ -133,9 +133,11 @@ function Navbar(props: NavbarProps): JSX.Element {
             style={{ fontWeight: sectionScrollStates[2] ? 700 : 400 }}>
             PROJECTS
           </a>
-          <button>
+          <a
+            id={'join-us'}
+            href="/join">
             JOIN US
-          </button>
+          </a>
         </nav>
       </div>
     </div>
