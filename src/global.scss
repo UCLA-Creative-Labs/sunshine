@@ -1,4 +1,4 @@
-@import 'components/styles/variables';
+@import url('components/styles/variables');
 
 body {
   padding: 0;
@@ -43,7 +43,7 @@ a {
   background-color: $section-bg;
   box-sizing: border-box;
   min-height: calc(100vh - #{$navbar-height} + 1px);
-  width: calc(100vw - 15px); // To avoid slight overflow
+  width: calc(100vw - 15px); /* To avoid slight overflow */
   padding: $section-padding;
   margin: 0;
   border-bottom: 1px solid dimgray;
@@ -66,6 +66,6 @@ a {
   }
 }
 
-.Toastify__toast-body {
-  font-family: 'Lato', sans-serif;
+.Toastify__toast-body { /* stylelint-disable-line */
+  font-family: Lato, sans-serif;
 }

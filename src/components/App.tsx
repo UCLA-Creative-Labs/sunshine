@@ -8,11 +8,6 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import notifications from '../assets/notifications.json';
-import sectionItem   from '../assets/sectionInfo.json';
-
-import { openWindow, Person, query } from '../utils/Utils';
-
 import Construction  from './Construction';
 import Footer        from './Footer';
 import Join          from './Join';
@@ -22,6 +17,9 @@ import Splash        from './Splash';
 import Team          from './Team';
 
 import colors from './styles/_variables.scss';
+import notifications from '../assets/notifications.json';
+import sectionItem   from '../assets/sectionInfo.json';
+import { openWindow, Person, query } from '../utils/Utils';
 
 function App(): JSX.Element {
   const [ isDay, setIsDay ] = useState(true);

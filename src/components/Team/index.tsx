@@ -1,7 +1,7 @@
 import React, { CSSProperties, useState } from 'react';
 import Select from 'react-select';
-import {Person, roles_index} from '../../utils/Utils';
 import TeamCard from './TeamCard';
+import {Person, roles_index} from '../../utils/Utils';
 
 interface TeamProps {
   data: Person[];
