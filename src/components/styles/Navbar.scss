@@ -48,6 +48,28 @@
   cursor: pointer;
 }
 
+#join-us-divider {
+  position: relative;
+  top: 8px;
+  margin-left: 2.5%;
+  display: inline-block;
+  width: 0px;
+  height: 28px;
+  border: 1px solid map-get($colors, joinUsText);
+}
+
+#join-us-container {
+  display: inline-block;
+  padding-left: 2.5%;
+}
+
+#join-us {
+  padding: 6px 30px !important;
+  border-radius: 10px;
+  border: 2px solid map-get($colors, joinUsText);
+  color: map-get($colors, joinUsText);
+}
+
 @media only screen and (max-width: 600px) {
   #navbar {
     width: 100vw;
