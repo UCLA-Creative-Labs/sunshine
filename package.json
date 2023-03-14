@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server --open --config webpack.dev.js --host=0.0.0.0",
+    "start": "webpack-dev-server --open --config webpack.dev.js --host=localhost",
     "build": "webpack --config webpack.prod.js",
     "lint": "npx eslint '**/*.tsx' '**/*.ts' && npx stylelint '**/*.css' '**/*.scss'"
   },
