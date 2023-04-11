@@ -5,6 +5,20 @@
 # 4. Remove stale reviews
 # 5. Dependabot
 
+queue_rules:
+  - name: default
+    conditions:
+      # Conditions to get out of the queue (= merged)
+      - -title~=(WIP|wip)
+      - -label~=(work-in-progress|do-not-merge|no-squash)
+      - -merged
+      - -closed
+      - author!=dependabot[bot]
+      - author!=dependabot-preview[bot]
+      - "#approved-reviews-by>=1"
+      - -approved-reviews-by~=author
+      - "#changes-requested-reviews-by=0"
+
 pull_request_rules:
 
   # 1. Check title to follow conventional commits
@@ -25,10 +39,8 @@ pull_request_rules:
       comment:
         message: Thanks for contributing! Your pull request will be updated from master and then merged automatically (do not update manually, and be sure to [allow changes to be pushed to your fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)).
       merge:
-        strict: smart
         method: squash
-        strict_method: merge
-        commit_message: title+body
+        commit_message_template: title+body
       delete_head_branch: {}
     conditions:
       - -title~=(WIP|wip)
@@ -47,11 +59,9 @@ pull_request_rules:
       comment:
         message: Thank you for contributing! Your pull request will be updated from master and then merged automatically (do not update manually, and be sure to [allow changes to be pushed to your fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork)).
       merge:
-        strict: smart
         # Merge instead of squash
         method: merge
-        strict_method: merge
-        commit_message: title+body
+        commit_message_template: title+body
       delete_head_branch: {}
     conditions:
       - -title~=(WIP|wip)
@@ -84,10 +94,10 @@ pull_request_rules:
       comment:
         message: Thanks Dependabot 🙏!
       merge:
+        # 4/10/23 strict mode has been depreciated
         # 'strict: false' disables Mergify keeping the branch up-to-date from master.
         # It's not necessary: Dependabot will do that itself.
         # It's not dangerous: GitHub branch protection settings prevent merging stale branches.
-        strict: false
         method: squash
       delete_head_branch: {}
     conditions:
