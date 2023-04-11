@@ -16,6 +16,7 @@ function Navbar(props: NavbarProps): JSX.Element {
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
+  const joinUsDividerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLDivElement>(null);
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
 
@@ -27,28 +28,32 @@ function Navbar(props: NavbarProps): JSX.Element {
   };
 
   const toNightStyle = () => {
-    if (!navbarRef.current || !navigationRef.current || !logoRef.current)
+    if (!navbarRef.current || !navigationRef.current || !joinUsDividerRef.current || !logoRef.current)
       return;
     const navbarStyle = navbarRef.current.style;
     const navigationStyle = navigationRef.current.style;
+    const joinUsDividerStyle = joinUsDividerRef.current.style;
     const logoStyle = logoRef.current.style;
 
     navbarStyle.backgroundColor = colors.navbarBgScroll;
     navbarStyle.color = colors.navbarTextScroll;
     navigationStyle.color = colors.navbarTextScroll;
+    joinUsDividerStyle.borderColor = colors.joinUsTextScroll;
     logoStyle.filter = 'invert(100%)';
   };
 
   const toDayStyle = () => {
-    if (navbarRef.current == null || navigationRef.current == null || logoRef.current == null)
+    if (navbarRef.current == null || navigationRef.current == null || joinUsDividerRef.current == null || logoRef.current == null)
       return;
     const navbarStyle = navbarRef.current.style;
     const navigationStyle = navigationRef.current.style;
+    const joinUsDividerStyle = joinUsDividerRef.current.style;
     const logoStyle = logoRef.current.style;
 
     navbarStyle.backgroundColor = colors.splashBgDay;
     navbarStyle.color = colors.navbarText;
     navigationStyle.color = colors.navbarText;
+    joinUsDividerStyle.borderColor = colors.joinUsText;
     logoStyle.filter = 'invert(0%)';
   };
 
@@ -133,6 +138,18 @@ function Navbar(props: NavbarProps): JSX.Element {
             style={{ fontWeight: sectionScrollStates[2] ? 700 : 400 }}>
             PROJECTS
           </a>
+          <div id={'join-us-divider'} ref={joinUsDividerRef}></div>
+          <div id={'join-us-container'}>
+            <a
+              id={'join-us'}
+              href="/join"
+              style={{
+                backgroundColor: window.location.pathname === "/join" ? colors.joinUsBgSelected : colors.joinUsBg,
+                fontWeight: window.location.pathname === "/join" ? 700: 400
+              }}>
+              JOIN US
+            </a>
+          </div>
         </nav>
       </div>
     </div>
