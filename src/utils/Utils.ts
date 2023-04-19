@@ -7,6 +7,7 @@ export interface Person {
   name: string;
   class: number;
   roles: string[];
+  company?: string;
   image?: string;
   link?: string;
 }
@@ -27,6 +28,7 @@ export const query = `{
       name
       class
       roles
+      company
       photo {
         url
       }
