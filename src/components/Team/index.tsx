@@ -19,10 +19,9 @@ const roleOptions = roles.map((item) => ({ value: item, label: item }));
 
 // Set June to be the cut off day for the start of a new year
 const currYear = Math.floor(
-  new Date().getFullYear() + (new Date().getMonth() - 5) / 12
+  new Date().getFullYear() + (new Date().getMonth() - 5) / 12,
 );
 
-console.log(currYear);
 const yearOptions = [
   'All Years',
   currYear + 1,
@@ -75,11 +74,13 @@ function Team(props: TeamProps): JSX.Element {
   });
 
   const filteredData = props.data.filter(
-    (person) => person.class && person.name && person.roles
+    (person) => person.class && person.name && person.roles,
   );
 
   filteredData.forEach((person) =>
-    person.roles.sort((a, b) => roles_index.indexOf(a) - roles_index.indexOf(b))
+    person.roles.sort(
+      (a, b) => roles_index.indexOf(a) - roles_index.indexOf(b),
+    ),
   );
 
   let currentMembers = filteredData.filter((person) => person.class > currYear);
@@ -98,13 +99,13 @@ function Team(props: TeamProps): JSX.Element {
 
   if (year.value !== 'All Years') {
     currentMembers = currentMembers.filter(
-      (person) => person.class === +year.value
+      (person) => person.class === +year.value,
     );
   }
 
   if (role.value !== 'All Roles') {
     currentMembers = currentMembers.filter((person) =>
-      person.roles.some((r) => r === role.value || r.includes(role.value))
+      person.roles.some((r) => r === role.value || r.includes(role.value)),
     );
   }
 
@@ -114,7 +115,9 @@ function Team(props: TeamProps): JSX.Element {
 
   if (alumniRole.value !== 'All Roles') {
     alumni = alumni.filter((person) =>
-      person.roles.some((r) => r === role.value || r.includes(alumniRole.value))
+      person.roles.some(
+        (r) => r === role.value || r.includes(alumniRole.value),
+      ),
     );
   }
 
@@ -149,8 +152,8 @@ function Team(props: TeamProps): JSX.Element {
         <div className="team-cards">
           {currentMembers.length
             ? currentMembers.map((person) => (
-                <TeamCard key={person.name} data={person} />
-              ))
+              <TeamCard key={person.name} data={person} />
+            ))
             : 'No one was found.'}
         </div>
       </div>
@@ -183,8 +186,8 @@ function Team(props: TeamProps): JSX.Element {
         <div className="team-cards">
           {alumni.length
             ? alumni.map((person) => (
-                <TeamCard key={person.name} data={person} />
-              ))
+              <TeamCard key={person.name} data={person} />
+            ))
             : 'No one was found.'}
         </div>
       </div>
