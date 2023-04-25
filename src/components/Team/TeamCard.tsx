@@ -40,8 +40,9 @@ function TeamCard(props: TeamCardProps): JSX.Element {
       ) : (
         image
       )}
-      <h3 className='team-title'>{props.data.name}</h3>
+      <h3 className="team-title">{props.data.name}</h3>
       <p>{`CLASS OF ${props.data.class}`}</p>
+      <p style={{fontStyle: 'italic'}}>{(props.alumni && props.data.company !== null) ? `Now at: ${props.data.company}` : ''}</p>
       {props.data.roles.map((role) => (
         <p key={props.data.name + '_' + role}>— {role}</p>
       ))}
