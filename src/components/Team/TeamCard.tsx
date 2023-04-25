@@ -6,34 +6,42 @@ import '../styles/Team.scss';
 
 interface TeamCardProps {
   data: Person;
-  alumni: boolean;
 }
 
+// prettier-ignore
 function TeamCard(props: TeamCardProps): JSX.Element {
-  const image = <img className="team-img" src={props.data.image} alt={props.data.name} />;
+  const image = (
+    <img className='team-img' src={props.data.image} alt={props.data.name} />
+  );
 
   return (
-    <div className="team-card">
+    <div className='team-card'>
       {props.data.link ? (
         <>
           <a
             data-tip
             data-for={props.data.name}
-            target="_blank"
-            rel="noreferrer"
+            target='_blank'
+            rel='noreferrer'
             href={props.data.link}
           >
             {image}
           </a>
-          <ReactTooltip id={props.data.name} className='team-tooltip' arrowColor='transparent' textColor='black' backgroundColor='#FFF740'>
+          <ReactTooltip
+            id={props.data.name}
+            className='team-tooltip'
+            arrowColor='transparent'
+            textColor='black'
+            backgroundColor='#FFF740'
+          >
             {props.data.link.split('//').slice(-1)[0] + ' ↗'}
           </ReactTooltip>
         </>
       ) : (
         image
       )}
-      <h3 className="team-title">{props.data.name}</h3>
-      <p>{props.alumni ? 'ALUMNI' : `CLASS OF ${props.data.class}`}</p>
+      <h3 className='team-title'>{props.data.name}</h3>
+      <p>{`CLASS OF ${props.data.class}`}</p>
       {props.data.roles.map((role) => (
         <p key={props.data.name + '_' + role}>— {role}</p>
       ))}
