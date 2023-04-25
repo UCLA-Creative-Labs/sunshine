@@ -186,7 +186,7 @@ function Team(props: TeamProps): JSX.Element {
         <div className="team-cards">
           {alumni.length
             ? alumni.map((person) => (
-              <TeamCard key={person.name} data={person} />
+              <TeamCard key={person.name} data={person} alumni={true} />
             ))
             : 'No one was found.'}
         </div>

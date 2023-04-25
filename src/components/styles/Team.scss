@@ -38,6 +38,7 @@
 
 .team-card {
   margin-bottom: 40px;
+  width: $team-card-width;
 }
 
 .team-card p {
@@ -55,8 +56,8 @@
 }
 
 .team-img {
-  height: 228px;
-  width: 228px;
+  height: $team-card-width;
+  width: $team-card-width;
   object-fit: cover;
 }
 
