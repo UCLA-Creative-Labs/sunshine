@@ -1,3 +1,4 @@
+import About from "@/components/About";
 import Navbar from "@/components/Navbar";
 import Splash from "@/components/Splash";
 
@@ -112,9 +113,10 @@ export default function Home() {
   //   </main>
   // )
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex min-h-screen flex-col">
       <Navbar />
       <Splash />
+      <About />
     </main>
   )
 }
