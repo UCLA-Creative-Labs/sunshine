@@ -1,4 +1,4 @@
-export default function Splash() {
+export default function HomepageSplash() {
     return (
         <div id="splash" className="flex flex-col justify-end min-h-[70vh] min-w-full bg-[#85b6ff] dark:bg-[#000000] p-10 lg:px-20 lg:py-20">
             <div>
