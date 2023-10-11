@@ -6,8 +6,8 @@ const lato = Lato({ weight: '700', subsets: ['latin'] })
 export default function About() {
     return (
         <div className="text-black min-w-full divide-y-2 divide-black">
-            <div className="p-20 lg:px-60 lg:py-20 space-y-10">
-                <h1 className={ `text-5xl tracking-wide ${lato.className}` }>
+            <div className="p-10 sm:p-20 xl:px-60 lg:py-20 space-y-10">
+                <h1 className={ `text-center md:text-start text-5xl tracking-wide ${lato.className}` }>
                     ABOUT
                 </h1>
                 <div className="flex flex-col space-y-8 md:space-y-0 md:flex-row md:space-x-16">
@@ -25,8 +25,8 @@ export default function About() {
                     />
                 </div>
             </div>
-            <div className="p-10 lg:px-60 lg:py-20 space-y-10">
-                <h1 className={ `text-5xl tracking-wide ${lato.className}` }>
+            <div className="p-10 sm:p-20 xl:px-60 lg:py-20 space-y-10">
+                <h1 className={ `text-center md:text-start text-5xl tracking-wide ${lato.className}` }>
                     PROJECTS
                 </h1>
                 <div className="flex flex-col space-y-8 md:space-y-0 md:flex-row md:space-x-4 lg:space-x-16">
