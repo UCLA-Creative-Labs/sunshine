@@ -1,14 +1,14 @@
-import About from "@/app/(root)/About";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import Splash from "@/app/(root)/Splash";
+import HomepageSplash from "@/app/(root)/HomepageSplash";
+import HomepageContent from "./HomepageContent";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       <Navbar />
-      <Splash />
-      <About />
+      <HomepageSplash />
+      <HomepageContent />
       <Footer />
     </main>
   )
