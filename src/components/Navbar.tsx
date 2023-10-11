@@ -21,7 +21,7 @@ export default function Navbar() {
     return (
         <div 
             id="navbar" 
-            className={ `transition ease-in-out delay-100 flex justify-between min-w-full py-10 px-10 lg:px-20 dark:bg-[#000000] sticky top-0 ${pastScrollPoint ? 'bg-[#000000] text-white' : 'bg-[#85b6ff]'}` }
+            className={ `transition z-50 ease-in-out delay-100 flex justify-between min-w-full p-10 lg:px-20 dark:bg-[#000000] sticky top-0 ${pastScrollPoint ? 'bg-[#000000] text-white' : 'bg-[#85b6ff]'}` }
             style={{
 
             }}
