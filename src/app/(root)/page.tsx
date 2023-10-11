@@ -1,7 +1,7 @@
-import About from "@/components/About";
+import About from "@/app/(root)/About";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import Splash from "@/components/Splash";
+import Splash from "@/app/(root)/Splash";
 
 export default function Home() {
   return (
