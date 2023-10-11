@@ -10,7 +10,7 @@ interface GenericCardProps {
     className?: string
 }
 
-export default function GenericCard({ title, description, imgSrc='/what-we-do.svg', imgPos='top', className='' }: GenericCardProps) {
+export default function GenericCard({ title, description, imgSrc='/card_icons/what-we-do.svg', imgPos='top', className='' }: GenericCardProps) {
 
     return (
         <div
