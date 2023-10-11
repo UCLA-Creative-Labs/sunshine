@@ -1,10 +1,10 @@
-import ContentSection from "@/components/ContentSection"
 import GenericCard from "@/components/GenericCard"
+import HomepageSection from "./HomepageSection"
 
 export default function HomepageContent() {
     return (
-        <div className="text-black min-w-full p-20 space-y-10">
-            <ContentSection
+        <div className="text-black min-w-full divide-y-2 divide-black">
+            <HomepageSection
                 title="ABOUT"
             >
                 <GenericCard
@@ -19,8 +19,8 @@ export default function HomepageContent() {
                     description="Just some UCLA kids with skills in dev, design, and project management trying to make something cool, together. We were founded on the dream that with the right group of people, any idea can come to life."
                     className="md:w-1/2"
                 />
-            </ContentSection>
-            <ContentSection
+            </HomepageSection>
+            <HomepageSection
                 title="PROJECTS"
             >
                 <GenericCard
@@ -41,7 +41,7 @@ export default function HomepageContent() {
                     description="Kick off the holiday season with our brand new projects."
                     className="md:w-1/3"
                 />
-            </ContentSection>
+            </HomepageSection>
         </div>
     )
 }
