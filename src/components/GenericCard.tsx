@@ -1,4 +1,5 @@
 import { Lato } from "next/font/google"
+import Link from "next/link"
 
 const lato = Lato({ weight: '700', subsets: ['latin'] })
 
@@ -7,13 +8,14 @@ interface GenericCardProps {
     description: string,
     imgSrc?: string,
     imgPos?: string,
-    className?: string
+    className?: string,
+    href?: string
 }
 
-export default function GenericCard({ title, description, imgSrc='/card_icons/what-we-do.svg', imgPos='top', className='' }: GenericCardProps) {
+export default function GenericCard({ title, description, imgSrc='/card_icons/what-we-do.svg', imgPos='top', className='', href='/' }: GenericCardProps) {
 
     return (
-        <div
+        <Link href={href}
             className={`flex ${imgPos == 'top' ? 'flex-col space-y-8' : 'flex-row space-x-8 items-center'} group border border-black p-8 shadow-lg rounded-2xl cursor-pointer transition ease-in-out delay-50 duration-300 hover:-translate-y-5 ${className}`}
         >
             <div className="overflow-hidden rounded-xl shadow-lg">
@@ -39,6 +41,6 @@ export default function GenericCard({ title, description, imgSrc='/card_icons/wh
                 </p>
                 
             </div>
-        </div>
+        </Link>
     )
 }
