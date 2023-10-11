@@ -16,7 +16,7 @@ export default function Navbar() {
         window.addEventListener('scroll', () => {
             setPastScrollPoint(window.scrollY > SCROLLY_POINT);
         });
-    })
+    });
 
     return (
         <div 
@@ -26,7 +26,7 @@ export default function Navbar() {
 
             }}
         >
-            <div id="title" className="flex justify-between items-center min-w-full lg:min-w-0">
+            <div id="title" className="flex justify-center md:justify-between items-center min-w-full md:min-w-0">
                 <div className="flex items-center space-x-4">
                     <Image
                         alt="Creative Labs Logo"
@@ -42,8 +42,8 @@ export default function Navbar() {
                     </Link>
                 </div>
             </div>
-            <nav id="navigation" className="hidden lg:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-8 space-x-8">
-                <div id="links" className="flex space-x-8 text-xl">
+            <nav id="navigation" className="hidden md:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-6 space-x-6">
+                <div id="links" className="flex space-x-6 lg:text-xl">
                     <Link
                         href="/"
                     >
@@ -63,7 +63,7 @@ export default function Navbar() {
                 <div id="join">
                     <Link
                         href="/"
-                        className="text-xl border-[3px] border-black rounded-xl py-2 px-8 bg-white text-black"
+                        className="lg:text-xl border-[3px] border-black rounded-xl py-2 md:px-6 bg-white text-black"
                     >
                         JOIN US
                     </Link>
