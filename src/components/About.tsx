@@ -1,6 +1,4 @@
 import { Lato } from "next/font/google"
-import Card from "./Card"
-import CardRow from "./CardRow"
 
 const lato = Lato({ weight: '900', subsets: ['latin'] })
 
