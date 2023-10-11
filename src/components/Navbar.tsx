@@ -21,7 +21,7 @@ export default function Navbar() {
     return (
         <div 
             id="navbar" 
-            className={ `transition z-50 ease-in-out delay-100 flex justify-between min-w-full p-10 lg:px-20 dark:bg-[#000000] sticky top-0 ${pastScrollPoint ? 'bg-[#000000] text-white' : 'bg-[#85b6ff]'}` }
+            className={ `transition z-50 ease-in-out delay-100 flex justify-between min-w-full p-8 lg:px-20 dark:bg-[#000000] sticky top-0 ${pastScrollPoint ? 'bg-[#000000] text-white' : 'bg-[#85b6ff]'}` }
             style={{
 
             }}
@@ -37,13 +37,13 @@ export default function Navbar() {
                     />
                     <Link 
                         href="/"
-                        className={"text-xl lg:text-2xl tracking-widest " + lato.className}>
+                        className={"text-xl tracking-widest " + lato.className}>
                         CREATIVE LABS
                     </Link>
                 </div>
             </div>
             <nav id="navigation" className="hidden lg:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-8 space-x-8">
-                <div id="links" className="flex space-x-8 text-xl xl:text-2xl">
+                <div id="links" className="flex space-x-8 text-xl">
                     <Link
                         href="/"
                     >
@@ -63,7 +63,7 @@ export default function Navbar() {
                 <div id="join">
                     <Link
                         href="/"
-                        className="text-xl xl:text-2xl border-[3px] border-black rounded-xl py-2 px-8 bg-white text-black"
+                        className="text-xl border-[3px] border-black rounded-xl py-2 px-8 bg-white text-black"
                     >
                         JOIN US
                     </Link>
