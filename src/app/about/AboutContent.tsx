@@ -1,7 +1,4 @@
 import ContentSection from "@/components/ContentSection";
-import { Contrail_One, Lato } from "next/font/google"
-
-const lato = Lato({ weight: '700', subsets: ['latin'] });
 
 /*
 Display a responsive hero image that disappears on mobile
