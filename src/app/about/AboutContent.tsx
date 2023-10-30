@@ -70,13 +70,13 @@ export default function AboutContent() {
                     <HighlightCard 
                         imgSrc="https://www.mediastorehouse.com/p/172/bornean-orang-utan-adult-male-zoo-645392.jpg.webp"
                         blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. -some monke"
-                        className="lg:w-4/5"
+                        className="xl:w-4/5"
                     />
                     <HighlightCard 
                         imgSrc="https://www.mediastorehouse.com/p/172/bornean-orang-utan-adult-male-zoo-645392.jpg.webp"
                         blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. -some monke"
                         reverse={true}
-                        className="lg:w-4/5"
+                        className="xl:w-4/5"
                     />
                 </div>
             </ContentSection>
@@ -86,13 +86,13 @@ export default function AboutContent() {
                     <HighlightCard 
                         imgSrc="https://www.mediastorehouse.com/p/172/bornean-orang-utan-adult-male-zoo-645392.jpg.webp"
                         blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. -some monke"
-                        className="lg:w-4/5"
+                        className="xl:w-4/5"
                     />
                     <HighlightCard 
                         imgSrc="https://www.mediastorehouse.com/p/172/bornean-orang-utan-adult-male-zoo-645392.jpg.webp"
                         blurb="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. -some monke"
                         reverse={true}
-                        className="lg:w-4/5"
+                        className="xl:w-4/5"
                     />
                 </div>
             </ContentSection>
