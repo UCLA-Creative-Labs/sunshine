@@ -1,4 +1,19 @@
 import ContentSection from "@/components/ContentSection";
+import { Lato } from "next/font/google"
+
+const lato = Lato({ weight: '700', subsets: ['latin'] });
+
+function RoleCard({ imgSrc, title, desc, className }: { imgSrc: string, title: string, desc?:string, className?: string }) {
+    return (
+        <div className={`flex flex-col items-center w-full space-y-5 group ${className}`}>
+            <img src={imgSrc} className="h-1/2 py-4 drop-shadow-lg group-hover:scale-125 transition ease-in-out delay-50 duration-300" />
+            <h1 className={`text-center text-2xl ${lato.className}`}>{title}</h1>
+            <p className="leading-relaxed text-center">
+                {desc}
+            </p>
+        </div>
+    )
+}
 
 export default function JoinContent() {
     return (
@@ -36,7 +51,23 @@ export default function JoinContent() {
             </ContentSection>
 
             <ContentSection title="MAIN ROLES" titleClassName="text-4xl">
-                
+                <div className="flex items-start w-full space-x-12">
+                    <RoleCard
+                        imgSrc="/card_icons/pink_thing.svg" 
+                        title="Project Lead"
+                        desc="Have a cool idea? Apply to be a Project Lead and make it happen. We'll provide you the platform needed to recruit your dream team. Projects can be technical or non-technical! Past projects have ranged from a smart mirror to a fancy photoshoot."
+                    />
+                    <RoleCard 
+                        imgSrc="/card_icons/purple_thing.svg" 
+                        title="Project Member"
+                        desc="Want to be a part of something wonderful? Apply as a Project Member and collaborate with a Project Lead and other Project Members to create something awesome! Experience necessary varies! "
+                    />
+                    <RoleCard
+                        imgSrc="/card_icons/orange_thing.svg"
+                        title="Board Member"
+                        desc="We're always looking to grow our internal team! Help us run things behind the scenes like organizing events, socials, and workshops, communicating with Project Teams, securing funding, and creating promotional materials! "
+                    />
+                </div>
             </ContentSection>
 
             <ContentSection title="INTERNAL BOARD TEAMS" titleClassName="text-4xl">
