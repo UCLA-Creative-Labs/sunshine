@@ -18,7 +18,7 @@ interface TeamCardProps {
 
 function TeamCard(props: TeamCardProps): JSX.Element {
   const image = (
-    <div className="w-56 h-36 aspect-w-1 aspect-h-1 mb-4">
+    <div className="w-56 h-56 aspect-w-1 aspect-h-1">
       <img
         className="object-cover w-full h-full"
         src={props.data.image}
@@ -28,7 +28,7 @@ function TeamCard(props: TeamCardProps): JSX.Element {
   );
 
   return (
-    <div className="mb-8">
+    <div className="mb-8 mr-4 ml-4">
       {props.data.link ? (
         <a
           href={props.data.link}
@@ -42,7 +42,7 @@ function TeamCard(props: TeamCardProps): JSX.Element {
       ) : (
         image
       )}
-      <h3 className="mt-2 mb-2 font-bold text-2xl text-black">
+      <h3 className="mt-6 mb-2 font-bold text-2xl text-black">
         {props.data.name}
       </h3>
       <p className="my-1 text-lg text-black">{`CLASS OF ${props.data.class}`}</p>
