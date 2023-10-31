@@ -1,60 +1,49 @@
+"use client";
+
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { getDocsByType } from "@/lib/contentfulLib";
+import TeampageContent from "./TeampageContent";
+import { getBoardMembers } from "../../lib/boardMembers";
 import React, { useState, useEffect } from "react";
-import TeamContent from "./TeamContent/TeamContent";
 
-const ROLES_SORTING = [
-  "President",
-  "Director",
-  "Design",
-  "Marketing/External",
-  "Projects",
-  "Finance",
-  "Tech"
-]
-
-function memberSort(x, y) {
-  const x_roles = x.fields?.roles;
-  const y_roles = y.fields?.roles;
-  if (!x_roles || !y_roles) return 0;
-  if (ROLES_SORTING.indexOf(x_roles[0]) < ROLES_SORTING.indexOf(y_roles[0]))
-    return -1;
-  else if (ROLES_SORTING.indexOf(x_roles[0]) > ROLES_SORTING.indexOf(y_roles[0]))
-    return 1;
-  else {
-    if (ROLES_SORTING.indexOf(x_roles[1]) != ROLES_SORTING.indexOf(y_roles[1])) {
-      if (ROLES_SORTING.indexOf(x_roles[1]) < ROLES_SORTING.indexOf(y_roles[1]))
-        return -1;
-      else if (ROLES_SORTING.indexOf(x_roles[1]) > ROLES_SORTING.indexOf(y_roles[1]))
-        return 1;
-      }
-      const x_name = x?.fields?.name;
-      const y_name = y?.fields?.name;
-    
-      if (!x_name || !y_name)
-        return 0;
-      if (x_name > y_name)
-        return 1;
-      else if (x_name < y_name)
-        return -1;
-      else
-        return 0;
-    }
+interface Person {
+  name: string;
+  class: number;
+  roles: string[];
+  image?: string;
+  link?: string;
 }
 
-export default async function Team() {
-  const members = await getDocsByType('member')
-    .then(docs => {
-      docs.sort(memberSort);
-      docs = docs.map(obj => ({...obj, enabled: true}));
-      return docs;
+export default function Team(): JSX.Element {
+  const [team, setTeam] = useState<Person[]>([]);
+  getBoardMembers()
+    .then((data) => {
+      if (data && Array.isArray(data)) {
+        // Assuming 'data' is an array of team member entries
+        const updatedData = data.map((entry) => {
+          const fields = entry.fields;
+          return {
+            name: fields.name || "Unknown Name",
+            class: fields.class || 0,
+            roles: fields.roles || [],
+            image: fields.imageURL ? fields.imageURL : "/card_icons/winter.svg",
+            link: fields.website || fields.github || fields.instagram || "",
+          };
+        });
+
+        setTeam(updatedData);
+      } else {
+        console.error("Data structure is missing expected properties");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching team members:", error);
     });
 
   return (
     <main className="flex min-h-screen flex-col">
       <Navbar />
-      <TeamContent members={members} />
+      <TeampageContent data={team} />
       <Footer />
     </main>
   );
