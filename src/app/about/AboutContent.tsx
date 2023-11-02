@@ -29,20 +29,18 @@ function HighlightCard({ imgSrc, blurb, reverse=false, className }: { imgSrc: st
     )
 }
 
-function EventCard({ imgSrc, title, date=undefined, location=undefined, desc, orientation="h", className }: 
-    { imgSrc: string, title: string, date?: string|undefined, location?: string|undefined, desc: string, orientation?: string, className?: string }) {
-
-    let orientationBool = orientation == "h";
+function EventCard({ imgSrc, title, date=undefined, location=undefined, desc, vertical=false, className }: 
+    { imgSrc: string, title: string, date?: string|undefined, location?: string|undefined, desc: string, vertical?: boolean, className?: string }) {
 
     return (
-        <div className={ `flex ${ orientationBool ? "flex-row space-x-8 w-full" : "flex-col space-y-5" } items-center p-5 rounded-2xl transition ease-in-out delay-50 duration-300 hover:scale-110 hover:shadow-2xl hover:border hover:border-black ${className}`}>
+        <div className={ `flex ${ vertical ? "flex-col space-y-5" : "flex-row space-x-8 w-full" } items-center p-5 rounded-2xl transition ease-in-out delay-50 duration-300 hover:scale-110 hover:shadow-2xl hover:border hover:border-black ${className}`}>
             <div className="aspect-square h-[150px] md:h-[200px]">
                 <img src={imgSrc} className="object-cover h-full rounded-2xl drop-shadow-lg"/>
             </div>
 
             <div className="flex flex-col space-y-4">
                 <div className="flex flex-col text-center">
-                    <h1 className={`text-2xl ${orientationBool ? "md:text-4xl" : "md:text-2xl"} tracking-wide`}>{title}</h1>
+                    <h1 className={`text-2xl ${vertical ? "md:text-2xl" : "md:text-4xl"} tracking-wide`}>{title}</h1>
                     { date && <h2 className="text-xl md:text-2xl underline">{date}</h2> }
                     { location && <h2 className="text-xl md:text-2xl underline" >{location}</h2> }
                 </div>
@@ -132,21 +130,21 @@ export default function AboutContent() {
                         imgSrc="/old/s22_demo.png"
                         title="Spring 2022 Demo Day"
                         desc="Hello!! Demo Day is coming up this Friday, June 3rd from 6-8 PM @ Kinsey 1200B. Our project leads and members are super excited for you to see their projects this quarter !! Be there if you're cool 🐸."
-                        orientation="v"
+                        vertical
                         className="w-1/2 lg:w-1/3"
                     />
                     <EventCard 
                         imgSrc="/old/s22_social.png"
                         title="Sharetea Social"
                         desc="Need a pick-me-up?? Get 🧋 boba 🧋 with us today!See you at De Neve turnaround at 7 or meet us at Sharetea at 7:20pm!!"
-                        orientation="v"
+                        vertical
                         className="w-1/2 lg:w-1/3"
                     />
                     <EventCard 
                         imgSrc="/old/s22_gm.png"
                         title="Spring 2022 General Meeting"
                         desc="Want to take part in some awesome 🌟 projects? Meet cool 😎 people? Gain technical 👾 and non-technical 📝 experience? Come to CL's 🌸 Spring General Meeting 🌸!"
-                        orientation="v"
+                        vertical
                         className="w-1/2 lg:w-1/3"
                     />
                 </div>
