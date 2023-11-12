@@ -147,7 +147,7 @@ export default function TeampageContent(props: TeamProps): JSX.Element {
         <div className="flex">
           <div className="min-h-72 w-auto flex flex-col">
             <Select
-              className="w-48 px-2 py-3 mt-3 mr-16"
+              className="w-full sm:w-48 px-2 py-3 mt-3 sm:mt-0 sm:mr-16"
               styles={selectStyles}
               name="year"
               onChange={(selectedOption) => {
@@ -160,7 +160,7 @@ export default function TeampageContent(props: TeamProps): JSX.Element {
               aria-label="Filter by Year"
             />
             <Select
-              className="w-48 px-2 py-3 mt-3 mr-16"
+              className="w-full sm:w-48 px-2 py-3 mt-3 sm:mt-0 sm:mr-16"
               styles={selectStyles}
               name="role"
               onChange={(newValue) => {
@@ -173,7 +173,7 @@ export default function TeampageContent(props: TeamProps): JSX.Element {
               aria-label="Filter by Role"
             />
           </div>
-          <div className="w-full grid grid-cols-4 gap-4 justify-items-end mt-4">
+          <div className="w-full grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-4">
             {currentMembers.length
               ? currentMembers.map((person) => (
                   <TeamCard key={person.name} data={person} />
@@ -186,7 +186,7 @@ export default function TeampageContent(props: TeamProps): JSX.Element {
         <div className="flex">
           <div className="min-h-72 w-auto flex flex-col">
             <Select
-              className="ww-48 px-2 py-3 mt-3 mr-16"
+              className="w-full sm:w-48 px-2 py-3 mt-3 sm:mt-0 sm:mr-16"
               styles={selectStyles}
               name="alumni-year"
               onChange={(newValue) => {
@@ -199,7 +199,7 @@ export default function TeampageContent(props: TeamProps): JSX.Element {
               aria-label="Filter by Year"
             />
             <Select
-              className="w-48 px-2 py-3 mt-3 mr-16"
+              className="w-full sm:w-48 px-2 py-3 mt-3 sm:mt-0 sm:mr-16"
               styles={selectStyles}
               name="alumni-role"
               onChange={(newValue) => {
@@ -212,11 +212,9 @@ export default function TeampageContent(props: TeamProps): JSX.Element {
               aria-label="Filter by Role"
             />
           </div>
-          <div className="w-full grid grid-cols-4 gap-4 justify-items-end">
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-4">
             {alumni.length
-              ? alumni.map((person) => (
-                  <TeamCard key={person.name} data={person} />
-                ))
+              ? alumni.map((person) => <TeamCard data={person} />)
               : "No one was found."}
           </div>
         </div>
