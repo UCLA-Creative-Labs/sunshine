@@ -15,7 +15,7 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-select": "latest"
+    "react-icons": "^4.12.0"
   },
   "devDependencies": {
     "@types/node": "latest",
