@@ -69,7 +69,7 @@ export default function TeamContent({ members }: { members: Array<any> }) {
           menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
           menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
           menuButtonHoverColor="bg-blue-100"
-          options={["All Roles", "President", "Director", "Design", "Marketing/External", "Projects", "Finance", "Tech"]}
+          options={["All Roles", "President", "Director", "Design", "Marketing", "Projects", "Finance", "Tech", "External"]}
           setValue={setRole}
         />
       </div>
