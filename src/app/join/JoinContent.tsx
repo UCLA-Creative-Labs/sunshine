@@ -15,6 +15,20 @@ function RoleCard({ imgSrc, title, desc, className }: { imgSrc: string, title: s
     )
 }
 
+function TeamCard({ className='', title, imgSrc, bgClassName='', description='', reverse=false }: { className?: string, title: string, imgSrc: string, bgClassName?: string, description?: string, reverse?: boolean }) {
+    return (
+        <div className={`group space-y-4 ${className}`}>
+            <div className={`flex justify-center items-center space-x-4 rounded-xl drop-shadow-lg group-hover:scale-110 transition ease-in-out delay-50 duration-300 ${bgClassName} ${reverse ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                <img src={imgSrc} className="h-1/2 py-4 drop-shadow-xl" />
+                <h1 className="text-2xl font-bold">{title}</h1>
+            </div>
+            <p className="mx-4 tracking-wide leading-relaxed">
+                {description}
+            </p>
+        </div>
+    )
+}
+
 export default function JoinContent() {
     return (
         <div className="text-black min-w-full">
@@ -50,28 +64,57 @@ export default function JoinContent() {
                 </div>
             </ContentSection>
 
-            <ContentSection title="MAIN ROLES" titleClassName="text-4xl">
+            <ContentSection title="MAIN ROLES" centerText={true} titleClassName="text-4xl">
                 <div className="flex items-start w-full space-x-12">
                     <RoleCard
-                        imgSrc="/card_icons/pink_thing.svg" 
+                        imgSrc="/card_icons/pink_thing_scaled.svg" 
                         title="Project Lead"
                         desc="Have a cool idea? Apply to be a Project Lead and make it happen. We'll provide you the platform needed to recruit your dream team. Projects can be technical or non-technical! Past projects have ranged from a smart mirror to a fancy photoshoot."
                     />
                     <RoleCard 
-                        imgSrc="/card_icons/purple_thing.svg" 
+                        imgSrc="/card_icons/purple_thing_scaled.svg" 
                         title="Project Member"
                         desc="Want to be a part of something wonderful? Apply as a Project Member and collaborate with a Project Lead and other Project Members to create something awesome! Experience necessary varies! "
                     />
                     <RoleCard
-                        imgSrc="/card_icons/orange_thing.svg"
+                        imgSrc="/card_icons/orange_thing_scaled.svg"
                         title="Board Member"
                         desc="We're always looking to grow our internal team! Help us run things behind the scenes like organizing events, socials, and workshops, communicating with Project Teams, securing funding, and creating promotional materials! "
                     />
                 </div>
             </ContentSection>
 
-            <ContentSection title="INTERNAL BOARD TEAMS" titleClassName="text-4xl">
-                
+            <ContentSection title="INTERNAL BOARD TEAMS" centerText={true} titleClassName="text-4xl">
+                <div className="flex justify-center">
+                    <div className="w-4/5 content-center grid grid-cols-2 gap-12">
+                        <TeamCard 
+                            bgClassName="bg-red-100 group-hover:bg-red-200" 
+                            title="Design" 
+                            imgSrc="/card_icons/orange_thing.svg"
+                            description="Help us strengthen our visual identity by creating cool design-y things! You can also learn and improve your skills in graphic design, web design, and UI/UX! Previous design work includes creating social media graphics, presentation slides, and wireframes for website redesigns and brainstorming new yearly themes and logos. We hosted events such as Figma workshops and design jams like Capslock!"
+                        />
+                        <TeamCard 
+                            bgClassName="bg-green-100 group-hover:bg-green-200" 
+                            title="Tech" 
+                            imgSrc="/card_icons/orange_thing.svg"
+                            description="Support our club infrastructure and work on long-term community projects! We are currently working on a membership platform, board management tools, a market platform, and MLOps projects. If you're interested in these, feel free to reach out!"
+                        />
+                        <TeamCard 
+                            bgClassName="bg-blue-100 group-hover:bg-blue-200" 
+                            title="Marketing/External" 
+                            imgSrc="/card_icons/orange_thing.svg"
+                            reverse={true}
+                            description="We help editing materials before they go out for public consumption! Some main tasks include copywriting,  creating a posting schedule, and reaching out to other clubs/businesses. Previous marketing/external work includes writing blurbs for social media, advertising events, and promoting our club!"
+                        />
+                        <TeamCard 
+                            bgClassName="bg-yellow-100 group-hover:bg-yellow-200" 
+                            title="Projects" 
+                            imgSrc="/card_icons/orange_thing.svg" 
+                            reverse={true}
+                            description="Our main responsibility is hosting Creative Labs projects! Tasks include reaching out to projects teams, preparing for General Meetings and Demo Days, and compiling project info for documentation. In other words, you’ll be making sure that projects runs smoothly and stays on track by being the bridge between Project Leads and Project Members and the rest of the Internal Board!"
+                        />
+                    </div>
+                </div>
             </ContentSection>
         </div>
     )
