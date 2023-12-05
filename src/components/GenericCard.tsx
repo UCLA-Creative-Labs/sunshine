@@ -32,7 +32,7 @@ export default function GenericCard({ title, description, imgSrc='/card_icons/wh
                     >
                         {title}
                     </h1>
-                    <h1 className={`text-3xl group-hover:translate-x-10 transition ease-in-out duration-100 delay-50 ${lato.className}`}>➔</h1>
+                    <h1 className={`text-3xl group-hover:translate-x-4 transition ease-in-out duration-100 delay-50 ${lato.className}`}>➔</h1>
                 </div>
                 <p
                     className="text-xl"
