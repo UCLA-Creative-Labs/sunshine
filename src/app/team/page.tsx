@@ -8,11 +8,10 @@ const ROLES_SORTING = [
   "President",
   "Director",
   "Design",
-  "Marketing",
+  "Marketing/External",
   "Projects",
   "Finance",
-  "Tech",
-  "External"
+  "Tech"
 ]
 
 function memberSort(x, y) {
