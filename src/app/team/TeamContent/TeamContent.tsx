@@ -1,18 +1,27 @@
 'use client'
 import DropdownMenu from "@/components/DropdownMenu";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 function MemberCard({ memberData, className } : { memberData: any, className?: string }) {
   const { name, year, titles } = memberData;
   const photoURL = memberData?.photo?.fields?.file?.url;
   return (
-    <div className={`space-y-2 ${className}`}>
-      <div className="max-w-[250px] aspect-square overflow-hidden">
-        {photoURL && <img className="object-cover w-full h-full" src={photoURL}/>}
+    <div className={`group space-y-2 text-center md:text-start ${className}`}>
+      <div className="max-w-[250px] aspect-square overflow-hidden shadow-lg rounded-lg">
+        {photoURL && 
+          <img 
+            className="group-hover:scale-110 transition ease-in-out delay-50 duration-300 object-cover w-full h-full" 
+            src={photoURL}
+            alt={`Photo of ${name}`}
+          />
+        }
       </div>
-      <h1 className="text-2xl font-bold">{name}</h1>
-      <h1 className="text-md">{year ? 'CLASS OF ' + year : ''}</h1>
-      {titles && titles.map((roleName, idx) => <h1 key={idx} className="text-md">{roleName}</h1>)}
+      <div className="mx-2 space-y-1">
+        <h1 className="text-xl md:text-2xl font-bold group-hover:text-blue-400 group-hover:drop-shadow-2xl transition ease-in-out delay-50 duration-300">{name}</h1>
+        <h1 className="text-md text-neutral-500">{year ? 'CLASS OF ' + year : ''}</h1>
+        {titles && titles.map((roleName, idx) => <h1 key={idx} className="text-md">{roleName}</h1>)}
+      </div>
     </div>
   )
 }
@@ -30,13 +39,15 @@ export default function TeamContent({ members }: { members: Array<any> }) {
     if (membersList) {
       let newMembersList: Array<any> = [];
       for (const member of members) {
-        if (year == "All Years" || member.fields.year == year) {
+        if ((year == "All Years" || member.fields.year == year) &&
+            (role == "All Roles" || member.fields.roles.includes(role))
+        ) {
           newMembersList.push(member);
         }
       }
       setMembersList(newMembersList);
     }
-  }, [year]);
+  }, [year, role]);
 
   return (
   <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
@@ -58,11 +69,12 @@ export default function TeamContent({ members }: { members: Array<any> }) {
           menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
           menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
           menuButtonHoverColor="bg-blue-100"
-          options={["All Roles", "President(s)", "Director(s)", "Design", "Marketing", "Projects", "Finance", "Tech", "External"]}
+          options={["All Roles", "President", "Director", "Design", "Marketing", "Projects", "Finance", "Tech", "External"]}
+          setValue={setRole}
         />
       </div>
     </div>
-    <div className="p-12 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8 lg:gap-12 xl:gap-16">
+    <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
       { membersList?.filter((data) => data.enabled).map((data, idx) => 
         {
           const memberData = data.fields;
