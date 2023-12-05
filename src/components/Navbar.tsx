@@ -59,7 +59,7 @@ export default function Navbar() {
         </div>
         <div id="join">
           <Link
-            href="/"
+            href="/join"
             className="lg:text-xl border-[3px] border-black rounded-xl py-2 md:px-6 bg-white text-black"
           >
             JOIN US
