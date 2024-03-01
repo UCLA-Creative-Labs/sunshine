@@ -18,7 +18,7 @@ interface TeamCardProps {
 
 function TeamCard(props: TeamCardProps): JSX.Element {
   const image = (
-    <div className="w-56 h-56 aspect-w-1 aspect-h-1 mb-4">
+    <div className="w-56 h-36 aspect-w-1 aspect-h-1 mb-4">
       <img
         className="object-cover w-full h-full"
         src={props.data.image}
