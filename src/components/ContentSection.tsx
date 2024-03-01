@@ -11,7 +11,7 @@ interface ContentSectionProps {
 
 export default function ContentSection({ title, children, centerText=false, titleClassName="text-4xl" } : ContentSectionProps) {
     return (
-    <div className="p-10 sm:p-20 xl:px-60 lg:py-20 space-y-10">
+    <div className="space-y-10">
         <h1 className={ `text-center ${!centerText && "md:text-start"} ${titleClassName} tracking-wide ${lato.className}` }>
             {title}
         </h1>

@@ -3,7 +3,7 @@ import GenericCard from "@/components/GenericCard"
 
 export default function HomepageContent() {
     return (
-        <div className="text-black min-w-full divide-y-2 divide-black">
+        <div className="text-black min-w-full p-20 space-y-10">
             <ContentSection
                 title="ABOUT"
             >
