@@ -53,8 +53,8 @@ export default function Navbar() {
         className="hidden md:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-6 space-x-6"
       >
         <div id="links" className="flex space-x-6 lg:text-xl">
-          <Link href="/">ABOUT</Link>
-          <Link href="/">PROJECTS</Link>
+          <Link href="/about">ABOUT</Link>
+          <Link href="/projects">PROJECTS</Link>
           <Link href="/team">OUR TEAM</Link>
         </div>
         <div id="join">
