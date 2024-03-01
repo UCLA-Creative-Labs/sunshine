@@ -1,7 +1,9 @@
+'use client'
+
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import HomepageSplash from "@/app/(root)/HomepageSplash";
 import HomepageContent from "./HomepageContent";
+import React from "react";
 
 export default function Home() {
   const [ mousePos, setMousePos ] = React.useState<number[]>([]);
@@ -40,11 +42,23 @@ export default function Home() {
     }, [mousePos]);
 
   return (
-    <main className="flex min-h-screen flex-col">
-      <Navbar />
-      <HomepageSplash />
-      <HomepageContent />
-      <Footer />
+    <main className="flex min-h-screen flex-col" onMouseMove={onMouseMove}>
+        <Navbar />
+        <div className="flex items-end bg-black py-20 relative min-h-[230px]">
+          <h1 className="px-20 text-4xl md:w-1/2">
+            A community of UCLA creatives working on cool projects to discover even cooler passions.
+          </h1>
+          <div className="hidden grow md:flex justify-center">
+            <div ref={faceRef} className="bg-[url('/sun.svg')] w-[224px] h-[224px] relative">
+                <div
+                  className="bg-[url('/sunmoon-face.svg')] w-[88px] h-[30px] absolute"
+                  style={{ top: facePos[1], left: facePos[0] }}
+                />
+            </div>
+          </div>
+        </div>
+        <HomepageContent />
+        <Footer />
     </main>
   )
 }
