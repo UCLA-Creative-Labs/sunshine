@@ -16,7 +16,7 @@ export default function GenericCard({ title, description, imgSrc='/card_icons/wh
 
     return (
         <Link href={href}
-            className={`flex ${imgPos == 'top' ? 'flex-col space-y-8' : 'flex-row space-x-8 items-center'} group border border-black p-8 shadow-lg rounded-2xl cursor-pointer transition ease-in-out delay-50 duration-300 hover:-translate-y-5 ${className}`}
+            className={`flex ${imgPos == 'top' ? 'flex-col space-y-8' : 'flex-row space-x-8 items-center'} group border border-black p-8 shadow-lg rounded-2xl cursor-pointer transition ease-in-out delay-50 duration-300 ${className}`}
         >
             <div className="overflow-hidden rounded-xl shadow-lg">
                 <img
