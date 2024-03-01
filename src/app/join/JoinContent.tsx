@@ -19,7 +19,7 @@ function TeamCard({ className='', title, imgSrc, bgClassName='', description='',
     return (
         <div className={`group space-y-4 ${className}`}>
             <div className={`flex justify-center items-center space-x-4 rounded-xl drop-shadow-lg group-hover:scale-110 transition ease-in-out delay-50 duration-300 ${bgClassName} ${reverse ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                <img src={imgSrc} className="h-[100px] md:h-1/2 py-4 drop-shadow-xl" />
+                <img src={imgSrc} className="h-[100px] md:h-[100px] py-4 drop-shadow-xl" />
                 <h1 className="text-2xl font-bold">{title}</h1>
             </div>
             <p className="mx-4 tracking-wide leading-relaxed">
@@ -86,7 +86,7 @@ export default function JoinContent() {
 
             <ContentSection title="INTERNAL BOARD TEAMS" centerText={true} titleClassName="text-4xl">
                 <div className="flex justify-center">
-                    <div className="md:w-4/5 content-center grid md:grid-cols-2 gap-12">
+                    <div className="content-center grid md:grid-cols-2 gap-12">
                         <TeamCard 
                             bgClassName="bg-red-100 group-hover:bg-red-200" 
                             title="Design" 
