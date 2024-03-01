@@ -19,7 +19,7 @@ function TeamCard({ className='', title, imgSrc, bgClassName='', description='',
     return (
         <div className={`group space-y-4 ${className}`}>
             <div className={`flex justify-center items-center space-x-4 rounded-xl drop-shadow-lg group-hover:scale-110 transition ease-in-out delay-50 duration-300 ${bgClassName} ${reverse ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                <img src={imgSrc} className="h-1/2 py-4 drop-shadow-xl" />
+                <img src={imgSrc} className="h-[100px] md:h-1/2 py-4 drop-shadow-xl" />
                 <h1 className="text-2xl font-bold">{title}</h1>
             </div>
             <p className="mx-4 tracking-wide leading-relaxed">
@@ -31,27 +31,27 @@ function TeamCard({ className='', title, imgSrc, bgClassName='', description='',
 
 export default function JoinContent() {
     return (
-        <div className="text-black min-w-full">
+        <div className="text-black min-w-full p-10 md:p-20 space-y-20">
             <ContentSection title="OPPORTUNITIES">
-                <div className="flex flex-col space-y-5 [&>*]:text-xl [&>*]:leading-relaxed">
-                    <p className="text-2xl">At Creative Labs, we have activities that all students can participate in!</p>
-                    <p className="text-xl font-bold pl-10">(1) Workshops:</p>
-                    <p className="text-xl pl-20">
+                <div className="flex flex-col space-y-5 [&>*]:text-base md:[&>*]:text-xl [&>*]:leading-relaxed">
+                    <p>At Creative Labs, we have activities that all students can participate in!</p>
+                    <p className="font-bold md:pl-10">(1) Workshops:</p>
+                    <p className=" md:pl-20">
                         Anyone can attend workshops! We teach a variety of topics from basic design skills to illustrating. Follow our Instagram and Discord for the most recent updates!
                     </p>
-                    <p className="text-xl font-bold pl-10">(2) Events:</p>
-                    <p className="text-xl pl-20">
+                    <p className="font-bold md:pl-10">(2) Events:</p>
+                    <p className="md:pl-20">
                         Anyone can also attend events! We sometimes invite famous people to talk about their passions or have companies talk about recruitment opportunities. Follow our Instagram and Discord for the most recent updates!
                     </p>
-                    <p className="text-xl font-bold pl-10">(3) Projects:</p>
-                    <p className="text-xl pl-20">
+                    <p className="font-bold md:pl-10">(3) Projects:</p>
+                    <p className="md:pl-20">
                         Students must apply to projects before the start of each quarter. Students can either be a Project Lead or Project Member. Together, everyone will work to complete a project by the end of the quarter. To see projects from past quarters, visit our Projects page.
                     </p>
                 </div>
             </ContentSection>
 
             <ContentSection title="HOW DO WE OPERATE?">
-                <div className="flex flex-col space-y-6 [&>*]:text-xl [&>*]:leading-relaxed">
+                <div className="flex flex-col space-y-6 md:[&>*]:text-xl [&>*]:leading-relaxed">
                     <p>
                         Everyone is already part of the Creative Labs community! We also have various roles that students can apply to every quarter. Creative Labs has three main roles: Project Leads, Project Members, and Internal Board Members.
                     </p>
@@ -64,8 +64,8 @@ export default function JoinContent() {
                 </div>
             </ContentSection>
 
-            <ContentSection title="MAIN ROLES" centerText={true} titleClassName="text-4xl">
-                <div className="flex items-start w-full space-x-12">
+            <ContentSection title="MAIN ROLES" centerText={true}>
+                <div className="flex flex-col md:flex-row items-start w-full md:space-x-12">
                     <RoleCard
                         imgSrc="/card_icons/pink_thing_scaled.svg" 
                         title="Project Lead"
@@ -86,7 +86,7 @@ export default function JoinContent() {
 
             <ContentSection title="INTERNAL BOARD TEAMS" centerText={true} titleClassName="text-4xl">
                 <div className="flex justify-center">
-                    <div className="w-4/5 content-center grid grid-cols-2 gap-12">
+                    <div className="md:w-4/5 content-center grid md:grid-cols-2 gap-12">
                         <TeamCard 
                             bgClassName="bg-red-100 group-hover:bg-red-200" 
                             title="Design" 
