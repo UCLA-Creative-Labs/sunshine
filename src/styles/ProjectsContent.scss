@@ -1,0 +1,30 @@
+@import '_variables.scss';
+
+.proj-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Creates 3 equal-width columns */
+    gap: 32px; /* Optional: Adds space between grid items */
+  }
+
+
+/* Project Card CSS*/
+
+.proj-card{
+  aspect-ratio: 7 / 6;
+  border: 2px solid #61616130;
+  border-radius: 0.5em;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  font-size: 1em;
+  margin: 0.5em;
+  margin-bottom: 2em;
+  overflow: hidden;
+  padding: 2em;
+  position: relative;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.project-image {
+    border: 2px solid #EAEAEA;
+    display: inline-block;
+    margin-bottom: 2em;
+  }
