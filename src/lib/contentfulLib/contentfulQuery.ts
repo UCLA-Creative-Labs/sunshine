@@ -1,4 +1,4 @@
-import client from "./contentfulClient";
+import client from './contentfulClient';
 
 /**
  * Fetches documents from Contentful matching a query.
@@ -23,18 +23,19 @@ export async function getDocsByType(contentType: string) {
  * @param contentType
  * @param fields
  */
-export async function getDocsByField(contentType: string, fields: { [key: string]: string }) {
+export async function getDocsByField(
+    contentType: string,
+    fields: { [key: string]: string | boolean }
+) {
     const typeQuery = {
-        content_type: contentType
-    }
+        content_type: contentType,
+    };
     const fieldsQuery = Object.fromEntries(
-        Object.entries(fields).map(
-            (pair) => {
-                return [`fields.${pair[0]}`, pair[1]]
-            }
-        )
+        Object.entries(fields).map((pair) => {
+            return [`fields.${pair[0]}`, pair[1]];
+        })
     );
     const query = { ...typeQuery, ...fieldsQuery };
-    
+
     return getDocs(query);
 }
