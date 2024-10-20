@@ -71,7 +71,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
 
   return (
     <div className="flex flex-col items-center w-full my-12 text-black">
-      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black ml-5">
+      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
         <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
           <h1 className="text-4xl font-bold">THE TEAM</h1>
           <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
