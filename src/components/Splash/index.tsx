@@ -2,7 +2,7 @@ import React from 'react';
 
 import SunMoon from './SunMoon';
 
-import '../styles/Splash.scss';
+import '@/styles/Splash.scss';
 
 interface SplashProps {
   isDay: boolean;

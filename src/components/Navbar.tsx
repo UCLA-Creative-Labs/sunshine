@@ -1,159 +1,71 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation} from 'react-router-dom';
+"use client";
 
-import colors from './styles/_variables.scss';
-import './styles/Navbar.scss';
+import { Lato } from "next/font/google";
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 
-interface NavbarProps {
-  isDay: boolean;
-}
+const lato = Lato({ weight: "900", subsets: ["latin"] });
 
-function Navbar(props: NavbarProps): JSX.Element {
-  const [ scrollTop, setScrollTop ] = useState<number>(0);
-  const [ sectionScrollStates, setSectionScrollStates ]
-    = useState<boolean[]>([ true, false, false, false ]);
-  const location = useLocation();
+const SCROLLY_POINT = 150;
 
-  const navbarRef = useRef<HTMLDivElement>(null);
-  const navigationRef = useRef<HTMLDivElement>(null);
-  const joinUsDividerRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLDivElement>(null);
-  const sectionsRef = useRef<(HTMLElement | null)[]>([]);
-
-  const isElementInView = (el: HTMLElement | null): boolean => {
-    if (!el) return false;
-    const rect: DOMRect = el.getBoundingClientRect();
-    return (rect.top >= 0 && rect.top <= window.innerHeight * 0.4)
-      || (rect.bottom <= window.innerHeight && rect.bottom >= window.innerHeight * 0.4);
-  };
-
-  const toNightStyle = () => {
-    if (!navbarRef.current || !navigationRef.current || !joinUsDividerRef.current || !logoRef.current)
-      return;
-    const navbarStyle = navbarRef.current.style;
-    const navigationStyle = navigationRef.current.style;
-    const joinUsDividerStyle = joinUsDividerRef.current.style;
-    const logoStyle = logoRef.current.style;
-
-    navbarStyle.backgroundColor = colors.navbarBgScroll;
-    navbarStyle.color = colors.navbarTextScroll;
-    navigationStyle.color = colors.navbarTextScroll;
-    joinUsDividerStyle.borderColor = colors.joinUsTextScroll;
-    logoStyle.filter = 'invert(100%)';
-  };
-
-  const toDayStyle = () => {
-    if (navbarRef.current == null || navigationRef.current == null || joinUsDividerRef.current == null || logoRef.current == null)
-      return;
-    const navbarStyle = navbarRef.current.style;
-    const navigationStyle = navigationRef.current.style;
-    const joinUsDividerStyle = joinUsDividerRef.current.style;
-    const logoStyle = logoRef.current.style;
-
-    navbarStyle.backgroundColor = colors.splashBgDay;
-    navbarStyle.color = colors.navbarText;
-    navigationStyle.color = colors.navbarText;
-    joinUsDividerStyle.borderColor = colors.joinUsText;
-    logoStyle.filter = 'invert(0%)';
-  };
+export default function Navbar() {
+  const [pastScrollPoint, setPastScrollPoint] = useState(false);
 
   useEffect(() => {
-    // default to body if the element can't be found
-    sectionsRef.current = [
-      document.getElementById('splash'),
-      document.getElementById('about'),
-      document.getElementById('projects'),
-    ];
-  }, []);
-
-  useEffect(() => {
-    if (!props.isDay) toNightStyle();
-  }, [ props.isDay ]);
-
-  useEffect(() => {
-    const vpHeight = window.innerHeight;
-
-    if ((scrollTop < 0.2 * vpHeight) && props.isDay)
-      toDayStyle();
-    else
-      toNightStyle();
-
-    const onScroll = () => {
-      setScrollTop(document.documentElement.scrollTop);
-
-      for (let i = 0; i < sectionsRef.current.length; i++) {
-        if (isElementInView(sectionsRef.current[i])) {
-          const scrollState: boolean[] = new Array(sectionsRef.current.length).fill(false);
-          scrollState[i] = true;
-          setSectionScrollStates(scrollState);
-        }
-      }
-
-    };
-
-    window.addEventListener('scroll', onScroll);
-
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [ scrollTop ]);
-
-  /**
-   * Scroll to section if on the root path
-   *
-   * @param el the section element to scroll to
-   */
-  const scrollToElement = (el: HTMLElement | null) => {
-    if (location.pathname !== '/') {
-      window.location.href = '/';
-    }
-    if (!el) return;
-    const navbar = document.getElementById('navbar');
-    const navbarHeight = navbar?.offsetHeight ?? document.body.offsetHeight - el.offsetHeight;
-    window.scrollBy({
-      top: el.getBoundingClientRect().top - navbarHeight,
-      left: 0,
-      behavior: 'smooth',
+    window.addEventListener("scroll", () => {
+      setPastScrollPoint(window.scrollY > SCROLLY_POINT);
     });
-  };
+  });
 
   return (
-    <div id={'navbar'} ref={navbarRef}>
-      <h3 id={'title'} className={'logotype'} onClick={() => scrollToElement(sectionsRef.current[0])}>
-        <div id={'logo'} ref={logoRef} />
-        CREATIVE LABS
-      </h3>
-      <div id={'navigation'} ref={navigationRef}>
-        <nav>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[0])}
-            style={{ fontWeight: sectionScrollStates[0] ? 700 : 400 }}>
-            HOME
-          </a>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[1])}
-            style={{ fontWeight: sectionScrollStates[1] ? 700 : 400 }}>
-            ABOUT
-          </a>
-          <a
-            onClick={() => scrollToElement(sectionsRef.current[2])}
-            style={{ fontWeight: sectionScrollStates[2] ? 700 : 400 }}>
-            PROJECTS
-          </a>
-          <div id={'join-us-divider'} ref={joinUsDividerRef}></div>
-          <div id={'join-us-container'}>
-            <a
-              id={'join-us'}
-              href="/join"
-              style={{
-                backgroundColor: window.location.pathname === "/join" ? colors.joinUsBgSelected : colors.joinUsBg,
-                fontWeight: window.location.pathname === "/join" ? 700: 400
-              }}>
-              JOIN US
-            </a>
-          </div>
-        </nav>
+    <div
+      id="navbar"
+      className={`transition z-50 ease-in-out delay-100 flex justify-between min-w-full p-8 lg:px-20 dark:bg-[#000000] sticky top-0 ${
+        pastScrollPoint ? "bg-[#000000] text-white" : "bg-[#85b6ff]"
+      }`}
+      style={{}}
+    >
+      <div
+        id="title"
+        className="flex justify-center md:justify-between items-center min-w-full md:min-w-0"
+      >
+        <div className="flex items-center space-x-4">
+          <Image
+            alt="Creative Labs Logo"
+            src="/cl-logo.svg"
+            width={40}
+            height={40}
+            className={`transition ease-in-out delay-100 dark:invert ${
+              pastScrollPoint && "invert"
+            }`}
+          />
+          <Link
+            href="/"
+            className={"text-xl tracking-widest " + lato.className}
+          >
+            CREATIVE LABS
+          </Link>
+        </div>
       </div>
+      <nav
+        id="navigation"
+        className="hidden md:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-6 space-x-6"
+      >
+        <div id="links" className="flex space-x-6 lg:text-xl">
+          <Link href="/about">ABOUT</Link>
+          <Link href="/projects">PROJECTS</Link>
+          <Link href="/team">OUR TEAM</Link>
+        </div>
+        <div id="join">
+          <Link
+            href="/join"
+            className="lg:text-xl border-[3px] border-black rounded-xl py-2 md:px-6 bg-white text-black"
+          >
+            JOIN US
+          </Link>
+        </div>
+      </nav>
     </div>
   );
 }
-
-export default Navbar;

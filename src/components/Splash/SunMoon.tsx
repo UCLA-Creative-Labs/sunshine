@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-import '../styles/Splash.scss';
+import '@/styles/Splash.scss';
 
 interface SunMoonProps {
   isDay: boolean;
@@ -49,7 +49,7 @@ function SunMoon(props: SunMoonProps): JSX.Element {
 
   return (
     <div id={'sunmoon'} ref={bg} className={props.isDay ? 'day' : 'night'}>
-      <div id='sunmoon-face' ref={face} />
+      
     </div>
   );
 }
