@@ -57,7 +57,7 @@ export default async function Team() {
     docs = docs.map(obj => ({...obj, enabled: true}));
     return docs;
   });
-  
+
   return (
     <main className="flex min-h-screen flex-col">
       <Navbar />
