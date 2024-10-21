@@ -37,7 +37,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
     setMembersList(members);
     setAlumniList(alumni);
   }, [members, alumni]);
-
+  
   useEffect(() => {
     if (membersList) {
       let newMembersList: Array<any> = [];
