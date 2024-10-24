@@ -26,15 +26,18 @@ function MemberCard({ memberData, className } : { memberData: any, className?: s
   )
 }
 
-export default function TeamContent({ members }: { members: Array<any> }) {
+export default function TeamContent({ members, alumni }: { members: Array<any>, alumni: Array<any> }) {
   const [membersList, setMembersList] = useState<Array<any>|undefined>(undefined);
+  const [alumniList, setAlumniList] = useState<Array<any>|undefined>(undefined);
   const [year, setYear] = useState<string>("All Years");
   const [role, setRole] = useState<string>("All Roles");
+  const [alumniRole, setAlumniRole] = useState<string>("All Roles");
 
   useEffect(() => {
     setMembersList(members);
-  }, [members]);
-
+    setAlumniList(alumni);
+  }, [members, alumni]);
+  
   useEffect(() => {
     if (membersList) {
       let newMembersList: Array<any> = [];
@@ -49,45 +52,85 @@ export default function TeamContent({ members }: { members: Array<any> }) {
     }
   }, [year, role]);
 
+  useEffect(() => {
+    if (alumniList) {
+      let newAlumniList: Array<any> = [];
+      for (const alumniMember of alumni) {
+        if (alumniRole == "All Roles" || alumniMember.fields.roles.includes(alumniRole)
+        ) {
+          newAlumniList.push(alumniMember);
+        }
+      }
+      setAlumniList(newAlumniList);
+    }
+  }, [alumniRole]);
+
   return (
-  <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
-    <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
-      <h1 className="text-4xl font-bold">THE TEAM</h1>
-      <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
-        <DropdownMenu
-          className="flex flex-col w-[200px] text-xl"
-          buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
-          menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
-          menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
-          menuButtonHoverColor="bg-blue-100"
-          options={["All Years", "2024", "2025", "2026", "2027"]}
-          setValue={setYear}
-        />
-        <DropdownMenu
-          className="flex flex-col w-[200px] text-xl"
-          buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
-          menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
-          menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
-          menuButtonHoverColor="bg-blue-100"
-          options={["All Roles", "President", "Director", "Design", "Marketing/External", "Projects", "Finance", "Tech"]}
-          setValue={setRole}
-        />
+    <div className="flex flex-col items-center w-full my-12 text-black">
+      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
+        <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
+          <h1 className="text-4xl font-bold">THE TEAM</h1>
+          <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
+            <DropdownMenu
+              className="flex flex-col w-[200px] text-xl"
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
+              menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
+              menuButtonHoverColor="bg-blue-100"
+              options={["All Years", "2024", "2025", "2026", "2027"]}
+              setValue={setYear}
+            />
+            <DropdownMenu
+              className="flex flex-col w-[200px] text-xl"
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
+              menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
+              menuButtonHoverColor="bg-blue-100"
+              options={["All Roles", "President", "Director", "Design", "Marketing/External", "Projects", "Finance", "Tech"]}
+              setValue={setRole}
+            />
+          </div>
+        </div>
+        <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
+          { membersList?.filter((data) => data.enabled).map((data, idx) => 
+            {
+              const memberData = data.fields;
+              return <MemberCard
+                key={idx}
+                memberData={memberData}
+              />
+            }
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
+        <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
+          <h1 className="text-4xl font-bold">ALUMNI</h1>
+          <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
+            <DropdownMenu
+              className="flex flex-col w-[200px] text-xl"
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
+              menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
+              menuButtonHoverColor="bg-blue-100"
+              options={["All Roles", "President", "Director", "Design", "Marketing/External", "Projects", "Finance", "Tech"]}
+              setValue={setAlumniRole}
+            />
+          </div>
+        </div>
+        <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
+          { alumniList?.filter((data) => data.enabled).map((data, idx) => 
+            {
+              const alumniData = data.fields;
+              return <MemberCard
+                key={idx}
+                memberData={alumniData}
+              />
+            }
+          )}
+        </div>
       </div>
     </div>
-    <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
-      { membersList?.filter((data) => data.enabled).map((data, idx) => 
-        {
-          const memberData = data.fields;
-          return <MemberCard
-            key={idx}
-            memberData={memberData}
-          />
-        }
-      )}
-    </div>
-    <div>
-
-    </div>
-  </div>
   )
 }
