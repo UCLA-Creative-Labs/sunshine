@@ -20,6 +20,10 @@ $section-padding-mobile: $padding-vert-mobile $padding-horiz-mobile;
 $section-bg: #fff;
 $max-section-width: 1440px;
 
+// Breakpoints
+$tablet-breakpoint: 1160px;
+$mobile-breakpoint: 768px;
+
 // Colors
 $colors: (
   splashBgDay: #85b6ff,
