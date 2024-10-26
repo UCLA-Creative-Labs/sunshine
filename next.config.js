@@ -10,6 +10,11 @@ const nextConfig = {
       // config.infrastructureLogging = { debug: /PackFileCache/ };
       return config;
     },
+
+    env: {
+      SPACE_ID: process.env.SPACE_ID,
+      CDN_API_KEY: process.env.CDN_API_KEY,
+    },
   };
 
-module.exports = nextConfig
+  module.exports = nextConfig

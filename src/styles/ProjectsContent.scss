@@ -1,16 +1,37 @@
-@import '_variables.scss';
+@import 'variables';
 
 .proj-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Creates 3 equal-width columns */
-    gap: 32px; /* Optional: Adds space between grid items */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Creates 3 equal-width columns */
+  gap: 2.5%; 
+  flex-grow: 1;
+}
+
+
+@media (max-width: $mobile-breakpoint) {
+  .pc{
+    padding: 1rem;
   }
+
+  .proj-container {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (min-width: $mobile-breakpoint) and (max-width: $tablet-breakpoint) {
+  .pc{
+    padding: 2.5rem;
+  }
+
+  .proj-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
 
 /* Project Card CSS*/
 
 .proj-card{
-  aspect-ratio: 7 / 6;
   border: 2px solid #61616130;
   border-radius: 0.5em;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
@@ -18,13 +39,13 @@
   margin: 0.5em;
   margin-bottom: 2em;
   overflow: hidden;
-  padding: 2em;
+  padding: 5%;
   position: relative;
   transition: box-shadow 0.3s ease-in-out;
 }
 
 .project-image {
-    border: 2px solid #EAEAEA;
-    display: inline-block;
-    margin-bottom: 2em;
-  }
+  border: 2px solid #EAEAEA;
+  display: inline-block;
+  margin-bottom: 1em;
+}
