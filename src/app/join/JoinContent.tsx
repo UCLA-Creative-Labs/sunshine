@@ -3,8 +3,10 @@ import { Lato } from "next/font/google"
 
 const lato = Lato({ weight: '700', subsets: ['latin'] });
 
-function RoleCard({ imgSrc, title, desc, className }: { imgSrc: string, title: string, desc?:string, className?: string }) {
+function RoleCard({ src, imgSrc, title, desc, className }: { src: string, imgSrc: string, title: string, desc?:string, className?: string }) {
+	console.log(src)
     return (
+	<a href={src} target="_blank">
         <div className={`flex flex-col items-center w-full space-y-5 group ${className}`}>
             <img src={imgSrc} className="h-1/2 py-4 drop-shadow-lg group-hover:scale-125 transition ease-in-out delay-50 duration-300" />
             <h1 className={`text-center text-2xl ${lato.className}`}>{title}</h1>
@@ -12,6 +14,7 @@ function RoleCard({ imgSrc, title, desc, className }: { imgSrc: string, title: s
                 {desc}
             </p>
         </div>
+	</a>
     )
 }
 
@@ -29,7 +32,7 @@ function TeamCard({ className='', title, imgSrc, bgClassName='', description='',
     )
 }
 
-export default function JoinContent() {
+export default function JoinContent({ pLeadLink='#', pMemLink='#', bMemLink='#' } : { pLeadLink?: string, pMemLink?: string, bMemLink: string }) {
     return (
         <div className="text-black min-w-full p-10 md:p-20 space-y-20">
             <ContentSection title="OPPORTUNITIES">
@@ -70,16 +73,19 @@ export default function JoinContent() {
                         imgSrc="/card_icons/pink_thing_scaled.svg" 
                         title="Project Lead"
                         desc="Have a cool idea? Apply to be a Project Lead and make it happen. We'll provide you the platform needed to recruit your dream team. Projects can be technical or non-technical! Past projects have ranged from a smart mirror to a fancy photoshoot."
+			src={pLeadLink}
                     />
                     <RoleCard 
                         imgSrc="/card_icons/purple_thing_scaled.svg" 
                         title="Project Member"
                         desc="Want to be a part of something wonderful? Apply as a Project Member and collaborate with a Project Lead and other Project Members to create something awesome! Experience necessary varies! "
+			src={pMemLink}
                     />
                     <RoleCard
                         imgSrc="/card_icons/orange_thing_scaled.svg"
                         title="Board Member"
                         desc="We're always looking to grow our internal team! Help us run things behind the scenes like organizing events, socials, and workshops, communicating with Project Teams, securing funding, and creating promotional materials! "
+			src={bMemLink}
                     />
                 </div>
             </ContentSection>
