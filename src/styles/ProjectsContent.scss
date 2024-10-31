@@ -3,7 +3,7 @@
 .proj-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* Creates 3 equal-width columns */
-  gap: 2.5%; 
+  column-gap: 2.5%;
   flex-grow: 1;
 }
 
