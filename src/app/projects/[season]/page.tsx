@@ -5,29 +5,39 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import ContentSection from "@/components/ContentSection";
-import {seasonData} from '@/assets/projectData';
+import ProjectsContent from "./ProjectsContent";
+import { projData , seasonData } from '@/assets/projectData';
+
 
 
 const SeasonProjectPage = () => {
   const { season } = useParams(); // Get the 'season' parameter from the URL
 
-  const currentSeason = seasonData.find((data) => data.url.endsWith(season));
+  const seasonParam = Array.isArray(season) ? season[0] : season;
+  const currentSeason = seasonData.find((data) => data.url.endsWith(seasonParam));
+  const currentSeasonProjects = projData.filter((project) => project.season === seasonParam);
 
-  return (
+  return (    
     <main className="flex min-h-screen flex-col">
       <Navbar />
       <div className="grow flex flex-col space-y-10 px-20 py-20 text-black min-w-full pc">
-        {currentSeason ? (
-            <ContentSection title={currentSeason.title}>
-                <div>
-                <h1>hhhh</h1>
-                <p>Details about the {season} season projects go here.</p>
-                {/* Add more content, project lists, etc., as needed */}
-                </div>
-            </ContentSection>
+        <h1>Projects- {currentSeason?.title}</h1>
+        {currentSeasonProjects.length > 0 ? (
+          currentSeasonProjects.map((project, index) => (
+            <ProjectsContent
+            key={index}
+            title={project.title}
+            description={project.description}
+            projGraphic={project.proj_graphic}
+            instaGraphic={project.insta_graphic}
+            teamGraphic={project.team_graphic}
+            projectLeads={project.pLeads}
+            projectMembers={project.pMembers}
+            url={project.url}
+            />
+          ))
         ) : (
-            <h1>Season not found.</h1>
+          <h1>No projects found for this season.</h1>
         )}
       </div>
       <Footer />

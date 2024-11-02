@@ -2,7 +2,7 @@ import ContentSection from "@/components/ContentSection";
 import ProjectCard from "./ProjectCard";
 import {seasonData} from '@/assets/projectData';
 
-import '../../styles/ProjectsContent.scss';
+import '../../styles/ProjectSeasonContent.scss';
 
 
 export default function ProjectsContent() {

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from "next/link";
 
 
-import '../../styles/ProjectsContent.scss';
+import '../../styles/ProjectSeasonContent.scss';
 
 
 const lato = Lato({ weight: '700', subsets: ['latin'] })

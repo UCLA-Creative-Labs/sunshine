@@ -1,5 +1,12 @@
 // project.js
 export const seasonData = [
+    { title: "Spring 2025", description: "Featured Projects:", img: "/projects/comingsoon.png", 
+        alt: "coming soon!", url: "projects/s25" },
+    { title: "Winter 2025", description: "Featured Projects:", img: "/projects/comingsoon.png", 
+        alt: "coming soon!", url: "projects/w25" },
+    { title: "Fall 2024", description: "Featured Projects:", img: "/projects/comingsoon.png", 
+        alt: "coming soon!", url: "projects/f24" },
+
     { title: "Spring 2024", description: "Featured Projects:", img: "/projects/comingsoon.png", 
         alt: "coming soon!", url: "projects/s24" },
     { title: "Winter 2024", description: "Featured Projects:", img: "/projects/comingsoon.png", 
@@ -36,3 +43,39 @@ export const seasonData = [
         alt: "coming soon!", url: "projects/f19" },
   ];
     
+  export const projData = [
+    //fall 2024
+    { 
+    title: "Clothesline",
+    season: "f24",
+    insta_graphic: "/projects/comingsoon.png",
+    team_graphic: "/projects/comingsoon.png",
+    proj_graphic: "/projects/comingsoon.png",
+    pLeads: "Zane Labute & Megan Clarke",
+    pMembers: "Not Alex, Not Travis, Not Ollie, Not Justin",
+    description: "Featured Projects:", 
+    url: "projects/s24/Clothesline"},
+
+    { 
+    title: "Clothesline",
+    season: "f24",
+    insta_graphic: "/projects/comingsoon.png",
+    team_graphic: "/projects/comingsoon.png",
+    proj_graphic: "/projects/comingsoon.png",
+    pLeads: "Zane Labute & Megan Clarke",
+    pMembers: "Not Alex, Not Travis, Not Ollie, Not Justin",
+    description: "Featured Projects:", 
+    url: "projects/s24/Clothesline"},
+
+    { 
+    title: "Clothesline",
+    season: "f24",
+    insta_graphic: "/projects/comingsoon.png",
+    team_graphic: "/projects/comingsoon.png",
+    proj_graphic: "/projects/comingsoon.png",
+    pLeads: "Zane Labute & Megan Clarke",
+    pMembers: "Not Alex, Not Travis, Not Ollie, Not Justin",
+    description: "Featured Projects:", 
+    url: "projects/s24/Clothesline"},
+
+  ];
