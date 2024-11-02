@@ -1,6 +1,6 @@
 import ContentSection from "@/components/ContentSection";
 import ProjectCard from "./ProjectCard";
-import projectData from '@/assets/projectData';
+import {seasonData} from '@/assets/projectData';
 
 import '../../styles/ProjectsContent.scss';
 
@@ -12,7 +12,7 @@ export default function ProjectsContent() {
             <ContentSection title="">
                 <div className="relative flex flex-col w-full">
                     <div className="proj-container w-full">
-                        {projectData.map((project, index) => (
+                        {seasonData.map((project, index) => (
                             <ProjectCard
                             key={index}
                             title={project.title}

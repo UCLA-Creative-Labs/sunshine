@@ -1,5 +1,5 @@
-// projectData.js
-const projectData = [
+// project.js
+export const seasonData = [
     { title: "Spring 2024", description: "Featured Projects:", img: "/projects/comingsoon.png", 
         alt: "coming soon!", url: "projects/s24" },
     { title: "Winter 2024", description: "Featured Projects:", img: "/projects/comingsoon.png", 
@@ -35,6 +35,4 @@ const projectData = [
     { title: "Fall 2019", description: "Featured Projects:", img: "/projects/comingsoon.png", 
         alt: "coming soon!", url: "projects/f19" },
   ];
-  
-  export default projectData;
-  
+    
