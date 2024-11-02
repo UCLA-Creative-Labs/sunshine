@@ -48,34 +48,34 @@ export const seasonData = [
     { 
     title: "Clothesline",
     season: "f24",
-    insta_graphic: "/projects/comingsoon.png",
+    insta_graphic: "/projects/insta-default.png",
     team_graphic: "/projects/comingsoon.png",
     proj_graphic: "/projects/comingsoon.png",
     pLeads: "Zane Labute & Megan Clarke",
     pMembers: "Not Alex, Not Travis, Not Ollie, Not Justin",
-    description: "Featured Projects:", 
+    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`, 
     url: "projects/s24/Clothesline"},
 
     { 
     title: "Clothesline",
     season: "f24",
-    insta_graphic: "/projects/comingsoon.png",
+    insta_graphic: "/projects/insta-default.png",
     team_graphic: "/projects/comingsoon.png",
     proj_graphic: "/projects/comingsoon.png",
     pLeads: "Zane Labute & Megan Clarke",
     pMembers: "Not Alex, Not Travis, Not Ollie, Not Justin",
-    description: "Featured Projects:", 
+    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`, 
     url: "projects/s24/Clothesline"},
 
     { 
     title: "Clothesline",
     season: "f24",
-    insta_graphic: "/projects/comingsoon.png",
+    insta_graphic: "/projects/insta-default.png",
     team_graphic: "/projects/comingsoon.png",
     proj_graphic: "/projects/comingsoon.png",
     pLeads: "Zane Labute & Megan Clarke",
     pMembers: "Not Alex, Not Travis, Not Ollie, Not Justin",
-    description: "Featured Projects:", 
+    description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`, 
     url: "projects/s24/Clothesline"},
 
   ];

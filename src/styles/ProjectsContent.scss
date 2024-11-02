@@ -1,3 +1,19 @@
 @import 'variables';
 
 /* Project List CSS*/
+.projects-card {
+    border: 1px solid black;
+    display: flex;
+    padding: 2.5%;
+}
+
+.graphic {
+    aspect-ratio: 1;
+    height: 100%;
+    max-height: 300px;
+}
+
+.about-proj {
+    margin-left: 2vw;
+    width: 100%
+}

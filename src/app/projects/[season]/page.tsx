@@ -8,8 +8,6 @@ import Navbar from "@/components/Navbar";
 import ProjectsContent from "./ProjectsContent";
 import { projData , seasonData } from '@/assets/projectData';
 
-
-
 const SeasonProjectPage = () => {
   const { season } = useParams(); // Get the 'season' parameter from the URL
 
@@ -20,17 +18,17 @@ const SeasonProjectPage = () => {
   return (    
     <main className="flex min-h-screen flex-col">
       <Navbar />
-      <div className="grow flex flex-col space-y-10 px-20 py-20 text-black min-w-full pc">
-        <h1>Projects- {currentSeason?.title}</h1>
+      <div className="grow flex flex-col space-y-10 px-20 py-10 text-black min-w-full pc">
+        <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>
+            Projects- {currentSeason?.title}
+        </h1>
         {currentSeasonProjects.length > 0 ? (
           currentSeasonProjects.map((project, index) => (
             <ProjectsContent
             key={index}
             title={project.title}
             description={project.description}
-            projGraphic={project.proj_graphic}
             instaGraphic={project.insta_graphic}
-            teamGraphic={project.team_graphic}
             projectLeads={project.pLeads}
             projectMembers={project.pMembers}
             url={project.url}
