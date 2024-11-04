@@ -3,8 +3,8 @@ import DropdownMenu from "@/components/DropdownMenu";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-function MemberCard({ memberData, className } : { memberData: any, className?: string }) {
-  const { name, year, titles, degree, fact } = memberData;
+function MemberCard({ memberData, alumni, className } : { memberData: any, alumni: boolean, className?: string }) {
+  const { name, year, titles, degree, fact, company } = memberData;
   const photoURL = memberData?.photo?.fields?.file?.url;
   return (
     <div className={`group space-y-2 text-center md:text-start ${className}`}>
@@ -22,8 +22,9 @@ function MemberCard({ memberData, className } : { memberData: any, className?: s
         <h1 className="text-md text-neutral-500">{year ? 'CLASS OF ' + year : ''}</h1>
         <ul>
           {titles && titles.map((roleName, idx) => <li key={idx} className="text-md">{'\u2043' + ' '}{roleName}</li>)}
-          {degree && <li className="text-md">{'\u2043'} Major: {degree}</li>}
-          {fact && <li className="text-md">{'\u2043'} Fun Fact: {fact}</li>}
+          {!alumni && degree && <li className="text-md">{'\u2043'} Major: {degree}</li>}
+          {!alumni && fact && <li className="text-md">{'\u2043'} Fun Fact: {fact}</li>}
+          {alumni && company && <li className="text-md">{'\u2043'} Now at: {company}</li>}
         </ul>
       </div>
     </div>
@@ -60,7 +61,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
     if (alumniList) {
       let newAlumniList: Array<any> = [];
       for (const alumniMember of alumni) {
-        if (alumniRole == "All Roles" || alumniMember.fields.roles.includes(alumniRole)
+        if (alumniRole == "All Roles" || (alumniMember?.fields?.roles?.includes(alumniRole))
         ) {
           newAlumniList.push(alumniMember);
         }
@@ -72,7 +73,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
   return (
     <div className="flex flex-col items-center w-full my-12 text-black">
       <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
-        <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
+        <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4 ml-5">
           <h1 className="text-4xl font-bold">THE TEAM</h1>
           <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
             <DropdownMenu
@@ -102,6 +103,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
               return <MemberCard
                 key={idx}
                 memberData={memberData}
+                alumni={false}
               />
             }
           )}
@@ -130,6 +132,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
               return <MemberCard
                 key={idx}
                 memberData={alumniData}
+                alumni={true}
               />
             }
           )}
