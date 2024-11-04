@@ -1,9 +1,8 @@
-"use client";
-
+"use server";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { getDocsByType } from "@/lib/contentfulLib";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import TeamContent from "./TeamContent/TeamContent";
 
 const ROLES_SORTING = [
