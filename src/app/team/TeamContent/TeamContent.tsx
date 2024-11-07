@@ -1,10 +1,11 @@
 'use client'
 import DropdownMenu from "@/components/DropdownMenu";
+import ToolTip from "@/components/ToolTip";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 function MemberCard({ memberData, alumni, className } : { memberData: any, alumni: boolean, className?: string }) {
-  const { name, year, titles, degree, fact, company } = memberData;
+  const { name, year, titles, degree, fact, company, website} = memberData;
   const photoURL = memberData?.photo?.fields?.file?.url;
   return (
     <div className={`group space-y-2 text-center md:text-start ${className}`}>
@@ -16,6 +17,12 @@ function MemberCard({ memberData, alumni, className } : { memberData: any, alumn
             alt={`Photo of ${name}`}
           />
         }
+        {/* Tooltip */}
+        {website && (
+          <ToolTip content={<a href={website} target="_blank" rel="noopener noreferrer">Visit Website</a>}>
+            <div className="w-full h-full"></div> {/* This div wraps the image */}
+          </ToolTip>
+        )}
       </div>
       <div className="mx-2 space-y-1">
         <h1 className="text-xl md:text-2xl font-bold group-hover:text-blue-400 group-hover:drop-shadow-2xl transition ease-in-out delay-50 duration-300">{name}</h1>
