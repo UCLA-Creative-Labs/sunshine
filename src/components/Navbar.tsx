@@ -152,6 +152,28 @@ function Navbar(props: NavbarProps): JSX.Element {
           </div>
         </nav>
       </div>
+<<<<<<< Updated upstream
+=======
+      <nav
+        id="navigation"
+        className="hidden md:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-6 space-x-6"
+      >
+        <div id="links" className="flex space-x-6 lg:text-xl">
+          <Link href="/">HOME</Link>
+          <Link href="/about">ABOUT</Link>
+          <Link href="/projects">PROJECTS</Link>
+          <Link href="/team">OUR TEAM</Link>
+        </div>
+        <div id="join">
+          <Link
+            href="/join"
+            className="lg:text-xl border-[3px] border-black rounded-xl py-2 md:px-6 bg-white text-black"
+          >
+            JOIN US
+          </Link>
+        </div>
+      </nav>
+>>>>>>> Stashed changes
     </div>
   );
 }
