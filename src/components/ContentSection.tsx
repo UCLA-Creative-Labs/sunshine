@@ -4,7 +4,7 @@ const lato = Lato({ weight: '700', subsets: ['latin'] });
 
 interface ContentSectionProps {
     title?: string,
-    description?: string,
+    description?: React.ReactNode,
     children?: React.ReactNode,
     centerText?: boolean,
     titleClassName?: string

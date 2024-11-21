@@ -1,5 +1,7 @@
 import ContentSection from "@/components/ContentSection"
 import GenericCard from "@/components/GenericCard"
+import Link from "next/link";
+
 
 export default function HomepageContent() {
     return (
@@ -9,24 +11,32 @@ export default function HomepageContent() {
             >
                 <GenericCard
                     imgSrc="/card_icons/what-we-do.svg"
-                    title="Who are we? What is Creative Labs?"
-                    description="We connect students from all disciplines and backgrounds together to bring any creative passion project to life! Creative Labs started as a small group of friends and is founded on the idea that with the right group of people, any idea can come to life. Let’s make something cool together!"
+                    title="Creativity for All!"
+                    description="We bring students from all disciplines and backgrounds together to work on technical and creative projects. Let’s make something cool!"
                     className="md:w-1/2"
-                    end="ABOUT CREATIVE LABS"
+                    end="LEARN MORE ABOUT CL"
                     href="/about"
                 />
                 <GenericCard
                     imgSrc="/card_icons/who-are-we.svg"
                     title="How do we operate?"
-                    description="We have two main components: internal board and external projects. The internal board is responsible for running things behind the scenes like hosting events, socials, and workshops (which are open to everyone)! External projects work together in teams to complete and execute any creative idea by the end of the quarter."
+                    description="We have two main components: internal board who runs things behind the scenes and external projects that change every quarter."
                     className="md:w-1/2"
-                    end="JOIN US"
+                    end="INTERESTED? JOIN US"
                     href="/join"
                 />
             </ContentSection>
             <ContentSection
                 title="PROJECTS"
-                description="Every quarter we have student teams collaborate and execute an idea. Below are some projects that were created in the past quarters."
+                description={
+                    <>
+                        Every quarter, we have student teams collaborate and execute any creative idea. Browse some of the cool projects we’ve made in past quarters down below, or take a look at the entire projects archive{" "}
+                        <Link href="/projects">
+                            <a className="border-b border-black">HERE</a>
+                        </Link>
+                        . Have fun!
+                    </>
+                }
             >
                 <GenericCard
                     imgSrc="/card_icons/fall.svg"
