@@ -17,9 +17,9 @@ export default function GenericCard({ title, description, end, imgSrc='/card_ico
 
     return (
         <Link href={href}
-            className={`flex ${imgPos == 'top' ? 'flex-col space-y-8' : 'flex-row space-x-8 items-center'} group border border-black p-8 shadow-lg rounded-none cursor-pointer transition ease-in-out delay-50 duration-300 ${className}`}
+            className={`flex ${imgPos == 'top' ? 'flex-col space-y-8' : 'flex-row space-x-8 items-center'} group border border-black p-8 shadow-lg rounded-xl cursor-pointer transition ease-in-out delay-50 duration-300 ${className}`}
         >
-            <div className="overflow-hidden rounded-none shadow-lg">
+            <div className="overflow-hidden rounded-xl shadow-lg">
                 <img
                     alt="Card Icon"
                     src={imgSrc}
@@ -41,7 +41,8 @@ export default function GenericCard({ title, description, end, imgSrc='/card_ico
                 </p>
                 {end && (
                     <div className="flex items-center space-x-2">
-                        <p className="text-xl">
+                        <p className="text-xl relative mb-1">
+                            <span className="absolute bottom-0 left-0 w-full border-b border-black"></span>
                             {end}
                         </p>
                         <h1 className={`text-xl group-hover:translate-x-4 transition ease-in-out duration-100 delay-50 ${lato.className}`}>➔</h1>
