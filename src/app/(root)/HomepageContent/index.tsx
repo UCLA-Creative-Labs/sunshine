@@ -9,19 +9,24 @@ export default function HomepageContent() {
             >
                 <GenericCard
                     imgSrc="/card_icons/what-we-do.svg"
-                    title="Creativity for All"
-                    description="We bring students from all disciplines and backgrounds together to work on technical & creative projects."
+                    title="Who are we? What is Creative Labs?"
+                    description="We connect students from all disciplines and backgrounds together to bring any creative passion project to life! Creative Labs started as a small group of friends and is founded on the idea that with the right group of people, any idea can come to life. Let’s make something cool together!"
                     className="md:w-1/2"
+                    end="ABOUT CREATIVE LABS"
+                    href="/about"
                 />
                 <GenericCard
                     imgSrc="/card_icons/who-are-we.svg"
-                    title="Welcome to Our Lab"
-                    description="Just some UCLA kids with skills in dev, design, and project management trying to make something cool, together. We were founded on the dream that with the right group of people, any idea can come to life."
+                    title="How do we operate?"
+                    description="We have two main components: internal board and external projects. The internal board is responsible for running things behind the scenes like hosting events, socials, and workshops (which are open to everyone)! External projects work together in teams to complete and execute any creative idea by the end of the quarter."
                     className="md:w-1/2"
+                    end="JOIN US"
+                    href="/join"
                 />
             </ContentSection>
             <ContentSection
                 title="PROJECTS"
+                description="Every quarter we have student teams collaborate and execute an idea. Below are some projects that were created in the past quarters."
             >
                 <GenericCard
                     imgSrc="/card_icons/fall.svg"
