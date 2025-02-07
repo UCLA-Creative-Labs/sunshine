@@ -1,5 +1,6 @@
 import ContentSection from "@/components/ContentSection"
 import GenericCard from "@/components/GenericCard"
+import ProjectCard from "@/components/ProjectCard"
 import Link from "next/link";
 
 
@@ -38,22 +39,19 @@ export default function HomepageContent() {
                     </>
                 }
             >
-                <GenericCard
-                    imgSrc="/card_icons/fall.svg"
-                    title="Fall 2023"
-                    description="Start the year strong with these new projects!"
+                <ProjectCard
+                    imgSrc="/card_icons/year1.svg"
+                    title="2024-2025"
                     className="md:w-1/3"
                 />
-                <GenericCard
-                    imgSrc="/card_icons/spring.svg"
-                    title="Spring 2023"
-                    description="End the academic year with a quick browse through our projects."
+                <ProjectCard
+                    imgSrc="/card_icons/year2.svg"
+                    title="2023-2024"
                     className="md:w-1/3"
                 />
-                <GenericCard
-                    imgSrc="/card_icons/winter.svg"
-                    title="Winter 2023"
-                    description="Kick off the holiday season with our brand new projects."
+                <ProjectCard
+                    imgSrc="/card_icons/year3.svg"
+                    title="2022-2023"
                     className="md:w-1/3"
                 />
             </ContentSection>
