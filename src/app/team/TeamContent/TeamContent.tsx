@@ -37,6 +37,8 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
   const [year, setYear] = useState<string>("All Years");
   const [role, setRole] = useState<string>("All Roles");
   const [alumniRole, setAlumniRole] = useState<string>("All Roles");
+  const [alumniYear, setAlumniYear] = useState<string>("All Years");
+
 
   useEffect(() => {
     setMembersList(members);
@@ -61,14 +63,14 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
     if (alumniList) {
       let newAlumniList: Array<any> = [];
       for (const alumniMember of alumni) {
-        if (alumniRole == "All Roles" || (alumniMember?.fields?.roles?.includes(alumniRole))
+        if ((alumniYear == "All Years" || alumniMember.fields.year == alumniYear) && (alumniRole == "All Roles" || (alumniMember?.fields?.roles?.includes(alumniRole)))
         ) {
           newAlumniList.push(alumniMember);
         }
       }
       setAlumniList(newAlumniList);
     }
-  }, [alumniRole]);
+  }, [alumniYear, alumniRole]);
 
   return (
     <div className="flex flex-col items-center w-full my-12 text-black">
@@ -114,6 +116,15 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
         <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
           <h1 className="text-4xl font-bold">ALUMNI</h1>
           <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
+            <DropdownMenu
+              className="flex flex-col w-[200px] text-xl"
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
+              menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
+              menuButtonHoverColor="bg-blue-100"
+              options={["All Years", "2021", "2022", "2023", "2024"]}
+              setValue={setAlumniYear}
+            />
             <DropdownMenu
               className="flex flex-col w-[200px] text-xl"
               buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
