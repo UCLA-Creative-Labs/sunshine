@@ -4,28 +4,80 @@ import ToolTip from "@/components/ToolTip";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+// function MemberCard({ memberData, alumni, className } : { memberData: any, alumni: boolean, className?: string }) {
+//   const { name, year, titles, degree, fact, company, website } = memberData;
+//   const photoURL = memberData?.photo?.fields?.file?.url;
+//   return (
+//     <div className={`group space-y-2 text-center md:text-start ${className}`}>
+//       <div className="max-w-[250px] aspect-square overflow-hidden shadow-lg rounded-lg">
+        
+//         {/* Tooltip */}
+//         {website ? (
+//           <ToolTip content={<a href={website} target="_blank" rel="noopener noreferrer">Visit Website</a>}>
+//             <div className="w-full h-full">
+//               {photoURL && 
+//                 <img 
+//                   className="group-hover:scale-110 transition ease-in-out delay-50 duration-300 object-cover w-full h-full" 
+//                   src={photoURL}
+//                   alt={`Photo of ${name}`}
+//                   onClick={() => window.open(website, "_blank", "noopener,noreferrer")}
+//                 />
+//               }
+//             </div> {/* This div wraps the image */}
+//           </ToolTip>
+//         ) : (
+//       </div>
+//       <div className="mx-2 space-y-1">
+//         <h1 className="text-xl md:text-2xl font-bold group-hover:text-blue-400 group-hover:drop-shadow-2xl transition ease-in-out delay-50 duration-300">{name}</h1>
+//         <h1 className="text-md text-neutral-500">{year ? 'CLASS OF ' + year : ''}</h1>
+//         <ul>
+//           {titles && titles.map((roleName, idx) => <li key={idx} className="text-md">{'\u2043' + ' '}{roleName}</li>)}
+//           {!alumni && degree && <li className="text-md">{'\u2043'} Major: {degree}</li>}
+//           {!alumni && fact && <li className="text-md">{'\u2043'} Fun Fact: {fact}</li>}
+//           {alumni && company && <li className="text-md">{'\u2043'} Now at: {company}</li>}
+//         </ul>
+//       </div>
+//     </div>
+//   )
+// }
 function MemberCard({ memberData, alumni, className } : { memberData: any, alumni: boolean, className?: string }) {
   const { name, year, titles, degree, fact, company, website} = memberData;
   const photoURL = memberData?.photo?.fields?.file?.url;
+
   return (
     <div className={`group space-y-2 text-center md:text-start ${className}`}>
       <div className="max-w-[250px] aspect-square overflow-hidden shadow-lg rounded-lg">
-        {photoURL && 
-          <img 
-            className="group-hover:scale-110 transition ease-in-out delay-50 duration-300 object-cover w-full h-full" 
-            src={photoURL}
-            alt={`Photo of ${name}`}
-          />
-        }
-        {/* Tooltip */}
-        {website && (
-          <ToolTip content={<a href={website} target="_blank" rel="noopener noreferrer">Visit Website</a>}>
-            <div className="w-full h-full"></div> {/* This div wraps the image */}
+        
+        {website ? (
+          <ToolTip content="Click to visit">
+            <div className="w-full h-full">
+              {photoURL && 
+                <img 
+                  className="group-hover:scale-110 transition ease-in-out delay-50 duration-300 object-cover w-full h-full cursor-pointer" 
+                  src={photoURL}
+                  alt={`Photo of ${name}`}
+                  onClick={() => window.open(website, "_blank", "noopener,noreferrer")}
+                />
+              }
+            </div>
           </ToolTip>
+        ) : (
+          <div className="w-full h-full">
+            {photoURL && 
+              <img 
+                className="object-cover w-full h-full" 
+                src={photoURL}
+                alt={`Photo of ${name}`}
+              />
+            }
+          </div>
         )}
       </div>
+
       <div className="mx-2 space-y-1">
-        <h1 className="text-xl md:text-2xl font-bold group-hover:text-blue-400 group-hover:drop-shadow-2xl transition ease-in-out delay-50 duration-300">{name}</h1>
+        <h1 className="text-xl md:text-2xl font-bold group-hover:text-blue-400 group-hover:drop-shadow-2xl transition ease-in-out delay-50 duration-300">
+          {name}
+        </h1>
         <h1 className="text-md text-neutral-500">{year ? 'CLASS OF ' + year : ''}</h1>
         <ul>
           {titles && titles.map((roleName, idx) => <li key={idx} className="text-md">{'\u2043' + ' '}{roleName}</li>)}
@@ -35,8 +87,9 @@ function MemberCard({ memberData, alumni, className } : { memberData: any, alumn
         </ul>
       </div>
     </div>
-  )
+  );
 }
+
 
 export default function TeamContent({ members, alumni }: { members: Array<any>, alumni: Array<any> }) {
   const [membersList, setMembersList] = useState<Array<any>|undefined>(undefined);
