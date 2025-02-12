@@ -49,6 +49,7 @@ const ToolTip = ({ content, children, className }: ToolTipProps) => {
           left: tooltipStyle.left,
           display: tooltipStyle.display,
           maxWidth: "200px",
+          pointerEvents: "none",
         }}
       >
         {content}
