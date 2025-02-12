@@ -43,16 +43,19 @@ export default function HomepageContent() {
                     imgSrc="/card_icons/year1.svg"
                     title="2024-2025"
                     className="md:w-1/3"
+                    href="/projects/2024-2025"
                 />
                 <ProjectCard
                     imgSrc="/card_icons/year2.svg"
                     title="2023-2024"
                     className="md:w-1/3"
+                    href="/projects/2023-2024"
                 />
                 <ProjectCard
                     imgSrc="/card_icons/year3.svg"
                     title="2022-2023"
                     className="md:w-1/3"
+                    href="/projects/2022-2023"
                 />
             </ContentSection>
         </div>
