@@ -3,23 +3,33 @@ import { Lato } from "next/font/google";
 
 const lato = Lato({ weight: "700", subsets: ["latin"] });
 
-interface BoardAlumniCardProps {
+interface PersonCardProps {
+  name: string;
+  position: string;
   quote: string;  
-  image: string; 
+  image: string;
+  contact?: string; // Only for alumni
 }
 
-export default function PersonCard({quote, image }: BoardAlumniCardProps): JSX.Element {
+export default function PersonCard({ name, position, quote, image, contact }: PersonCardProps): JSX.Element {
   return (
-    <div className="flex flex-col items-center mb-8">
-      {image && (
-        <div className="w-32 h-32 overflow-hidden rounded-full mb-4">
-          <img
-            className="object-cover w-full h-full"
-            src={image}
-          />
-        </div>
+    <div className="border-2 border-black rounded-2xl p-6 flex flex-col items-center text-center shadow-md w-full">
+      {/* Circular Profile Picture */}
+      <div className="w-24 h-24 overflow-hidden rounded-full mb-4 border-2 border-black">
+        <img className="object-cover w-full h-full" src={image} />
+      </div>
+
+      {/* Name & Position */}
+      <h2 className={`text-xl font-bold ${lato.className}`}>{name}</h2>
+      <p className="text-sm text-gray-600 mb-2">{position}</p>
+
+      {/* Quote */}
+      <p className="italic text-lg">"{quote}"</p>
+
+      {/* Contact Info for Alumni */}
+      {contact && (
+        <p className="text-sm text-gray-600 font-semibold mt-4">{contact}</p>
       )}
-      <p className="italic text-center text-lg">"{quote}"</p>
     </div>
   );
 }
