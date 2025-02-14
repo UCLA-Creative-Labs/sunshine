@@ -4,14 +4,19 @@ import BoardAlumniCard from "@/components/BoardAlumniCard";
 import UpcomingEventsCard from "@/components/UpcomingEventsCard";
 
 const boardMembers = [
-  { quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” - Joe Bruin", image: "/old/rectangle_pfp.png"},
-  { quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” - Joe Bruin", image: "/old/rectangle_pfp.png" }
+  { name: "Joe Bruin", position: "[insert position/year here]", quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” ", image: "/old/rectangle_pfp.png"},
+  { name: "Joe Bruin", position: "[insert position/year here]", quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” ", image: "/old/rectangle_pfp.png" },
+  { name: "Joe Bruin", position: "[insert position/year here]", quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” ", image: "/old/rectangle_pfp.png" }
+];
+
+const projectHighlights = [
+  { name: "Joe Bruin", position: "[insert position/year here]", quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” ", image: "/old/rectangle_pfp.png"},
+  { name: "Joe Bruin", position: "[insert position/year here]", quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” ", image: "/old/rectangle_pfp.png" },
+  { name: "Joe Bruin", position: "[insert position/year here]", quote: "“Quick blurb about what Creative Labs community means to them, what their favorite part is, etc. Something short, nice, and cute!” ", image: "/old/rectangle_pfp.png" }
 ];
 
 const alumniRecollections = [
-  { quote: "“Quick blurb about their past experiences and memories from CL.” - Joe Bruin", image: "/old/rectangle_pfp.png" },
-  { quote: "“Quick blurb about their past experiences and memories from CL.” - Joe Bruin", image: "/old/rectangle_pfp.png" },
-  { quote: "“Quick blurb about their past experiences and memories from CL.” - Joe Bruin", image: "/old/rectangle_pfp.png" }
+  { name: "Alumni Bruin", position: "[insert position/year here]", quote: "“Quick blurb about their past experiences and memories from CL.” ", image: "/old/rectangle_pfp.png", contact: "Connect with [name] on LinkedIn or check out [name]'s portfolio! "},
 ];
 
 const upcomingEvents = [
@@ -29,44 +34,75 @@ const pastEvents = [
 export default function AboutContent() {
   return (
     <div>
-      <div className="mx-auto max-w-5xl"> 
-        <img
-          src="/old/about.jpg"
-          alt="About Page Cover"
-        />
-      </div>
       <div className="grow flex flex-col space-y-10 px-20 py-20 text-black min-w-full">
-        <ContentSection title="ABOUT">
-          <p className="text-lg">
-            We connect students from all disciplines and backgrounds together to bring any creative passion project to life! We offer various opportunities to students such as workshops and socials, which are available to everyone, and projects, which require an application process. A team of students will then work together to complete a project by the end of the quarter. Creative Labs started as a small group of friends and is founded on the idea that with the right group of people, any idea can come to life. Let’s make something cool together!
-          </p>
+        <ContentSection title="WHAT IS CL?">
+          <div className="flex flex-col space-y-8">
+            <div className="mx-auto max-w-5xl"> 
+              <img
+                src="/old/about.jpg"
+                alt="About Page Cover"
+              />
+            </div>
+            <p className="text-lg">
+            We’re a bunch of UCLA creatives passionate about making our world a little cooler! We offer various opportunities to students such as workshops and socials, which are available to everyone, and projects, which require an application process. A team of students will then work together to complete a project by the end of the quarter. Creative Labs started as a small group of friends and is founded on the idea that with the right group of people, any idea can come to life. Let’s make something cool together and spread some creativity!
+            </p>
+          </div>
         </ContentSection>
 
         <ContentSection title="BOARD MEMBER HIGHLIGHTS">
-          <div className="flex flex-wrap justify-between">
-            {boardMembers.map((member, idx) => (
-              <div key={idx} className="w-1/2 p-4">
-              <BoardAlumniCard
-                quote={member.quote}
-                image={member.image}
-              />
-            </div>            
-            ))}
+          <div className="flex flex-col space-y-8">
+            <p className="text-lg">
+            The internal board helps keep CL running behind the scenes! Let’s see what some board members have to say about their time with CL. Check out our current internal team HERE, or learn more about what our internal board does HERE!            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {boardMembers.map((member, idx) => (
+                <BoardAlumniCard
+                  key={idx}
+                  name={member.name}
+                  position={member.position}
+                  quote={member.quote}
+                  image={member.image}
+                />
+              ))}
+            </div>
+          </div>
+        </ContentSection>
+        <ContentSection title="EXTERNAL PROJECTS HIGHLIGHTS">
+          <div className="flex flex-col space-y-8">
+            <p className="text-lg">
+            Every quarter, students from all skillsets and backgrounds work together to execute any creative idea. Let’s see what some external projects members have to say about their time with CL. Learn more about external projects HERE!            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {projectHighlights.map((member, idx) => (
+                <BoardAlumniCard
+                  key={idx}
+                  name={member.name}
+                  position={member.position}
+                  quote={member.quote}
+                  image={member.image}
+                />
+              ))}
+            </div>
+          </div>
+        </ContentSection>
+        <ContentSection title="ALUMNI STORIES">
+          <div className="flex flex-col space-y-8">
+            <p className="text-lg">
+            We all started at Creative Labs, but our alumni have found success in both technical and non-technical fields! Let’s see what our alumni have to say about how CL helped them along in their journeys! 
+            </p>
+            <div className="flex flex-col items-center space-y-6">
+              {alumniRecollections.map((alumni, idx) => (
+                <BoardAlumniCard
+                  key={idx}
+                  name={alumni.name}
+                  position={alumni.position}
+                  quote={alumni.quote}
+                  image={alumni.image}
+                  contact={alumni.contact} // Includes "Connect with me on LinkedIn" text
+                />
+              ))}
+            </div>
           </div>
         </ContentSection>
 
-        <ContentSection title="ALUMNI RECOLLECTIONS">
-          <div className="flex flex-wrap justify-between">
-            {alumniRecollections.map((alumni, idx) => (
-              <div key={idx} className="w-1/3 p-4">
-              <BoardAlumniCard
-                quote={alumni.quote}
-                image={alumni.image}
-              />
-            </div>            
-            ))}
-          </div>
-        </ContentSection>
 
         <ContentSection title="UPCOMING EVENTS">
           <div className="flex flex-col space-y-4">
@@ -84,21 +120,6 @@ export default function AboutContent() {
           </div>
         </ContentSection>
 
-        {/* <ContentSection title="UPCOMING EVENTS">
-          <div className="flex flex-col space-y-2 border border-gray-300 p-3 rounded-md">
-            {upcomingEvents.map((event, idx) => (
-              <GenericCard
-                key={idx}
-                title={event.title}
-                description={`${event.description}\n${event.time}\n${event.location}`}
-                imgPos="left"
-                imgSrc={event.imgSrc} 
-                className="border border-black-300 rounded-md p-3"
-              />
-            ))}
-          </div>
-        </ContentSection> */}
-
         <ContentSection title="PAST EVENTS">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {pastEvents.map((event, idx) => (
@@ -112,6 +133,7 @@ export default function AboutContent() {
             ))}
           </div>
         </ContentSection>
+
       </div>
     </div>
   );
