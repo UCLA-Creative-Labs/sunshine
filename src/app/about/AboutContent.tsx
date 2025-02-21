@@ -84,7 +84,7 @@ export default function AboutContent() {
 
         
 
-        {/* <ContentSection title="UPCOMING EVENTS">
+        <ContentSection title="UPCOMING EVENTS">
           <div className="flex flex-col space-y-4">
             {upcomingEvents.map((event, idx) => (
               <UpcomingEventsCard
@@ -94,7 +94,7 @@ export default function AboutContent() {
                 eventTime={event.time}
                 location={event.location}
                 imgSrc={event.imgSrc}
-                className="border border-gray-300 rounded-md"
+                className="border-2 border-black rounded-2xl p-6"
               />
             ))}
           </div>
@@ -108,11 +108,11 @@ export default function AboutContent() {
                 title={event.title}
                 description={event.description}
                 imgSrc={event.imgSrc} 
-                className="border border-black-300 rounded-md p-4"
+                className="border-2 border-black rounded-2xl p-6"
               />
             ))}
           </div>
-        </ContentSection> */}
+        </ContentSection>
 
       </div>
     </div>
