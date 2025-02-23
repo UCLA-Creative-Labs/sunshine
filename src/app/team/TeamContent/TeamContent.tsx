@@ -13,7 +13,7 @@ function MemberCard({ memberData, alumni, className } : { memberData: any, alumn
       <div className="max-w-[250px] aspect-square overflow-hidden shadow-lg rounded-lg">
         
         {website ? (
-          <ToolTip content={<span className="break-all">{website}</span>}>
+          <ToolTip content={<span className="break-all">{website} <span className="ml-1">↗</span> </span>}>
             <div className="w-full h-full">
               {photoURL && 
                 <img 
