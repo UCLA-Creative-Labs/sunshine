@@ -1,0 +1,32 @@
+@import 'variables';
+
+
+@media (max-width: $mobile-breakpoint) {
+  .pc{
+    padding: 1rem;
+  }
+
+}
+
+@media (min-width: $mobile-breakpoint) and (max-width: $tablet-breakpoint) {
+  .pc{
+    padding: 2.5rem;
+  }
+
+}
+
+
+/* Project Card CSS*/
+
+.proj-card{
+  box-sizing: border-box;
+  border-radius: 0.75em;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  align-items: center;
+  font-size: 1em;
+  margin: 2rm;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+

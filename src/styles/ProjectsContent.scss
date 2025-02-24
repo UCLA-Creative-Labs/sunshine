@@ -3,7 +3,7 @@
 .proj-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* Creates 3 equal-width columns */
-  column-gap: 2.5%;
+  column-gap: 6%;
   flex-grow: 1;
 }
 
@@ -32,20 +32,28 @@
 /* Project Card CSS*/
 
 .proj-card{
-  border: 2px solid #61616130;
-  border-radius: 0.5em;
+  border: 2px solid #000000;
+  border-radius: 0.75em;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+  align-items: center;
   font-size: 1em;
-  margin: 0.5em;
+  margin: 1rm;
   margin-bottom: 2em;
   overflow: hidden;
-  padding: 5%;
+  padding: 7.5%;
   position: relative;
   transition: box-shadow 0.3s ease-in-out;
+}
+
+
+/* Hover effects */
+.proj-card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* hover:shadow-md */
+  transform: translateY(-4px); /* Slight lift on hover */
 }
 
 .project-image {
   border: 2px solid #EAEAEA;
   display: inline-block;
-  margin-bottom: 1em;
+  margin-bottom: 2em;
 }
