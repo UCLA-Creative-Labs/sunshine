@@ -12,6 +12,10 @@ export interface IndividualProjectProps {
     instaPostUrl: string;
 };
 
+function joinStrings(strings: string[]): string {
+    return strings.filter(str => str.trim() !== "").join(", ");
+}
+
 const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, logoUrl, prototypeUrl, projectManagers, projectMembers, demoDayUrl, instaPostUrl } : IndividualProjectProps) => {
     const [isExpanded, expand] = useState(false);
 
@@ -21,7 +25,7 @@ const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, 
             <img src={logoUrl} alt="Project Logo" className="w-16 h-16 mr-4 rounded-lg" />
             <div className="flex-1">
               <h2 className="text-xl font-bold">
-                {projectName}: {projectLeads.join(" ")}
+                {projectName}: {joinStrings(projectLeads)}
               </h2>
               { !isExpanded ? <p className="mt-2 line-clamp-3 flex-1">{projectDescription}</p> : <p className="mt-2">{projectDescription}</p> }
             </div>
@@ -30,10 +34,10 @@ const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, 
             <div className="flex flex-col md:flex-row mt-6">
                 <div className="mt-4">
                     <p>
-                    <strong>Project Manager(s):</strong> {projectManagers.join(" ")}
+                    <strong>Project Manager(s):</strong> {joinStrings(projectManagers)}
                     </p>
                     <p>
-                    <strong>Project Members:</strong> {projectMembers.join(" ")}
+                    <strong>Project Members:</strong> {joinStrings(projectMembers)}
                     </p>
                     <div className="mt-4 flex space-x-4">
                     <a
