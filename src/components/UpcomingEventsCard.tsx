@@ -23,9 +23,8 @@ export default function UpcomingEventsCard({
   href = "/",
 }: UpcomingEventsCardProps) {
   return (
-    <Link
-      href={href}
-      className={`flex flex-row items-stretch space-x-4 group border border-black p-8 shadow-lg cursor-pointer transition ease-in-out delay-50 duration-300 ${className}`}
+    <div
+      className={`flex flex-row items-stretch space-x-4 group border border-black p-8 shadow-lg transition ease-in-out delay-50 duration-300 ${className}`}
     >
       <div className="w-1/3 flex-shrink-0 flex items-center justify-center">
         <img
@@ -50,6 +49,6 @@ export default function UpcomingEventsCard({
           </p>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
