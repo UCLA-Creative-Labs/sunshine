@@ -9,7 +9,7 @@ interface SplashProps {
   mousePos: number[];
 }
 
-function Splash(props: SplashProps): JSX.Element {
+function Splash(props: SplashProps): React.JSX.Element {
   return (
     <div id='splash' className={'section' + (props.isDay ? ' day' : ' night')}>
       <div>

@@ -11,7 +11,7 @@ interface PersonCardProps {
   contact?: string; // Only for alumni
 }
 
-export default function PersonCard({ name, position, quote, image, contact }: PersonCardProps): JSX.Element {
+export default function PersonCard({ name, position, quote, image, contact }: PersonCardProps): React.JSX.Element {
   return (
     <div className="border-2 border-black rounded-2xl p-6 flex flex-col items-center text-center shadow-md w-full">
       {/* Circular Profile Picture */}

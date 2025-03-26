@@ -7,6 +7,7 @@ import UpcomingEventsCard from '@/components/UpcomingEventsCard';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { getDocsByType } from '@/lib/contentfulLib/contentfulQuery';
+import Link from 'next/link';
 
 const cl_members = [
     {
@@ -136,9 +137,9 @@ export default function AboutContent() {
                             together to make cool things! Let's see what some
                             members have to say about their time with CL, and
                             learn more about what Creative Labs does{' '}
-                            <a href="/projects">
+                            <Link href="/projects">
                                 <u>HERE</u>
-                            </a>
+                            </Link>
                             !
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
