@@ -296,7 +296,7 @@ const allProjects = {
 
 const QuarterProjectCardList = ( { quarter, year }: QuarterListProps) => {
     return <>
-        {allProjects[year][quarter].length > 0 ? allProjects[year][quarter].map(project => <IndividualProjectCard {...project} />) : <span className="font-bold">No projects yet!</span>}
+        {allProjects[year][quarter].length > 0 ? allProjects[year][quarter].map(project => <IndividualProjectCard key={project.projectName} {...project} />) : <span className="font-bold">No projects yet!</span>}
         </>
 };
 
