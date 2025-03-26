@@ -16,7 +16,7 @@ interface TeamCardProps {
   data: Person;
 }
 
-function TeamCard(props: TeamCardProps): JSX.Element {
+function TeamCard(props: TeamCardProps): React.JSX.Element {
   const image = (
     <div className="w-56 h-36 aspect-w-1 aspect-h-1 mb-4">
       <img

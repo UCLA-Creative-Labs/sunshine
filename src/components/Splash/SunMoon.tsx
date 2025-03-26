@@ -7,7 +7,7 @@ interface SunMoonProps {
   mousePos: number[];
 }
 
-function SunMoon(props: SunMoonProps): JSX.Element {
+function SunMoon(props: SunMoonProps): React.JSX.Element {
   const bg = useRef<HTMLDivElement>(null);
   const face = useRef<HTMLDivElement>(null);
   const bgRect = useRef<DOMRect>(new DOMRect(0, 0, 0, 0));

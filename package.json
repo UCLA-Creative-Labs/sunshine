@@ -29,7 +29,7 @@
     "eslint-config-next": "latest",
     "postcss": "latest",
     "sass": "^1.71.1",
-    "tailwindcss": "latest",
+    "tailwindcss": "3",
     "typescript": "latest"
   }
 }
