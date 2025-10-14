@@ -53,26 +53,23 @@ function memberSort(x, y) {
 }
 
 export default async function Team() {
-    // const members = await getDocsByType('member')
-    //   .then(docs => {
-    //     docs.sort(memberSort);
-    //     docs = docs.map(obj => ({...obj, enabled: true}));
-    //     return docs;
-    //   });
+    const members = await getDocsByType('member').then((docs) => {
+        docs.sort(memberSort);
+        docs = docs.map((obj) => ({ ...obj, enabled: true }));
+        return docs;
+    });
 
-    // const alumni = await getDocsByType('alumni')
-    // .then(docs => {
-    //   docs.sort(memberSort);
-    //   docs = docs.map(obj => ({...obj, enabled: true}));
-    //   return docs;
-    // });
+    const alumni = await getDocsByType('alumni').then((docs) => {
+        docs.sort(memberSort);
+        docs = docs.map((obj) => ({ ...obj, enabled: true }));
+        return docs;
+    });
 
-    // return (
-    //   <main className="flex min-h-screen flex-col">
-    //     <Navbar />
-    //     <TeamContent members={members} alumni={alumni}/>
-    //     <Footer />
-    //   </main>
-    // );
-    redirect('/');
+    return (
+        <main className="flex min-h-screen flex-col">
+            <Navbar />
+            <TeamContent members={members} alumni={alumni} />
+            <Footer />
+        </main>
+    );
 }
