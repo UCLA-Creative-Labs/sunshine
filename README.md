@@ -21,6 +21,7 @@ The basic commands to get this repository and start are:
 $ git clone https://github.com/UCLA-Creative-Labs/sunshine.git
 $ cd sunshine
 $ yarn install
+$ yarn build
 $ yarn start
 ```
 
