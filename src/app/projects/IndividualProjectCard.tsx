@@ -64,7 +64,7 @@ const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, 
             </div> : <></> }
     
           { !isExpanded ? <div className="mt-4 text-gray-600 cursor-pointer text-underline" onClick={() => expand(!isExpanded)}>
-            ▼ See more about this project
+            ▶ See more about this project
           </div> :
           
           <div className="mt-4 text-gray-600 cursor-pointer text-underline" onClick={() => expand(!isExpanded)}>
