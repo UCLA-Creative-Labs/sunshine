@@ -40,22 +40,22 @@ export default function HomepageContent() {
                 }
             >
                 <ProjectCard
-                    imgSrc="/card_icons/year1.svg"
+                    imgSrc="/projects/25-26/25-26_year_banner.svg"
+                    title="2025-2026"
+                    className="md:w-1/3"
+                    href="/projects/25-26"
+                />
+                <ProjectCard
+                    imgSrc="/projects/24-25/24-25_year_banner.svg"
                     title="2024-2025"
                     className="md:w-1/3"
-                    href="/projects/2024-2025"
+                    href="/projects/24-25"
                 />
                 <ProjectCard
-                    imgSrc="/card_icons/year2.svg"
+                    imgSrc="/projects/23-24/23-24_year_banner.svg"
                     title="2023-2024"
                     className="md:w-1/3"
-                    href="/projects/2023-2024"
-                />
-                <ProjectCard
-                    imgSrc="/card_icons/year3.svg"
-                    title="2022-2023"
-                    className="md:w-1/3"
-                    href="/projects/2022-2023"
+                    href="/projects/23-24"
                 />
             </ContentSection>
         </div>

@@ -45,7 +45,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col" onMouseMove={onMouseMove}>
         <Navbar />
         <div className="flex items-end bg-black py-20 relative min-h-[230px]">
-          <h1 className="px-20 text-4xl md:w-1/2">
+          <h1 className="px-20 text-4xl md:w-1/2 text-white">
             A community of UCLA creatives working on cool projects to discover even cooler passions.
           </h1>
           <div className="hidden grow md:flex justify-center">
