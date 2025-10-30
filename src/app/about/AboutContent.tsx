@@ -109,13 +109,27 @@ export default function AboutContent() {
         event=>
         {
             if(!event.fields.eventTime)
-                return true;
+                return false;
             const eventDate = new Date(event.fields.eventTime)
             return eventDate < cut_off_time;
         }
     );
+    //if a contentful placard doesn't have a time, then it won't be displayed on the website
 
+    upcomingEvents.sort(
+        (event1, event2) => {
+            const event1_time = new Date(event1.fields.eventTime!).getTime();
+            const event2_time = new Date(event2.fields.eventTime!).getTime();
+            return event1_time - event2_time;
+    });
+    pastEvents.sort(
+        (event1,event2) => {
+        const event1_time = new Date(event1.fields.eventTime!).getTime();
+        const event2_time = new Date(event2.fields.eventTime!).getTime();
+        return event2_time - event1_time;
+    });
     
+
     return (
         <div>
             <div className="grow flex flex-col space-y-10 px-20 py-20 text-black min-w-full">
