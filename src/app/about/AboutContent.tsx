@@ -88,19 +88,34 @@ export default function AboutContent() {
     if (loading) return <div>Loading...</div>;
 
     // Filter events into upcoming and past based on eventTime
-    const now = new Date();
-    const upcomingEvents = events.filter(event => {
-        if (!event.fields.eventTime) return false;
-        const eventDate = new Date(event.fields.eventTime);
-        return eventDate >= now;
-    });
+    const now = new Date()
+    const cut_off_time = new Date(now);
+    cut_off_time.setHours(cut_off_time.getHours() - 12 )
+    //our cut off time is half a date, meaning an event will be shown as "upcoming" for 12 hours until after it's start time
+
+
     
-    const pastEvents = events.filter(event => {
-        if (!event.fields.eventTime) return true; 
-        const eventDate = new Date(event.fields.eventTime);
-        return eventDate < now;
+    
+    const upcomingEvents = events.filter(
+        event=>
+    {
+        if(!event.fields.eventTime) 
+            return false;
+        const eventDate = new Date(event.fields.eventTime)
+        return eventDate  >= cut_off_time;
     });
 
+    const pastEvents = events.filter(
+        event=>
+        {
+            if(!event.fields.eventTime)
+                return true;
+            const eventDate = new Date(event.fields.eventTime)
+            return eventDate < cut_off_time;
+        }
+    );
+
+    
     return (
         <div>
             <div className="grow flex flex-col space-y-10 px-20 py-20 text-black min-w-full">
