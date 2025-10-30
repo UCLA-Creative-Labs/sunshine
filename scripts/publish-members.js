@@ -1,5 +1,7 @@
 import pkg from 'contentful-management';
 const { createClient } = pkg;
+import { parse } from 'csv-parse/sync';
+import { readFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -21,7 +23,18 @@ if (!SPACE_ID || !MANAGEMENT_TOKEN) {
 
 async function publishMembers() {
   try {
-    console.log('🚀 Publishing member entries...\n');
+    console.log('🚀 Publishing member entries from CSV...\n');
+
+    // Read and parse CSV
+    console.log('📋 Reading members.csv...');
+    const csvContent = readFileSync(resolve(__dirname, 'members.csv'), 'utf-8');
+    const records = parse(csvContent, {
+      columns: true,
+      skip_empty_lines: true
+    });
+
+    const csvNames = records.map(record => record['Full Name']?.trim()).filter(Boolean);
+    console.log(`   Found ${csvNames.length} members in CSV\n`);
 
     // Initialize Contentful client
     const client = createClient({
@@ -42,20 +55,27 @@ async function publishMembers() {
 
     const draftEntries = entries.items.filter(entry => !entry.isPublished());
 
-    console.log(`   Found ${draftEntries.length} draft members to publish\n`);
+    // Filter to only CSV members
+    const csvDraftEntries = draftEntries.filter(entry => {
+      const name = entry.fields.name?.['en-US'];
+      return csvNames.includes(name);
+    });
 
-    if (draftEntries.length === 0) {
-      console.log('✅ No draft entries to publish!');
+    console.log(`   Found ${draftEntries.length} draft members total`);
+    console.log(`   Found ${csvDraftEntries.length} draft members from CSV to publish\n`);
+
+    if (csvDraftEntries.length === 0) {
+      console.log('✅ No CSV draft entries to publish!');
       return;
     }
 
     let publishedCount = 0;
     let errorCount = 0;
 
-    for (const [index, entry] of draftEntries.entries()) {
+    for (const [index, entry] of csvDraftEntries.entries()) {
       try {
         const name = entry.fields.name?.['en-US'] || 'Unknown';
-        console.log(`[${index + 1}/${draftEntries.length}] Publishing: ${name}`);
+        console.log(`[${index + 1}/${csvDraftEntries.length}] Publishing: ${name}`);
 
         await entry.publish();
         console.log(`   ✅ Published`);

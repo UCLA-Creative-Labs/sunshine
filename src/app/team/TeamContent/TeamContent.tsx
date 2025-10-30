@@ -69,6 +69,8 @@ const TEAM_ORDER = [
 export default function TeamContent({ members, alumni }: { members: Array<any>, alumni: Array<any> }) {
   const [year, setYear] = useState<string>("All Years");
   const [role, setRole] = useState<string>("All Roles");
+  const [alumniYear, setAlumniYear] = useState<string>("All Years");
+  const [alumniRole, setAlumniRole] = useState<string>("All Roles");
 
   // Filter members by year and role
   const filteredMembers = members.filter((member) => {
@@ -118,6 +120,13 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
 
     return { team: displayName, members: teamMembers };
   }).filter(group => group.members.length > 0); // Only show teams with members
+
+  // Filter alumni by year and role
+  const filteredAlumni = alumni.filter((alumniMember) => {
+    const matchYear = alumniYear === "All Years" || alumniMember.fields.year == alumniYear;
+    const matchRole = alumniRole === "All Roles" || alumniMember.fields.roles?.includes(alumniRole);
+    return matchYear && matchRole && alumniMember.enabled;
+  });
 
   return (
     <div className="flex flex-col items-center w-full my-12 text-black">
@@ -175,6 +184,45 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
               <p className="text-2xl text-gray-500">No members match the selected filters.</p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Alumni Section */}
+      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12">
+        <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
+          <h1 className="text-4xl font-bold">ALUMNI</h1>
+          <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
+            <DropdownMenu
+              className="flex flex-col w-[200px] text-xl"
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300"
+              menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
+              menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
+              menuButtonHoverColor="bg-blue-100"
+              options={["All Years", "2021", "2022", "2023", "2024"]}
+              setValue={setAlumniYear}
+            />
+            <DropdownMenu
+              className="flex flex-col w-[200px] text-xl"
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300"
+              menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
+              menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
+              menuButtonHoverColor="bg-blue-100"
+              options={["All Roles", "President", "Director", "Design", "Marketing/External", "Projects", "Finance", "Tech"]}
+              setValue={setAlumniRole}
+            />
+          </div>
+        </div>
+        <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
+          {filteredAlumni.map((data, idx) => {
+            const alumniData = data.fields;
+            return (
+              <MemberCard
+                key={idx}
+                memberData={alumniData}
+                alumni={true}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
