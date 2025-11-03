@@ -5,8 +5,8 @@ import { useState } from "react";
 
 function MemberCard({ memberData, alumni, className } : { memberData: any, alumni: boolean, className?: string }) {
   const { name, year, titles, degree, fact, company, website} = memberData;
-  // Use default avatar for all members (professional headshots coming soon)
-  const photoURL = '/images/default-avatar.svg';
+  // Use Contentful photo if available, otherwise use default avatar
+  const photoURL = memberData?.photo?.fields?.file?.url || '/images/default-avatar.svg';
 
   return (
     <div className={`group space-y-2 text-center md:text-start ${className}`}>
