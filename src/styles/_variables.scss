@@ -63,10 +63,3 @@ $hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 // Footer
 $footer-height: 110px;
 $footer-height-mobile: 120px;
-
-// Export colors to JS
-:export {
-  @each $key, $value in $colors {
-    #{unquote($key)}: $value;
-  }
-}
