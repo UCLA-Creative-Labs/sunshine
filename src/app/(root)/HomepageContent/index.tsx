@@ -31,9 +31,9 @@ export default function HomepageContent() {
                 title="PROJECTS"
                 description={
                     <>
-                        Every quarter, we have student teams collaborate and execute any creative idea. Browse some of the cool projects we’ve made in past quarters down below, or take a look at the entire projects archive{" "}
-                        <Link href="/projects">
-                            <a className="border-b border-black">HERE</a>
+                        Every quarter, we have student teams collaborate and execute any creative idea. Browse some of the cool projects we've made in past quarters down below, or take a look at the entire projects archive{" "}
+                        <Link href="/projects" className="border-b border-black">
+                            HERE
                         </Link>
                         . Have fun!
                     </>

@@ -49,8 +49,10 @@ type Event = {
     fields: {
         title: string;
         description: string;
-        eventTime: string | null; // null for past events
-        location: string | null; // null for past events
+        eventTime: string | null; // Date for filtering upcoming/past
+        eventTimeDisplay: string | null; // Display string like "1pm - 4pm"
+        location: string | null;
+        rsvpLink: string | null;
         image?: {
             fields: {
                 file: {
@@ -62,8 +64,7 @@ type Event = {
 };
 
 export default function AboutContent() {
-    const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
-    const [pastEvents, setPastEvents] = useState<Event[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -71,21 +72,8 @@ export default function AboutContent() {
         const fetchEvents = async () => {
             try {
                 setLoading(true);
-                const [upcoming, past] = await Promise.all([
-                    getDocsByType('upcomingEvents'),
-                    getDocsByType('pastEvents'),
-                ]);
-                setUpcomingEvents(upcoming as unknown as Event[]);
-                setPastEvents(
-                    (past as unknown as Event[]).map((event) => ({
-                        ...event,
-                        fields: {
-                            ...event.fields,
-                            eventTime: null,
-                            location: null,
-                        },
-                    }))
-                );
+                const allEvents = await getDocsByType('event');
+                setEvents(allEvents as unknown as Event[])
             } catch (error) {
                 console.error('Error fetching events:', error);
                 setError('Failed to load events');
@@ -93,12 +81,54 @@ export default function AboutContent() {
                 setLoading(false);
             }
         };
-
         fetchEvents();
     }, []);
 
     if (error) return <div>Error: {error}</div>;
     if (loading) return <div>Loading...</div>;
+
+    // Filter events into upcoming and past based on eventTime
+    const now = new Date()
+    const cut_off_time = new Date(now);
+    cut_off_time.setHours(cut_off_time.getHours() - 12 )
+    //our cut off time is half a date, meaning an event will be shown as "upcoming" for 12 hours until after it's start time
+
+
+    
+    
+    const upcomingEvents = events.filter(
+        event=>
+    {
+        if(!event.fields.eventTime) 
+            return false;
+        const eventDate = new Date(event.fields.eventTime)
+        return eventDate  >= cut_off_time;
+    });
+
+    const pastEvents = events.filter(
+        event=>
+        {
+            if(!event.fields.eventTime)
+                return false;
+            const eventDate = new Date(event.fields.eventTime)
+            return eventDate < cut_off_time;
+        }
+    );
+    //if a contentful placard doesn't have a time, then it won't be displayed on the website
+
+    upcomingEvents.sort(
+        (event1, event2) => {
+            const event1_time = new Date(event1.fields.eventTime!).getTime();
+            const event2_time = new Date(event2.fields.eventTime!).getTime();
+            return event1_time - event2_time;
+    });
+    pastEvents.sort(
+        (event1,event2) => {
+        const event1_time = new Date(event1.fields.eventTime!).getTime();
+        const event2_time = new Date(event2.fields.eventTime!).getTime();
+        return event2_time - event1_time;
+    });
+    
 
     return (
         <div>
@@ -185,7 +215,7 @@ export default function AboutContent() {
                                 key={idx}
                                 title={event.fields.title}
                                 description={event.fields.description}
-                                eventTime={event.fields.eventTime || 'TBD'}
+                                eventTime={event.fields.eventTimeDisplay || 'TBD'}
                                 location={event.fields.location || 'TBD'}
                                 imgSrc={
                                     event.fields.image?.fields?.file?.url

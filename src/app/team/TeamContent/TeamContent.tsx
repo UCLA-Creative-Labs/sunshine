@@ -1,12 +1,12 @@
 'use client'
 import DropdownMenu from "@/components/DropdownMenu";
 import ToolTip from "@/components/ToolTip";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function MemberCard({ memberData, alumni, className } : { memberData: any, alumni: boolean, className?: string }) {
   const { name, year, titles, degree, fact, company, website} = memberData;
-  const photoURL = memberData?.photo?.fields?.file?.url;
+  // Use Contentful photo if available, otherwise use default avatar
+  const photoURL = memberData?.photo?.fields?.file?.url || '/images/default-avatar.svg';
 
   return (
     <div className={`group space-y-2 text-center md:text-start ${className}`}>
@@ -55,65 +55,98 @@ function MemberCard({ memberData, alumni, className } : { memberData: any, alumn
 }
 
 
+// Team order for display
+const TEAM_ORDER = [
+  'President',
+  'Senior Advisor',
+  'Design',
+  'Marketing/External',
+  'Projects',
+  'Finance',
+  'Tech'
+];
+
 export default function TeamContent({ members, alumni }: { members: Array<any>, alumni: Array<any> }) {
-  const [membersList, setMembersList] = useState<Array<any>|undefined>(undefined);
-  const [alumniList, setAlumniList] = useState<Array<any>|undefined>(undefined);
   const [year, setYear] = useState<string>("All Years");
   const [role, setRole] = useState<string>("All Roles");
-  const [alumniRole, setAlumniRole] = useState<string>("All Roles");
   const [alumniYear, setAlumniYear] = useState<string>("All Years");
+  const [alumniRole, setAlumniRole] = useState<string>("All Roles");
 
+  // Filter members by year and role
+  const filteredMembers = members.filter((member) => {
+    const matchYear = year === "All Years" || member.fields.year == year;
+    const matchRole = role === "All Roles" || member.fields.roles?.includes(role);
+    return matchYear && matchRole && member.enabled;
+  });
 
-  useEffect(() => {
-    setMembersList(members);
-    setAlumniList(alumni);
-  }, [members, alumni]);
-  
-  useEffect(() => {
-    if (membersList) {
-      let newMembersList: Array<any> = [];
-      for (const member of members) {
-        if ((year == "All Years" || member.fields.year == year) &&
-            (role == "All Roles" || member.fields.roles.includes(role))
-        ) {
-          newMembersList.push(member);
-        }
+  // Group members by their primary team
+  const groupedMembers = TEAM_ORDER.map(team => {
+    const teamMembers = filteredMembers.filter(member => {
+      const roles = member.fields.roles || [];
+
+      // For President section: people who are ONLY Directors (Exec role → Director in Contentful)
+      if (team === 'President') {
+        return roles.length === 1 && roles[0] === 'Director';
       }
-      setMembersList(newMembersList);
-    }
-  }, [year, role]);
 
-  useEffect(() => {
-    if (alumniList) {
-      let newAlumniList: Array<any> = [];
-      for (const alumniMember of alumni) {
-        if ((alumniYear == "All Years" || alumniMember.fields.year == alumniYear) && (alumniRole == "All Roles" || (alumniMember?.fields?.roles?.includes(alumniRole)))
-        ) {
-          newAlumniList.push(alumniMember);
-        }
+      // For Senior Advisor section: people with Senior Advisor role
+      if (team === 'Senior Advisor') {
+        return roles.includes('Senior Advisor');
       }
-      setAlumniList(newAlumniList);
+
+      // For other teams, check if team name is in their roles (handles both ['Director', 'Team'] and ['Team', 'Director'])
+      return roles.includes(team);
+    });
+
+    // Sort: Directors first (for team sections), then alphabetically
+    teamMembers.sort((a, b) => {
+      const aIsDirector = a.fields.roles?.includes('Director');
+      const bIsDirector = b.fields.roles?.includes('Director');
+
+      if (aIsDirector && !bIsDirector) return -1;
+      if (!aIsDirector && bIsDirector) return 1;
+
+      // Alphabetically by name
+      const aName = a.fields.name || '';
+      const bName = b.fields.name || '';
+      return aName.localeCompare(bName);
+    });
+
+    // Change "President" to "Co-Presidents" if there are 2+ members
+    let displayName = team;
+    if (team === 'President' && teamMembers.length > 1) {
+      displayName = 'Co-Presidents';
     }
-  }, [alumniYear, alumniRole]);
+
+    return { team: displayName, members: teamMembers };
+  }).filter(group => group.members.length > 0); // Only show teams with members
+
+  // Filter alumni by year and role
+  const filteredAlumni = alumni.filter((alumniMember) => {
+    const matchYear = alumniYear === "All Years" || alumniMember.fields.year == alumniYear;
+    const matchRole = alumniRole === "All Roles" || alumniMember.fields.roles?.includes(alumniRole);
+    return matchYear && matchRole && alumniMember.enabled;
+  });
 
   return (
     <div className="flex flex-col items-center w-full my-12 text-black">
-      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
+      {/* Header and Filters - Original Layout */}
+      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12">
         <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4 ml-5">
           <h1 className="text-4xl font-bold">THE TEAM</h1>
           <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
             <DropdownMenu
               className="flex flex-col w-[200px] text-xl"
-              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300"
               menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
               menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
               menuButtonHoverColor="bg-blue-100"
-              options={["All Years", "2024", "2025", "2026", "2027"]}
+              options={["All Years", "2025", "2026", "2027", "2028", "2029"]}
               setValue={setYear}
             />
             <DropdownMenu
               className="flex flex-col w-[200px] text-xl"
-              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300"
               menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
               menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
               menuButtonHoverColor="bg-blue-100"
@@ -122,27 +155,46 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
             />
           </div>
         </div>
-        <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
-          { membersList?.filter((data) => data.enabled).map((data, idx) => 
-            {
-              const memberData = data.fields;
-              return <MemberCard
-                key={idx}
-                memberData={memberData}
-                alumni={false}
-              />
-            }
+
+        {/* Team Sections */}
+        <div className="flex-1 w-full px-8">
+          {groupedMembers.map((group, groupIdx) => (
+            <div key={groupIdx} className="mb-16">
+              {/* Team Header - Black text, simple style */}
+              <h2 className="text-3xl font-bold text-black mb-8">
+                {group.team}
+              </h2>
+
+              {/* Team Members Grid */}
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {group.members.map((data, idx) => (
+                  <MemberCard
+                    key={idx}
+                    memberData={data.fields}
+                    alumni={false}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {/* No results message */}
+          {groupedMembers.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-2xl text-gray-500">No members match the selected filters.</p>
+            </div>
           )}
         </div>
       </div>
 
-      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12 text-black">
+      {/* Alumni Section */}
+      <div className="flex flex-col items-center lg:items-start lg:flex-row w-full my-12">
         <div className="flex flex-col space-y-8 items-center text-black w-1/2 md:w-1/4">
           <h1 className="text-4xl font-bold">ALUMNI</h1>
           <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-8 lg:space-x-0 lg:flex-col lg:space-y-2">
             <DropdownMenu
               className="flex flex-col w-[200px] text-xl"
-              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300"
               menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
               menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
               menuButtonHoverColor="bg-blue-100"
@@ -151,7 +203,7 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
             />
             <DropdownMenu
               className="flex flex-col w-[200px] text-xl"
-              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300" 
+              buttonClassName="p-4 px-4 bg-white border border-gray-300 border-[1.5px] focus:border-blue-300"
               menuClassName="w-[200px] bg-white mt-1 text-center drop-shadow-md"
               menuButtonClassName="py-2 hover:bg-blue-200 border border-[1.5px] border-b-0 border-gray"
               menuButtonHoverColor="bg-blue-100"
@@ -161,16 +213,16 @@ export default function TeamContent({ members, alumni }: { members: Array<any>, 
           </div>
         </div>
         <div className="p-12 grid gap-12 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-8 lg:gap-12 xl:gap-16">
-          { alumniList?.filter((data) => data.enabled).map((data, idx) => 
-            {
-              const alumniData = data.fields;
-              return <MemberCard
+          {filteredAlumni.map((data, idx) => {
+            const alumniData = data.fields;
+            return (
+              <MemberCard
                 key={idx}
                 memberData={alumniData}
                 alumni={true}
               />
-            }
-          )}
+            );
+          })}
         </div>
       </div>
     </div>
