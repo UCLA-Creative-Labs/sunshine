@@ -22,7 +22,7 @@ const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, 
     return (
         <div className="border rounded-lg p-6 shadow-md">
           <div className="flex items-start">
-            <img src={logoUrl} alt="Project Logo" className="w-16 h-16 mr-4 rounded-lg" />
+            {logoUrl && <img src={logoUrl} alt="Project Logo" className="w-16 h-16 mr-4 rounded-lg" />}
             <div className="flex-1">
               <h2 className="text-xl font-bold">
                 {projectName}: {joinStrings(projectLeads)}
@@ -32,39 +32,41 @@ const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, 
           </div>
           {isExpanded ?
             <div className="flex flex-col md:flex-row mt-6">
-                <div className="mt-4">
-                    <p>
-                    <strong>Project Manager(s):</strong> {joinStrings(projectManagers)}
-                    </p>
-                    <p>
+              <div className={`mt-4 ${prototypeUrl ? 'md:w-1/2' : 'w-full'}`}>
+                  <p>
+                  <strong>Project Manager(s):</strong> {joinStrings(projectManagers)}
+                  </p>
+                  <p>
                     <strong>Project Members:</strong> {joinStrings(projectMembers)}
                     </p>
                     <div className="mt-4 flex space-x-4">
-                    <a
-                    href={demoDayUrl}
-                    className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >
-                    Demo Day Slides
-                    </a>
-                    <a
-                    href={instaPostUrl}
-                    className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >
-                    Insta Post
-                    </a>
+                      <a
+                        href={demoDayUrl}
+                        className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Demo Day Slides
+                      </a>
+                      <a
+                        href={instaPostUrl}
+                        className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Insta Post
+                      </a>
+                  </div>
                 </div>
-                </div>
-                <div className="mt-6 ml-6">
-                    <img src={prototypeUrl} alt="Frontend Features" className="w-full rounded-lg" />
-                </div>
+                {prototypeUrl && (
+                  <div className="md:w-1/2 mt-6 md:mt-4">
+                    <iframe src={prototypeUrl} className="w-full h-96 rounded-lg" />
+                  </div>
+                )}
             </div> : <></> }
     
           { !isExpanded ? <div className="mt-4 text-gray-600 cursor-pointer text-underline" onClick={() => expand(!isExpanded)}>
-            ▶ See more about this project
+            ► See more about this project
           </div> :
           
           <div className="mt-4 text-gray-600 cursor-pointer text-underline" onClick={() => expand(!isExpanded)}>
