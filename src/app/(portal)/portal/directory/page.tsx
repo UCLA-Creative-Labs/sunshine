@@ -1,10 +1,11 @@
 // Directory page for the membership portal
 // Route: /portal/directory
+import ProjectsDirectory from "@/components/portal/directory/ProjectsDirectory";
 
 export default function PortalDirectory() {
     return (
         <div className="p-8 text-black">
-            <h1 className="text-3xl font-bold mb-4">Directory</h1>
+                <ProjectsDirectory />
         </div>
     );
 }
