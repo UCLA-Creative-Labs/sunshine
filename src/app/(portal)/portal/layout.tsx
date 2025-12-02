@@ -1,7 +1,8 @@
-// Portal-specific layout with sidebar/navigation
+// Portal-specific layout with sidebar navigation
 // This layout applies to all pages under /portal/*
 
-import PortalNavbar from '@/components/PortalNavbar';
+import Navbar from '@/components/Navbar';
+import PortalSidebar from './components/PortalSidebar';
 
 export default function PortalPageLayout({
     children,
@@ -9,9 +10,16 @@ export default function PortalPageLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen">
-            <PortalNavbar />
-            <main className="pt-24">{children}</main>
-        </div>
+        <>
+            <Navbar />
+            <div className="flex min-h-screen bg-white pt-24">
+                <PortalSidebar />
+                <main className="flex-1 p-8">
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
+                </main>
+            </div>
+        </>
     );
 }

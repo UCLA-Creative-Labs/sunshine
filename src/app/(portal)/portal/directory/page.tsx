@@ -5,7 +5,7 @@ import ProjectsDirectory from "@/components/portal/directory/ProjectsDirectory";
 export default function PortalDirectory() {
     return (
         <div className="p-8 text-black">
-                <ProjectsDirectory />
+            <ProjectsDirectory />
         </div>
     );
 }
