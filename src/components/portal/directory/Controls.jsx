@@ -26,10 +26,10 @@ const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange }) => {
           value={filters.category}
           onChange={(e) => onFilterChange('category', e.target.value)}
         >
-          <option>All Categories</option>
-          <option>Technology</option>
-          <option>Events</option>
-          <option>Community</option>
+          <option title="All Categories">All Categories</option>
+          <option title="Technology">Technology</option>
+          <option title="Events">Events</option>
+          <option title="Community">Community</option>
         </select>
         
         <select
