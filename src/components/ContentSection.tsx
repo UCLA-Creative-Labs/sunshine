@@ -1,7 +1,3 @@
-import { Lato } from "next/font/google"
-
-const lato = Lato({ weight: '700', subsets: ['latin'] });
-
 interface ContentSectionProps {
     title?: string,
     description?: React.ReactNode,
@@ -13,7 +9,7 @@ interface ContentSectionProps {
 export default function ContentSection({ title, description, children, centerText=false, titleClassName="text-2xl md:text-4xl" } : ContentSectionProps) {
     return (
     <div className="space-y-8">
-        <h1 className={ `text-center ${!centerText && "md:text-start"} ${titleClassName} tracking-wide ${lato.className}` }>
+        <h1 className={ `text-center ${!centerText && "md:text-start"} ${titleClassName} tracking-wide font-[family-name:var(--font-lato)] font-bold` }>
             {title}
             <span className="ml-2 text-3xl group-hover:translate-x-2 transition-transform ease-in-out duration-300">➔</span>
         </h1>

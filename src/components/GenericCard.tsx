@@ -1,7 +1,4 @@
-import { Lato } from "next/font/google"
 import Link from "next/link"
-
-const lato = Lato({ weight: '700', subsets: ['latin'] })
 
 interface GenericCardProps {
     title: string,
@@ -32,7 +29,7 @@ export default function GenericCard({ title, description, end, imgSrc='/card_ico
           </div>
           <div className="space-y-6">
             <div className="flex items-center space-x-2">
-              <h1 className={`text-3xl ${lato.className}`}>{title}</h1>
+              <h1 className={`text-3xl font-[family-name:var(--font-lato)] font-bold`}>{title}</h1>
             </div>
             <p className="text-xl">{description}</p>
             {end && (
@@ -42,7 +39,7 @@ export default function GenericCard({ title, description, end, imgSrc='/card_ico
                   {end}
                 </p>
                 <h1
-                  className={`text-xl group-hover:translate-x-4 transition ease-in-out duration-100 delay-50 ${lato.className}`}
+                  className={`text-xl group-hover:translate-x-4 transition ease-in-out duration-100 delay-50 font-[family-name:var(--font-lato)] font-bold`}
                 >
                   ➔
                 </h1>

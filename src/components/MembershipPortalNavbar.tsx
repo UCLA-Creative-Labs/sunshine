@@ -2,10 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { Mulish } from "next/font/google";
 import { usePathname, useRouter } from "next/navigation";
-
-const mulish = Mulish({ weight: "800", subsets: ["latin"] });
 
 const TAB_STYLES = {
   base: "relative px-0 py-1 text-sm md:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-colors duration-150",
@@ -146,7 +143,7 @@ export default function MembershipPortalNavbar({
             width={36}
             height={36}
           />
-          <span className={`${mulish.className} text-xl md:text-2xl font-extrabold tracking-wide text-black`}>
+          <span className={`font-[family-name:var(--font-mulish)] text-xl md:text-2xl font-extrabold tracking-wide text-black`}>
             CREATIVE LABS
           </span>
         </div>
@@ -161,7 +158,7 @@ export default function MembershipPortalNavbar({
               const isSelected = tab.id === currentValue;
               const tabClassName = [
                 TAB_STYLES.base,
-                mulish.className,
+                "font-[family-name:var(--font-mulish)]",
                 isSelected ? TAB_STYLES.selected : TAB_STYLES.unselected,
                 tab.disabled ? TAB_STYLES.disabled : "",
               ].join(" ");
