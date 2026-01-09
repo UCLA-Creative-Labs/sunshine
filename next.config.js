@@ -11,6 +11,8 @@ const nextConfig = {
     return config;
   },
 
+  turbopack: {},
+
   env: {
     SPACE_ID: process.env.SPACE_ID,
     CDN_API_KEY: process.env.CDN_API_KEY,
