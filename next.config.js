@@ -15,8 +15,6 @@ const nextConfig = {
     SPACE_ID: process.env.SPACE_ID,
     CDN_API_KEY: process.env.CDN_API_KEY,
   },
-
-  turbopack: {},
 };
 
 module.exports = nextConfig
