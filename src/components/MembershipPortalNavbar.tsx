@@ -43,9 +43,15 @@ export default function MembershipPortalNavbar({
     defaultValue ?? tabs[0]?.id
   );
 
-  const derivedFromHrefId =
-    tabs.find((tab) => (tab.href ? pathname?.startsWith(tab.href) : false))?.id ??
-    undefined;
+  const derivedFromHrefId = (() => {
+    if (!pathname) return undefined;
+    const matchingTabs = tabs.filter((tab) => tab.href && pathname.startsWith(tab.href));
+    if (matchingTabs.length === 0) return undefined;
+    const bestMatch = matchingTabs.reduce((a, b) => 
+      (a.href?.length ?? 0) > (b.href?.length ?? 0) ? a : b
+    );
+    return bestMatch.id;
+  })();
 
   const currentValue =
     value !== undefined
