@@ -21,16 +21,21 @@
         "sharp": "^0.33.0"
     },
     "devDependencies": {
+        "@eslint/eslintrc": "^3",
+        "@next/eslint-plugin-next": "^16.1.1",
         "@types/node": "latest",
         "@types/react": "latest",
         "@types/react-dom": "latest",
+        "@typescript-eslint/parser": "^8.52.0",
         "autoprefixer": "latest",
         "eslint": "^9",
-        "@eslint/eslintrc": "^3",
         "eslint-config-next": "latest",
+        "eslint-plugin-react": "^7.37.5",
+        "eslint-plugin-react-hooks": "^7.0.1",
         "postcss": "latest",
         "sass": "^1.71.1",
         "tailwindcss": "3",
-        "typescript": "latest"
+        "typescript": "latest",
+        "typescript-eslint": "^8.52.0"
     }
 }

@@ -1,7 +1,4 @@
-import { Lato } from "next/font/google"
 import Link from "next/link"
-
-const lato = Lato({ weight: '400', subsets: ['latin'] })
 
 interface ProjectCardProps {
     title: string,
@@ -27,7 +24,7 @@ export default function ProjectCard({ title, imgSrc='/card_icons/what-we-do.svg'
             <div className="space-y-6 flex justify-center items-center">
                 <div className="flex items-center space-x-2">
                     <h1
-                        className={ `text-3xl ${lato.className}` }
+                        className={ `text-3xl font-[family-name:var(--font-lato)]` }
                     >
                         {title}
                     </h1>

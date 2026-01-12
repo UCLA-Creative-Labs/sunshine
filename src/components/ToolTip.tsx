@@ -21,8 +21,8 @@ const ToolTip = ({ content, children, className }: ToolTipProps) => {
     const screenHeight = window.innerHeight;
 
     // Calculate tooltip position such that the center aligns with the cursor
-    let newLeft = e.clientX - tooltipWidth / 2;  // Move left by half the tooltip width
-    let newTop = e.clientY - tooltipHeight / 2; // Move up by half the tooltip height
+    const newLeft = e.clientX - tooltipWidth / 2;  // Move left by half the tooltip width
+    const newTop = e.clientY - tooltipHeight / 2; // Move up by half the tooltip height
 
     setTooltipStyle({
       top: newTop,
