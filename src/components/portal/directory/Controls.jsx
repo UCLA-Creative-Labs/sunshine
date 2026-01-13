@@ -9,7 +9,7 @@ const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange }) => {
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
       />
-      
+
       <div className="filter-group">
         <select
           className="filter-select"
@@ -20,18 +20,7 @@ const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange }) => {
           <option>Active</option>
           <option>Archived</option>
         </select>
-        
-        <select
-          className="filter-select"
-          value={filters.category}
-          onChange={(e) => onFilterChange('category', e.target.value)}
-        >
-          <option title="All Categories">All Categories</option>
-          <option title="Technology">Technology</option>
-          <option title="Events">Events</option>
-          <option title="Community">Community</option>
-        </select>
-        
+
         <select
           className="filter-select"
           value={filters.sort}
@@ -43,7 +32,7 @@ const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange }) => {
           <option>Sort: A-Z</option>
         </select>
       </div>
-      
+
       <div className="view-toggle">
         <button className="view-btn active" title="Grid View">⊞</button>
         <button className="view-btn" title="List View">☰</button>

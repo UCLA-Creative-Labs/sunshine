@@ -14,3 +14,16 @@ export async function getProjectsByYear(year: string): Promise<Project[]> {
 
     return (data || []) as Project[];
 }
+
+export async function getAllProjects(): Promise<Project[]> {
+    const { data, error } = await supabase
+        .from('projects')
+        .select('*');
+
+    if (error) {
+        console.error('Error fetching all projects:', error);
+        return [];
+    }
+
+    return (data || []) as Project[];
+}
