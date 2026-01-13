@@ -1,22 +1,19 @@
-import IndividualProjectCard, { IndividualProjectProps } from "./IndividualProjectCard";
-import projectData from "@/assets/projectData";
+import IndividualProjectCard from "./IndividualProjectCard";
+import { Project } from '@/types/project';
 
 interface QuarterListProps {
-    quarter: string;
-    year: string;
+    projects: Project[];
 };
 
 
-const QuarterProjectCardList = ( { quarter, year }: QuarterListProps) => {
-    const yearlyProjects = projectData.find(proj => proj.year === year)?.projects;
-
-    if (!yearlyProjects) {
+const QuarterProjectCardList = ({ projects }: QuarterListProps) => {
+    if (!projects || projects.length === 0) {
         return <span className="font-bold">No projects yet!</span>;
     }
 
     return <>
-        {yearlyProjects[quarter].length > 0 ? yearlyProjects[quarter].map(project => <IndividualProjectCard key={project.projectName} {...project} />) : <span className="font-bold">No projects yet!</span>}
-        </>
+        {projects.map(project => <IndividualProjectCard key={project.id} {...project} />)}
+    </>
 };
 
 export default QuarterProjectCardList;
