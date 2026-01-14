@@ -4,7 +4,7 @@ import ProfileContent from "@/components/portal/profile/ProfileContent";
 
 export default function PortalProfile() {
     return (
-        <div className="p-8 text-black">
+        <div className="w-full text-black">
             <ProfileContent />
         </div>
     );

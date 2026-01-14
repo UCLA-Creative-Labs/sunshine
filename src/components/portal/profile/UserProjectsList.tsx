@@ -93,7 +93,7 @@ const UserProjectsList: React.FC<UserProjectsListProps> = ({
                                 </div>
                                 <div className="p-4">
                                     <h3 className="font-semibold text-black mb-1">
-                                        {project.name}
+                                    {project.name}
                                     </h3>
                                     <p className="text-sm text-gray-600 mb-2">
                                         {project.description || 'description'}
@@ -117,10 +117,10 @@ const UserProjectsList: React.FC<UserProjectsListProps> = ({
                                 </div>
                             </div>
                         ))}
-                        <div
-                            onClick={onAddProjectClick}
+                            <div
+                                onClick={onAddProjectClick}
                             className="bg-white rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center h-64 w-48"
-                        >
+                            >
                             <div className="text-5xl text-gray-400 mb-2 font-light">+</div>
                             <div className="text-sm text-gray-500">click to add</div>
                         </div>

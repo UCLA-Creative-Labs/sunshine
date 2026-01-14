@@ -194,8 +194,8 @@ const ProfileContent = () => {
     const displayImage = profileImage || profile.profile_image_url;
 
     return (
-        <div className="bg-gray-100 min-h-full">
-            <div className="max-w-6xl mx-auto px-8 py-8 text-black">
+        <div className="bg-gray-100 min-h-full w-full">
+            <div className="w-full px-8 py-8 text-black">
                 <ProfileSection
                     profile={profile}
                     profileImage={displayImage}
