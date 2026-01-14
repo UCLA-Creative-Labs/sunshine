@@ -53,7 +53,7 @@ export default function LoginPage() {
             <p className="font-[family-name:var(--font-lato)] text-gray-600 tracking-wide">
               don&apos;t have an account?{" "}
               <Link
-                href="/join"
+                href="/signup"
                 className="font-bold text-black hover:underline"
               >
                 Sign Up

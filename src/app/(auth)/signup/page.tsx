@@ -13,7 +13,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +22,13 @@ export default function SignupPage() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+
+    // Validate UCLA email
+    if (!email.endsWith("@ucla.edu") && !email.endsWith("@g.ucla.edu")) {
+      setError("Please use a valid UCLA email address (@ucla.edu or @g.ucla.edu)");
+      setIsLoading(false);
+      return;
+    }
 
     // Validate password length
     if (password.length < 8) {
@@ -32,9 +39,6 @@ export default function SignupPage() {
 
     const supabase = createClient();
 
-    // Create email from username (assuming @ucla.edu domain)
-    const email = username.includes("@") ? username : `${username}@ucla.edu`;
-
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -42,7 +46,6 @@ export default function SignupPage() {
         data: {
           first_name: firstName,
           last_name: lastName,
-          username: username,
         },
       },
     });
@@ -51,8 +54,8 @@ export default function SignupPage() {
       setError(error.message);
       setIsLoading(false);
     } else {
-      // Redirect to login page after successful signup
-      router.push("/login?message=Check your email to confirm your account");
+      // Redirect to portal after successful signup
+      router.push("/portal");
     }
   };
 
@@ -105,7 +108,7 @@ export default function SignupPage() {
                   required
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="ex. jane"
+                  placeholder="ex. Travis"
                   className="block w-full px-4 py-3 rounded-full border border-gray-300 bg-white font-[family-name:var(--font-lato)] text-gray-900 placeholder:text-gray-400 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-all"
                 />
               </div>
@@ -124,31 +127,34 @@ export default function SignupPage() {
                   required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="ex. do"
+                  placeholder="ex. Nguyen"
                   className="block w-full px-4 py-3 rounded-full border border-gray-300 bg-white font-[family-name:var(--font-lato)] text-gray-900 placeholder:text-gray-400 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-all"
                 />
               </div>
             </div>
 
-            {/* Username field */}
+            {/* Email field */}
             <div>
               <label
-                htmlFor="username"
+                htmlFor="email"
                 className="block font-[family-name:var(--font-lato)] text-sm font-medium text-gray-700 mb-2 tracking-wide"
               >
-                username
+                ucla email
               </label>
               <input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="ex. janedo"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@ucla.edu"
                 className="block w-full px-4 py-3 rounded-full border border-gray-300 bg-white font-[family-name:var(--font-lato)] text-gray-900 placeholder:text-gray-400 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-all"
               />
+              <p className="mt-2 font-[family-name:var(--font-lato)] text-sm text-gray-500 tracking-wide">
+                *must be a @ucla.edu or @g.ucla.edu email
+              </p>
             </div>
 
             {/* Password field */}
