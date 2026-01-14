@@ -1,6 +1,6 @@
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, onClick }) => {
   return (
-    <div className="project-card">
+    <div className="project-card" onClick={() => onClick && onClick(project)} style={{ cursor: 'pointer' }}>
       <h3>{project.name}</h3>
       <p className="project-description">{project.description}</p>
       <div className="project-leads">

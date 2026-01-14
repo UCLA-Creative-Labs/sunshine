@@ -1,11 +1,8 @@
 "use client";
 
-import { Lato } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-
-const lato = Lato({ weight: "900", subsets: ["latin"] });
 
 const SCROLLY_POINT = 150;
 
@@ -42,7 +39,7 @@ export default function Navbar() {
           />
           <Link
             href="/"
-            className={"text-xl tracking-widest " + lato.className}
+            className={"text-xl tracking-widest " + "font-[family-name:var(--font-lato)] font-black"}
           >
             CREATIVE LABS
           </Link>
