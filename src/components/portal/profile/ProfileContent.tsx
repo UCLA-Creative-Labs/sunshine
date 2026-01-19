@@ -3,7 +3,7 @@
  * 
  * This is the main orchestrator component that:
  * - Manages all state (profile data, projects, form inputs, modals)
- * - Handles data fetching (TODO: connect to Supabase)
+ * - Handles data fetching from Supabase profiles table
  * - Calculates unlocked achievements based on level/points
  * - Coordinates between ProfileSection and UserProjectsList
  * - Handles all user interactions (image upload, bio editing, project CRUD)
@@ -18,7 +18,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// import { supabase } from '@/lib/supabase/client';
+import { profileService } from '@/lib/profileService';
 
 import { Profile, Project } from './types';
 import { ACHIEVEMENT_THRESHOLDS, ACHIEVEMENT_CONFIG } from './constants';
@@ -42,25 +42,35 @@ const ProfileContent = () => {
     const [projectLink, setProjectLink] = useState('');
     const [projects, setProjects] = useState<Project[]>([]);
 
-    // TODO: Replace with Supabase fetch when database is set up
-    // Initialize with default profile data
+    // Fetch current user profile from Supabase
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            const defaultProfile: Profile = {
-                id: 'temp-id',
-                first_name: 'First',
-                last_name: 'Last',
-                username: 'username',
-                bio: null,
-                profile_image_url: null,
-                level: 1,
-                points: 0,
-                joined_date: new Date().toISOString(),
-            };
-            setProfile(defaultProfile);
-            setLoading(false);
-        }, 500);
+        const fetchProfile = async () => {
+            try {
+                const profileData = await profileService.getCurrentProfile();
+                
+                // Transform Supabase profile to match UI expectations
+                const transformedProfile: Profile = {
+                    id: profileData.id,
+                    first_name: profileData.email.split('@')[0], // Use email prefix as name
+                    last_name: '',
+                    username: profileData.email.split('@')[0],
+                    bio: null,
+                    profile_image_url: null,
+                    level: 1,
+                    points: 0,
+                    joined_date: profileData.created_at,
+                };
+                
+                setProfile(transformedProfile);
+                setBio(transformedProfile.bio || '');
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
     }, []);
 
     // Calculate unlocked achievements based on level and points
@@ -77,25 +87,27 @@ const ProfileContent = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // TODO: Upload to Supabase Storage when database is set up
+        // TODO: Upload to Supabase Storage when storage is set up
         // For now, just use local file preview
         const reader = new FileReader();
         reader.onloadend = () => {
             const result = reader.result as string;
             setProfileImage(result);
-            // TODO: Update profile in Supabase when connected
-            // await supabase.from('profiles').update({ profile_image_url: result }).eq('id', profile.id);
         };
         reader.readAsDataURL(file);
     };
 
-    const handleBioUpdate = () => {
-        // TODO: Update bio in Supabase when database is set up
-        // await supabase.from('profiles').update({ bio }).eq('id', profile.id);
-        if (profile) {
+    const handleBioUpdate = async () => {
+        if (!profile) return;
+        
+        try {
+            // TODO: Update bio in profiles table when bio field is added
+            // await profileService.updateProfile(profile.id, { bio });
             setProfile({ ...profile, bio });
+            setIsEditingBio(false);
+        } catch (error) {
+            console.error('Error updating bio:', error);
         }
-        setIsEditingBio(false);
     };
 
     const handleProjectImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +161,7 @@ const ProfileContent = () => {
     const saveProject = () => {
         if (!projectName.trim()) return;
 
-        // TODO: Save to Supabase when database is set up
+        // TODO: Save to Supabase when projects table is set up
         const projectData: Project = {
             id: editingProject?.id || Date.now(),
             name: projectName,
@@ -160,14 +172,10 @@ const ProfileContent = () => {
         };
 
         if (editingProject) {
-            // TODO: Update in Supabase
-            // await supabase.from('projects').update(projectData).eq('id', editingProject.id);
             setProjects(prev =>
                 prev.map(p => (p.id === editingProject.id ? projectData : p))
             );
         } else {
-            // TODO: Insert into Supabase
-            // const { data } = await supabase.from('projects').insert(projectData).select().single();
             setProjects(prev => [...prev, projectData]);
         }
 

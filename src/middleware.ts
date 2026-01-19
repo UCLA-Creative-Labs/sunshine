@@ -8,6 +8,11 @@ import { createClient } from '@supabase/supabase-js';
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    // Redirect /portal to /login
+    if (pathname === '/portal') {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
     // Protect all /portal routes
     if (pathname.startsWith('/portal')) {
         const supabase = createClient(
@@ -38,6 +43,5 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/portal/:path*',
-        // Add other protected routes here
     ],
 };
