@@ -4,46 +4,39 @@ export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type InviteStatus = 'active' | 'expired' | 'revoked';
 
-// TODO: Update with correct user interface
-// export interface User {
-//   id: string;
-//   created_at: string;
-//   updated_at: string;
-//   email: string;
-//   first_name: string | null;
-//   last_name: string | null;
-//   avatar_url: string | null;
-//   permission: UserPermission;
-//   last_seen_at: string | null;
-// }
+export interface Profiles {
+  id: string;
+  created_at: string;
+  email: string;
+  display_name: string;
+}
 
-// TODO: Update with correct user interface
-// export interface Project {
-//   id: number;
-//   created_at: string;
-//   updated_at: string;
-//   project_name: string;
-//   project_description: string | null;
-//   year: string;
-//   quarter: string;
-//   github_url: string | null;
-//   figma_url: string | null;
-//   notion_url: string | null;
-//   demo_day_url: string | null;
-//   insta_post_url: string | null;
-//   logo_url: string | null;
-//   prototype_url: string | null;
-//   github_repo_owner: string | null;
-//   github_repo_name: string | null;
-//   github_installation_id: number | null;
-//   is_archived: boolean;
-// }
+export interface Project {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  project_name: string;
+  project_description: string | null;
+  year: string;
+  quarter: string;
+  github_url: string | null;
+  figma_url: string | null;
+  notion_url: string | null;
+  demo_day_url: string | null;
+  insta_post_url: string | null;
+  logo_url: string | null;
+  prototype_url: string | null;
+  github_repo_owner: string | null;
+  github_repo_name: string | null;
+  github_installation_id: number | null;
+  is_archived: boolean;
+}
 
 export interface ProjectMember {
   id: number;
   created_at: string;
   updated_at: string;
-  project_id: number;
+  project_id: string;
   user_id: string;
   role: ProjectRole;
   joined_at: string;
@@ -55,7 +48,7 @@ export interface Task {
   id: number;
   created_at: string;
   updated_at: string;
-  project_id: number;
+  project_id: string;
   parent_task_id: number | null;
   created_by: string | null;
   name: string;
@@ -86,7 +79,7 @@ export interface ProjectInvite {
   id: number;
   created_at: string;
   updated_at: string;
-  project_id: number;
+  project_id: string;
   created_by: string;
   invite_code: string;
   role_to_assign: ProjectRole;
@@ -99,7 +92,7 @@ export interface ProjectInvite {
 export interface GithubIntegration {
   id: number;
   created_at: string;
-  project_id: number;
+  project_id: string;
   task_id: number | null;
   delivery_id: string;
   event_type: string;
@@ -118,25 +111,24 @@ export interface ActivityLog {
   created_at: string;
   user_id: string | null;
   action: string;
-  project_id: number | null;
+  project_id: string | null;
   task_id: number | null;
   metadata: Record<string, any> | null;
 }
 
-// TODO: Uncomment once User and Projects table from DB has been updated
-// export interface ProjectWithMembers extends Project {
-//   members: (ProjectMember & { user: User })[];
-// }
+export interface ProjectWithMembers extends Project {
+  members: (ProjectMember & { user: Profiles })[];
+}
 
-// export interface TaskWithAssignments extends Task {
-//   assignments: (TaskAssignment & { user: User })[];
-//   subtasks?: Task[];
-// }
+export interface TaskWithAssignments extends Task {
+  assignments: (TaskAssignment & { user: Profiles })[];
+  subtasks?: Task[];
+}
 
-// export interface ProjectMemberWithUser extends ProjectMember {
-//   user: User;
-// }
+export interface ProjectMemberWithProfile extends ProjectMember {
+  user: Profiles;
+}
 
-// export interface TaskAssignmentWithUser extends TaskAssignment {
-//   user: User;
-// }
+export interface TaskAssignmentWithProfile extends TaskAssignment {
+  user: Profiles;
+}
