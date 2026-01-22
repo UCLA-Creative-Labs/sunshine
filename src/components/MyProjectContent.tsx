@@ -164,21 +164,21 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
           </div>
         </Section>
 
-        <Section title="my tasks" delay={160}>
+        <Section title="My Tasks" delay={160}>
           {isLoading ? (
-            <p className="text-sm text-black/50">loading tasks...</p>
+            <p className="text-sm text-black/50">Loading tasks...</p>
           ) : myTasks.length === 0 ? (
-            <p className="text-sm text-black/50">no tasks assigned to you yet</p>
+            <p className="text-sm text-black/50">No tasks assigned to you yet</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-xs md:text-sm text-black/80">
                 <thead>
                   <tr className="border-b border-[#E2E4F0]">
-                    <th className="pb-3 pr-6 font-semibold">name</th>
-                    <th className="pb-3 pr-6 font-semibold">priority</th>
-                    <th className="pb-3 pr-6 font-semibold">label</th>
-                    <th className="pb-3 pr-6 font-semibold">status</th>
-                    <th className="pb-3 font-semibold">assignees</th>
+                    <th className="pb-3 pr-6 font-semibold">Name</th>
+                    <th className="pb-3 pr-6 font-semibold">Priority</th>
+                    <th className="pb-3 pr-6 font-semibold">Label</th>
+                    <th className="pb-3 pr-6 font-semibold">Status</th>
+                    <th className="pb-3 font-semibold">Assignees</th>
                   </tr>
                 </thead>
                 <tbody>

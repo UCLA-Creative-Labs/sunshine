@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useTasks } from '@/lib/hooks/useTasks';
 import { useCreateTask } from '@/lib/hooks/useCreateTask';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
+import { useUserRole } from '@/lib/hooks/useUserRole';
 import { AddTaskModal } from './tasks/AddTaskModal';
 import { CreateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus } from '@/lib/types/database';
@@ -251,18 +252,17 @@ interface ProjectListContentProps {
   currentUserId: string;
 }
 
-// TODO: ensure route protection - only project members should access this page
-// RLS provides database-level security, but route guards improve UX
+// TODO: make sure to have route protection
 export default function ProjectListContent({ projectId, currentUserId }: ProjectListContentProps) {
   // fetch tasks and project members
   const { tasks: dbTasks, isLoading, error, refetch } = useTasks(projectId);
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
+  const { canCreateTasks } = useUserRole(projectId, currentUserId);
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // prepare assignee options for the modal
   const assigneeOptions = members.map((m) => ({
     id: m.user.id,
     display_name: m.user.display_name,
@@ -327,28 +327,30 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
       <header className="flex items-center justify-between">
         <div className="space-y-1">
           <p className="text-xs font-medium tracking-[0.18em] text-black/40 uppercase">
-            List View
+            LIST VIEW
           </p>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
             Tasks
           </h1>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-[#3F86FF] px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md transition-all duration-200 ease-out hover:bg-[#346edd] hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          <span className="text-base leading-none">+</span>
-          <span>Add Task</span>
-        </button>
+        {canCreateTasks && (
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-full bg-[#3F86FF] px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md transition-all duration-200 ease-out hover:bg-[#346edd] hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            <span className="text-base leading-none">+</span>
+            <span>Add Task</span>
+          </button>
+        )}
       </header>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-black/50">loading tasks...</p>
+          <p className="text-sm text-black/50">Loading tasks...</p>
         </div>
       ) : error ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-red-500">error loading tasks: {error}</p>
+          <p className="text-sm text-red-500">Error loading tasks: {error}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -394,7 +396,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
 
       {createError && (
         <div className="fixed bottom-4 right-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 shadow-lg">
-          failed to create task: {createError}
+          Failed to create task: {createError}
         </div>
       )}
     </div>

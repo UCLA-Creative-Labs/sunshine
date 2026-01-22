@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useTasks } from '@/lib/hooks/useTasks';
 import { useCreateTask } from '@/lib/hooks/useCreateTask';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
+import { useUserRole } from '@/lib/hooks/useUserRole';
 import { AddTaskModal } from './tasks/AddTaskModal';
 import { CreateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
@@ -52,7 +53,7 @@ function BoardColumn({ title, accentColor, children, delay = 0, onAddTask }: Boa
           {children}
           {onAddTask && (
             <button type="button" onClick={onAddTask} className={BUTTON_STYLES.addTask}>
-              + add task
+              + Add Task
             </button>
           )}
         </div>
@@ -109,7 +110,7 @@ function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, 
           </span>
         )}
         {dueDate && (
-          <span className="text-[10px] text-black/50">due {dueDate}</span>
+          <span className="text-[10px] text-black/50">Due {dueDate}</span>
         )}
       </div>
       {assignees.length > 0 && (
@@ -144,11 +145,11 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const { tasks: dbTasks, isLoading, error, refetch } = useTasks(projectId);
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
+  const { canCreateTasks } = useUserRole(projectId, currentUserId);
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // prepare assignee options for the modal
   const assigneeOptions = members.map((m) => ({
     id: m.user.id,
     display_name: m.user.display_name,
@@ -208,7 +209,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-sm text-black/50">loading tasks...</p>
+        <p className="text-sm text-black/50">Loading tasks...</p>
       </div>
     );
   }
@@ -216,7 +217,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   if (error) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-sm text-red-500">error loading tasks: {error}</p>
+        <p className="text-sm text-red-500">Error loading tasks: {error}</p>
       </div>
     );
   }
@@ -226,26 +227,28 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
       <header className="flex items-center justify-between gap-4 max-w-5xl">
         <div className="space-y-1">
           <p className="text-xs font-medium tracking-[0.18em] text-black/40 uppercase">
-            board view
+            BOARD VIEW
           </p>
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
-            tasks
+            Tasks
           </h1>
           <p className="text-[11px] md:text-xs text-black/50">{today}</p>
         </div>
         <div className="flex items-center gap-4">
           <AvatarStack initials={members.slice(0, 3).map(m => getInitials(m.user.display_name))} />
-          <button onClick={() => setIsModalOpen(true)} className={BUTTON_STYLES.primary}>
-            <span className="text-base leading-none">+</span>
-            <span>add task</span>
-          </button>
+          {canCreateTasks && (
+            <button onClick={() => setIsModalOpen(true)} className={BUTTON_STYLES.primary}>
+              <span className="text-base leading-none">+</span>
+              <span>Add Task</span>
+            </button>
+          )}
         </div>
       </header>
 
       <div className="relative w-full">
         <div className="w-full max-w-full overflow-x-auto overflow-y-visible pb-4">
           <div className="flex gap-4 md:gap-6 lg:gap-8 min-w-[1400px]">
-            <BoardColumn title="todo" accentColor="#E1225C" delay={40} onAddTask={() => setIsModalOpen(true)}>
+            <BoardColumn title="Todo" accentColor="#E1225C" delay={40} onAddTask={canCreateTasks ? () => setIsModalOpen(true) : undefined}>
               {tasksByStatus.todo.map((task, idx) => (
                 <BoardCard
                   key={task.id}
@@ -259,7 +262,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               ))}
             </BoardColumn>
 
-            <BoardColumn title="in progress" accentColor="#00C853" delay={80} onAddTask={() => setIsModalOpen(true)}>
+            <BoardColumn title="In Progress" accentColor="#00C853" delay={80} onAddTask={canCreateTasks ? () => setIsModalOpen(true) : undefined}>
               {tasksByStatus.in_progress.map((task, idx) => (
                 <BoardCard
                   key={task.id}
@@ -273,7 +276,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               ))}
             </BoardColumn>
 
-            <BoardColumn title="in review" accentColor="#FF9100" delay={120} onAddTask={() => setIsModalOpen(true)}>
+            <BoardColumn title="In Review" accentColor="#FF9100" delay={120} onAddTask={canCreateTasks ? () => setIsModalOpen(true) : undefined}>
               {tasksByStatus.in_review.map((task, idx) => (
                 <BoardCard
                   key={task.id}
@@ -287,7 +290,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               ))}
             </BoardColumn>
 
-            <BoardColumn title="done" accentColor="#6200EA" delay={160} onAddTask={() => setIsModalOpen(true)}>
+            <BoardColumn title="Done" accentColor="#6200EA" delay={160} onAddTask={canCreateTasks ? () => setIsModalOpen(true) : undefined}>
               {tasksByStatus.done.map((task, idx) => (
                 <BoardCard
                   key={task.id}
@@ -315,7 +318,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
 
       {createError && (
         <div className="fixed bottom-4 right-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 shadow-lg">
-          failed to create task: {createError}
+          Failed to create task: {createError}
         </div>
       )}
     </div>

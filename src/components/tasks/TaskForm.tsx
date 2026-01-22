@@ -48,10 +48,10 @@ export function TaskForm({
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!name.trim()) newErrors.name = 'task name is required';
-    if (!description.trim()) newErrors.description = 'description is required';
-    if (!dueDate) newErrors.dueDate = 'due date is required';
-    if (selectedAssignees.length === 0) newErrors.assignees = 'at least one assignee is required';
+    if (!name.trim()) newErrors.name = 'Task name is required';
+    if (!description.trim()) newErrors.description = 'Description is required';
+    if (!dueDate) newErrors.dueDate = 'Due date is required';
+    if (selectedAssignees.length === 0) newErrors.assignees = 'At least one assignee is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,31 +93,31 @@ export function TaskForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className={labelClass}>task name *</label>
+        <label className={labelClass}>Task Name *</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className={inputClass}
-          placeholder="enter task name"
+          placeholder="Enter task name"
         />
         {errors.name && <p className={errorClass}>{errors.name}</p>}
       </div>
 
       <div>
-        <label className={labelClass}>description *</label>
+        <label className={labelClass}>Description *</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className={`${inputClass} min-h-[80px] resize-none`}
-          placeholder="describe the task"
+          placeholder="Describe the task"
         />
         {errors.description && <p className={errorClass}>{errors.description}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>status *</label>
+          <label className={labelClass}>Status *</label>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as TaskStatus)}
@@ -129,7 +129,7 @@ export function TaskForm({
           </select>
         </div>
         <div>
-          <label className={labelClass}>priority *</label>
+          <label className={labelClass}>Priority *</label>
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value as TaskPriority)}
@@ -144,7 +144,7 @@ export function TaskForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className={labelClass}>due date *</label>
+          <label className={labelClass}>Due Date *</label>
           <input
             type="date"
             value={dueDate}
@@ -154,7 +154,7 @@ export function TaskForm({
           {errors.dueDate && <p className={errorClass}>{errors.dueDate}</p>}
         </div>
         <div>
-          <label className={labelClass}>label *</label>
+          <label className={labelClass}>Label *</label>
           <select
             value={labelIndex}
             onChange={(e) => setLabelIndex(Number(e.target.value))}
@@ -168,7 +168,7 @@ export function TaskForm({
       </div>
 
       <div>
-        <label className={labelClass}>assignees *</label>
+        <label className={labelClass}>Assignees *</label>
         <div className="flex flex-wrap gap-2 rounded-lg border border-[#D4D7E5] p-3">
           {projectMembers.map(member => (
             <button
@@ -185,7 +185,7 @@ export function TaskForm({
             </button>
           ))}
           {projectMembers.length === 0 && (
-            <p className="text-sm text-black/50">no project members found</p>
+            <p className="text-sm text-black/50">No project members found</p>
           )}
         </div>
         {errors.assignees && <p className={errorClass}>{errors.assignees}</p>}
@@ -198,14 +198,14 @@ export function TaskForm({
           className="rounded-lg border border-[#D4D7E5] px-4 py-2 text-sm font-medium text-black/70 hover:bg-gray-50"
           disabled={isSubmitting}
         >
-          cancel
+          Cancel
         </button>
         <button
           type="submit"
           className="rounded-lg bg-[#3F86FF] px-4 py-2 text-sm font-medium text-white hover:bg-[#346edd] disabled:opacity-50"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'creating...' : 'create task'}
+          {isSubmitting ? 'Creating...' : 'Create Task'}
         </button>
       </div>
     </form>
