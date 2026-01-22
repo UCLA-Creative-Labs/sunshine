@@ -65,6 +65,8 @@ export interface Task {
   synced_from_github: boolean;
   last_github_sync_at: string | null;
   sort_order: number;
+  label: string;
+  label_color: string;
 }
 
 export interface TaskAssignment {
