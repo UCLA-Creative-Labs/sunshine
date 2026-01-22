@@ -122,15 +122,16 @@ export interface ProjectWithMembers extends Project {
   members: (ProjectMember & { user: Profiles })[];
 }
 
+export interface TaskAssignmentWithProfile extends TaskAssignment {
+  assignee: Profiles;
+  assigned_by_profile: Profiles | null;
+}
+
 export interface TaskWithAssignments extends Task {
-  assignments: (TaskAssignment & { user: Profiles })[];
+  assignments: TaskAssignmentWithProfile[];
   subtasks?: Task[];
 }
 
 export interface ProjectMemberWithProfile extends ProjectMember {
-  user: Profiles;
-}
-
-export interface TaskAssignmentWithProfile extends TaskAssignment {
   user: Profiles;
 }
