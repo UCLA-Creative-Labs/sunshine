@@ -18,7 +18,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { profileService } from '@/lib/profileService';
+import { profileService } from '@/lib/supabase/profileService';
 
 import { Profile, Project } from './types';
 import { ACHIEVEMENT_THRESHOLDS, ACHIEVEMENT_CONFIG } from './constants';
