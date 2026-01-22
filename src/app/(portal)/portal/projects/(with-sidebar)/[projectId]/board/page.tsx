@@ -1,12 +1,27 @@
 "use client";
 
 import ProjectBoardContent from "@/components/ProjectBoardContent";
+import { useAuth } from "@/lib/hooks/useAuth";
 
-// TODO: get currentUserId from Supabase Auth session
 // TODO: add route guard to verify user is a project member
 export default function Page({ params }: { params: { projectId: string } }) {
-  // TODO: replace with actual userId from auth session
-  const currentUserId = "your-user-id-here";
+  const { userId, isLoading, error } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-sm text-black/50">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error || !userId) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-sm text-red-500">Please sign in to view this page</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -17,7 +32,7 @@ export default function Page({ params }: { params: { projectId: string } }) {
       </section>
       <ProjectBoardContent 
         projectId={params.projectId}
-        currentUserId={currentUserId}
+        currentUserId={userId}
       />
     </>
   );
