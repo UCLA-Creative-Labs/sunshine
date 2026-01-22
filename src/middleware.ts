@@ -1,5 +1,4 @@
 // Middleware for route protection
-// This runs before requests are completed
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
