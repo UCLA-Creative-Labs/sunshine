@@ -27,3 +27,30 @@ export async function getAllProjects(): Promise<Project[]> {
 
     return (data || []) as Project[];
 }
+
+/**
+ * Fetches the project associated with a user via the project_members join table.
+ * @param userId - The user ID to look up
+ * @returns The user's project or null if not found
+ */
+export async function getProjectByUserId(userId: string): Promise<Project | null> {
+    const { data, error } = await supabase
+        .from('project_members')
+        .select('project_id, projects(*)')
+        .eq('user_id', userId)
+        .single();
+
+    if (error || !data) {
+        console.error('Error fetching project for user:', error);
+        return null;
+    }
+
+    // The joined projects data is nested under the 'projects' key
+    const projectData = data.projects;
+
+    if (!projectData || Array.isArray(projectData)) {
+        return null;
+    }
+
+    return projectData as unknown as Project;
+}
