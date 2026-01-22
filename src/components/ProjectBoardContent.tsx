@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import { useTasks } from '@/lib/hooks/useTasks';
+import { useCreateTask } from '@/lib/hooks/useCreateTask';
+import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
+import { AddTaskModal } from './tasks/AddTaskModal';
+import { CreateTaskInput } from '@/lib/types/tasks';
+import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 
 const BUTTON_STYLES = {
   addTask: "mt-1 flex w-full items-center justify-center rounded-xl border border-dashed border-black/15 bg-white/60 px-3 py-2 text-[11px] md:text-xs font-medium text-black/70 transition-all duration-150 ease-out hover:bg-white hover:border-black/30 hover:-translate-y-0.5",
@@ -23,9 +29,10 @@ interface BoardColumnProps {
   accentColor: string;
   children: React.ReactNode;
   delay?: number;
+  onAddTask?: () => void;
 }
 
-function BoardColumn({ title, accentColor, children, delay = 0 }: BoardColumnProps) {
+function BoardColumn({ title, accentColor, children, delay = 0, onAddTask }: BoardColumnProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
 
@@ -43,9 +50,11 @@ function BoardColumn({ title, accentColor, children, delay = 0 }: BoardColumnPro
       <div className="rounded-3xl bg-[#E5E7EB]/80 px-3 py-4 shadow-md">
         <div className="space-y-3">
           {children}
-          <button type="button" className={BUTTON_STYLES.addTask}>
-            + Add Task
-          </button>
+          {onAddTask && (
+            <button type="button" onClick={onAddTask} className={BUTTON_STYLES.addTask}>
+              + add task
+            </button>
+          )}
         </div>
       </div>
     </section>
@@ -56,7 +65,7 @@ interface BoardCardProps {
   title: string;
   tag?: string;
   tagColor?: string;
-  assignee?: string;
+  assignees?: string[];
   dueDate?: string;
   delay?: number;
 }
@@ -80,7 +89,7 @@ function AvatarStack({ initials }: { initials: string[] }) {
   );
 }
 
-function BoardCard({ title, tag, tagColor = "#E5E7EB", assignee, dueDate, delay = 0 }: BoardCardProps) {
+function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0 }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
 
@@ -100,144 +109,215 @@ function BoardCard({ title, tag, tagColor = "#E5E7EB", assignee, dueDate, delay 
           </span>
         )}
         {dueDate && (
-          <span className="text-[10px] text-black/50">Due {dueDate}</span>
+          <span className="text-[10px] text-black/50">due {dueDate}</span>
         )}
       </div>
-      {assignee && (
-        <div className="mt-3 flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#E5E7EB] text-[10px] font-semibold text-black/70">
-            {getInitials(assignee)}
-          </div>
-          <span className="text-[11px] text-black/70 truncate">{assignee}</span>
+      {assignees.length > 0 && (
+        <div className="mt-3 flex -space-x-2">
+          {assignees.slice(0, 3).map((initials, idx) => (
+            <div
+              key={idx}
+              className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70"
+            >
+              {initials}
+            </div>
+          ))}
+          {assignees.length > 3 && (
+            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70">
+              +{assignees.length - 3}
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-// TODO: Fetch sprint and tasks data from database
-export default function ProjectBoardContent() {
+interface ProjectBoardContentProps {
+  projectId: string;
+  currentUserId: string;
+}
+
+// TODO: need route protection
+export default function ProjectBoardContent({ projectId, currentUserId }: ProjectBoardContentProps) {
+  // fetch tasks and project members
+  const { tasks: dbTasks, isLoading, error, refetch } = useTasks(projectId);
+  const { members } = useProjectMembers(projectId);
+  const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
+
+  // modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // prepare assignee options for the modal
+  const assigneeOptions = members.map((m) => ({
+    id: m.user.id,
+    display_name: m.user.display_name,
+  }));
+
+  // handle task creation
+  const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
+    const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
+    if (result) {
+      setIsModalOpen(false);
+      refetch();
+    }
+  };
+
+  // group tasks by status
+  const tasksByStatus = useMemo(() => {
+    const groups: Record<TaskStatus, TaskWithAssignments[]> = {
+      todo: [],
+      in_progress: [],
+      in_review: [],
+      done: [],
+    };
+
+    dbTasks.forEach(task => {
+      groups[task.status].push(task);
+    });
+
+    return groups;
+  }, [dbTasks]);
+
+  // helper to format date
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return undefined;
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  // helper to get assignee initials
+  const getAssigneeInitials = (task: TaskWithAssignments) => {
+    return task.assignments.map(a => 
+      a.assignee.display_name
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    );
+  };
   const today = useMemo(() => new Date().toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   }), []);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-sm text-black/50">loading tasks...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-sm text-red-500">error loading tasks: {error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Header row */}
       <header className="flex items-center justify-between gap-4 max-w-5xl">
         <div className="space-y-1">
           <p className="text-xs font-medium tracking-[0.18em] text-black/40 uppercase">
-            Board View
+            board view
           </p>
-          {/* TODO: Replace with sprint.name from database */}
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
-            Sprint Alpha
+            tasks
           </h1>
           <p className="text-[11px] md:text-xs text-black/50">{today}</p>
         </div>
-        {/* TODO: Replace with sprint.members from database */}
         <div className="flex items-center gap-4">
-          <AvatarStack initials={["SV", "SL", "TN"]} />
-          <button className={BUTTON_STYLES.primary}>
+          <AvatarStack initials={members.slice(0, 3).map(m => getInitials(m.user.display_name))} />
+          <button onClick={() => setIsModalOpen(true)} className={BUTTON_STYLES.primary}>
             <span className="text-base leading-none">+</span>
-            <span>Add Task</span>
+            <span>add task</span>
           </button>
         </div>
       </header>
 
-      {/* Columns */}
       <div className="relative w-full">
         <div className="w-full max-w-full overflow-x-auto overflow-y-visible pb-4">
-          {/* TODO: Replace BoardCards with tasks from database grouped by status */}
           <div className="flex gap-4 md:gap-6 lg:gap-8 min-w-[1400px]">
-          <BoardColumn title="Todo" accentColor="#E1225C" delay={40}>
-            <BoardCard
-              title="Set up `project `repo"
-              tag="Setup"
-              tagColor="#FFE6D5"
-              assignee="Sunny Vinay"
-              dueDate="Nov 20"
-              delay={60}
-            />
-            <BoardCard
-              title="Draft user stories"
-              tag="Product"
-              tagColor="#FFE3E3"
-              assignee="Shawn Lin"
-              dueDate="Nov 21"
-              delay={80}
-            />
-            <BoardCard
-              title="Design login screen"
-              tag="Design"
-              tagColor="#EAF4FF"
-              assignee="Stephanie Pham"
-              dueDate="Nov 22"
-              delay={100}
-            />
-          </BoardColumn>
+            <BoardColumn title="todo" accentColor="#E1225C" delay={40} onAddTask={() => setIsModalOpen(true)}>
+              {tasksByStatus.todo.map((task, idx) => (
+                <BoardCard
+                  key={task.id}
+                  title={task.name}
+                  tag={task.label}
+                  tagColor={task.label_color}
+                  assignees={getAssigneeInitials(task)}
+                  dueDate={formatDate(task.due_date)}
+                  delay={60 + idx * 20}
+                />
+              ))}
+            </BoardColumn>
 
-          <BoardColumn title="In Progress" accentColor="#00C853" delay={80}>
-            <BoardCard
-              title="Implement membership navbar"
-              tag="Frontend"
-              tagColor="#E2F7E6"
-              assignee="MJ Bagaoisan"
-              dueDate="Nov 19"
-              delay={100}
-            />
-            <BoardCard
-              title="Hook up project API"
-              tag="Backend"
-              tagColor="#FFF1C2"
-              assignee="Travis Nguyen"
-              dueDate="Nov 23"
-              delay={120}
-            />
-          </BoardColumn>
+            <BoardColumn title="in progress" accentColor="#00C853" delay={80} onAddTask={() => setIsModalOpen(true)}>
+              {tasksByStatus.in_progress.map((task, idx) => (
+                <BoardCard
+                  key={task.id}
+                  title={task.name}
+                  tag={task.label}
+                  tagColor={task.label_color}
+                  assignees={getAssigneeInitials(task)}
+                  dueDate={formatDate(task.due_date)}
+                  delay={100 + idx * 20}
+                />
+              ))}
+            </BoardColumn>
 
-          <BoardColumn title="In Review" accentColor="#FF9100" delay={120}>
-            <BoardCard
-              title="Animate dashboard cards"
-              tag="UX"
-              tagColor="#FFF1C2"
-              assignee="Sunny Vinnay"
-              dueDate="Nov 18"
-              delay={140}
-            />
-            <BoardCard
-              title="Refactor auth flow"
-              tag="Code Review"
-              tagColor="#E5E7EB"
-              assignee="Shawn Lin"
-              dueDate="Nov 24"
-              delay={160}
-            />
-          </BoardColumn>
+            <BoardColumn title="in review" accentColor="#FF9100" delay={120} onAddTask={() => setIsModalOpen(true)}>
+              {tasksByStatus.in_review.map((task, idx) => (
+                <BoardCard
+                  key={task.id}
+                  title={task.name}
+                  tag={task.label}
+                  tagColor={task.label_color}
+                  assignees={getAssigneeInitials(task)}
+                  dueDate={formatDate(task.due_date)}
+                  delay={140 + idx * 20}
+                />
+              ))}
+            </BoardColumn>
 
-          <BoardColumn title="Done" accentColor="#6200EA" delay={160}>
-            <BoardCard
-              title="Set up CI pipeline"
-              tag="DevOps"
-              tagColor="#EAF4FF"
-              assignee="LeBron James"
-              dueDate="Nov 15"
-              delay={180}
-            />
-            <BoardCard
-              title="Ship v0.1"
-              tag="Release"
-              tagColor="#E2F7E6"
-              assignee="Stephanie Pham"
-              dueDate="Nov 16"
-              delay={200}
-            />
-          </BoardColumn>
+            <BoardColumn title="done" accentColor="#6200EA" delay={160} onAddTask={() => setIsModalOpen(true)}>
+              {tasksByStatus.done.map((task, idx) => (
+                <BoardCard
+                  key={task.id}
+                  title={task.name}
+                  tag={task.label}
+                  tagColor={task.label_color}
+                  assignees={getAssigneeInitials(task)}
+                  dueDate={formatDate(task.due_date)}
+                  delay={180 + idx * 20}
+                />
+              ))}
+            </BoardColumn>
           </div>
         </div>
       </div>
+
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateTask}
+        projectId={projectId}
+        projectMembers={assigneeOptions}
+        isSubmitting={isCreating}
+      />
+
+      {createError && (
+        <div className="fixed bottom-4 right-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 shadow-lg">
+          failed to create task: {createError}
+        </div>
+      )}
     </div>
   );
 }

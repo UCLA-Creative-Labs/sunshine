@@ -1,8 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTasks } from '@/lib/hooks/useTasks';
+import { useCreateTask } from '@/lib/hooks/useCreateTask';
+import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
+import { AddTaskModal } from './tasks/AddTaskModal';
+import { CreateTaskInput } from '@/lib/types/tasks';
+import { TaskStatus } from '@/lib/types/database';
 
-type StatusId = "todo" | "in-progress" | "in-review" | "done";
+type StatusId = "todo" | "in_progress" | "in_review" | "done";
 type Priority = "low" | "medium" | "high";
 
 function useMountAnimation(delay: number) {
@@ -36,14 +42,14 @@ const STATUS_META: Record<StatusId, { label: string; bandBg: string; textColor: 
     dotColor: "bg-[#E1225C]",
     borderColor: "#FFCDD2",
   },
-  "in-progress": {
+  "in_progress": {
     label: "In Progress",
     bandBg: "#E6F8ED",
     textColor: "#00C853",
     dotColor: "bg-[#00C853]",
     borderColor: "#C8E6C9",
   },
-  "in-review": {
+  "in_review": {
     label: "In Review",
     bandBg: "#FFF3DC",
     textColor: "#FF9100",
@@ -59,64 +65,20 @@ const STATUS_META: Record<StatusId, { label: string; bandBg: string; textColor: 
   },
 };
 
-// TODO: Replace with tasks fetched from database
-const SAMPLE_TASKS: ListTask[] = [
-  {
-    id: "1",
-    name: "Set up project repo",
-    status: "todo",
-    statusLabel: "Label",
-    dueDate: "2025/06/07",
-    assignees: ["SV", "SL"],
-    priority: "medium",
-    label: "Setup",
-    labelColor: "#FFE6D5",
-  },
-  {
-    id: "2",
-    name: "Draft onboarding emails",
-    status: "todo",
-    statusLabel: "Label",
-    dueDate: "2025/06/09",
-    assignees: ["SP"],
-    priority: "low",
-    label: "Product",
-    labelColor: "#FFE3E3",
-  },
-  {
-    id: "3",
-    name: "Animate dashboard cards",
-    status: "in-progress",
-    statusLabel: "Label",
-    dueDate: "2025/06/10",
-    assignees: ["MJ"],
-    priority: "high",
-    label: "UX",
-    labelColor: "#FFF1C2",
-  },
-  {
-    id: "4",
-    name: "Hook up project API",
-    status: "in-review",
-    statusLabel: "Label",
-    dueDate: "2025/06/12",
-    assignees: ["TN"],
-    priority: "medium",
-    label: "Backend",
-    labelColor: "#FFF1C2",
-  },
-  {
-    id: "5",
-    name: "Ship v0.1",
-    status: "done",
-    statusLabel: "Label",
-    dueDate: "2025/06/01",
-    assignees: ["LJ"],
-    priority: "low",
-    label: "Release",
-    labelColor: "#E2F7E6",
-  },
-];
+// helper to map database task status to ui status id
+function mapTaskStatusToStatusId(status: TaskStatus): StatusId {
+  return status as StatusId;
+}
+
+// helper to get assignee initials from display name
+function getInitials(displayName: string): string {
+  return displayName
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 function AssigneeGroup({ assignees }: { assignees: string[] }) {
   return (
@@ -284,23 +246,72 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0 }: StatusSec
   );
 }
 
-// TODO: Fetch tasks from database and group by status
-export default function ProjectListContent() {
+interface ProjectListContentProps {
+  projectId: string;
+  currentUserId: string;
+}
+
+// TODO: ensure route protection - only project members should access this page
+// RLS provides database-level security, but route guards improve UX
+export default function ProjectListContent({ projectId, currentUserId }: ProjectListContentProps) {
+  // fetch tasks and project members
+  const { tasks: dbTasks, isLoading, error, refetch } = useTasks(projectId);
+  const { members } = useProjectMembers(projectId);
+  const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
+
+  // modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // prepare assignee options for the modal
+  const assigneeOptions = members.map((m) => ({
+    id: m.user.id,
+    display_name: m.user.display_name,
+  }));
+
+  // handle task creation
+  const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
+    const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
+    if (result) {
+      setIsModalOpen(false);
+      refetch();
+    }
+  };
+
+  // transform db tasks to list tasks
+  const listTasks: ListTask[] = dbTasks.map(task => ({
+    id: task.id.toString(),
+    name: task.name,
+    status: mapTaskStatusToStatusId(task.status),
+    statusLabel: task.label,
+    dueDate: task.due_date 
+      ? new Date(task.due_date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).replace(/\//g, '/')
+      : 'no due date',
+    assignees: task.assignments.map(a => getInitials(a.assignee.display_name)),
+    priority: task.priority as Priority,
+    label: task.label,
+    labelColor: task.label_color,
+  }));
+
+  // group tasks by status
   const groups: Record<StatusId, ListTask[]> = {
     "todo": [],
-    "in-progress": [],
-    "in-review": [],
+    "in_progress": [],
+    "in_review": [],
     "done": [],
   };
 
-  for (const task of SAMPLE_TASKS) {
+  for (const task of listTasks) {
     groups[task.status].push(task);
   }
 
   const [openSections, setOpenSections] = useState<Record<StatusId, boolean>>({
     "todo": true,
-    "in-progress": true,
-    "in-review": true,
+    "in_progress": true,
+    "in_review": true,
     "done": true,
   });
 
@@ -322,42 +333,70 @@ export default function ProjectListContent() {
             Tasks
           </h1>
         </div>
-        <button className="inline-flex items-center gap-2 rounded-full bg-[#3F86FF] px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md transition-all duration-200 ease-out hover:bg-[#346edd] hover:-translate-y-0.5 hover:shadow-lg">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center gap-2 rounded-full bg-[#3F86FF] px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md transition-all duration-200 ease-out hover:bg-[#346edd] hover:-translate-y-0.5 hover:shadow-lg"
+        >
           <span className="text-base leading-none">+</span>
           <span>Add Task</span>
         </button>
       </header>
 
-      <div className="space-y-6">
-        <StatusSection
-          status="todo"
-          tasks={groups["todo"]}
-          isOpen={openSections["todo"]}
-          onToggle={() => toggleSection("todo")}
-          delay={100}
-        />
-        <StatusSection
-          status="in-progress"
-          tasks={groups["in-progress"]}
-          isOpen={openSections["in-progress"]}
-          onToggle={() => toggleSection("in-progress")}
-          delay={200}
-        />
-        <StatusSection
-          status="in-review"
-          tasks={groups["in-review"]}
-          isOpen={openSections["in-review"]}
-          onToggle={() => toggleSection("in-review")}
-          delay={300}
-        />
-        <StatusSection
-          status="done"
-          tasks={groups["done"]}
-          isOpen={openSections["done"]}
-          onToggle={() => toggleSection("done")}
-          delay={400}
-        />
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-sm text-black/50">loading tasks...</p>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-sm text-red-500">error loading tasks: {error}</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <StatusSection
+            status="todo"
+            tasks={groups["todo"]}
+            isOpen={openSections["todo"]}
+            onToggle={() => toggleSection("todo")}
+            delay={100}
+          />
+          <StatusSection
+            status="in_progress"
+            tasks={groups["in_progress"]}
+            isOpen={openSections["in_progress"]}
+            onToggle={() => toggleSection("in_progress")}
+            delay={200}
+          />
+          <StatusSection
+            status="in_review"
+            tasks={groups["in_review"]}
+            isOpen={openSections["in_review"]}
+            onToggle={() => toggleSection("in_review")}
+            delay={300}
+          />
+          <StatusSection
+            status="done"
+            tasks={groups["done"]}
+            isOpen={openSections["done"]}
+            onToggle={() => toggleSection("done")}
+            delay={400}
+          />
+        </div>
+      )}
+
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateTask}
+        projectId={projectId}
+        projectMembers={assigneeOptions}
+        isSubmitting={isCreating}
+      />
+
+      {createError && (
+        <div className="fixed bottom-4 right-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 shadow-lg">
+          failed to create task: {createError}
+        </div>
+      )}
     </div>
   );
 }

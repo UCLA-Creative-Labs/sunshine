@@ -1,9 +1,10 @@
 "use client";
 
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
+import { useTasks } from '@/lib/hooks/useTasks';
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
@@ -93,8 +94,44 @@ function ActivityItem({ name, time, action, comment }: ActivityItemProps) {
   );
 }
 
-// TODO: Fetch project data from database (description, leads, tasks, activity)
-export default function MyProjectContent() {
+interface MyProjectContentProps {
+  projectId: string;
+  currentUserId: string;
+}
+
+// TODO: fetch project data from database (description, leads, activity)
+export default function MyProjectContent({ projectId, currentUserId }: MyProjectContentProps) {
+  // fetch all tasks for the project
+  const { tasks: allTasks, isLoading } = useTasks(projectId);
+
+  // filter tasks assigned to current user
+  const myTasks = useMemo(() => {
+    return allTasks.filter(task => 
+      task.assignments.some(assignment => assignment.assignee.id === currentUserId)
+    );
+  }, [allTasks, currentUserId]);
+
+  // helper to get priority badge styles
+  const getPriorityStyles = (priority: string) => {
+    const styles = {
+      low: { bg: '#E5F3FF', text: '#3F86FF' },
+      medium: { bg: '#FFF3DC', text: '#FF9100' },
+      high: { bg: '#FFE3E3', text: '#E1225C' },
+      urgent: { bg: '#FFE3E3', text: '#E1225C' },
+    };
+    return styles[priority as keyof typeof styles] || styles.medium;
+  };
+
+  // helper to get status badge styles
+  const getStatusStyles = (status: string) => {
+    const styles = {
+      todo: { bg: '#FFE7EA', text: '#E1225C', label: 'todo' },
+      in_progress: { bg: '#E2F7E6', text: '#1F7A3D', label: 'in progress' },
+      in_review: { bg: '#FFF3DC', text: '#FF9100', label: 'in review' },
+      done: { bg: '#ECE3FF', text: '#6200EA', label: 'done' },
+    };
+    return styles[status as keyof typeof styles] || styles.todo;
+  };
   return (
     <div className="grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
       {/* Left column */}
@@ -127,55 +164,79 @@ export default function MyProjectContent() {
           </div>
         </Section>
 
-        {/* TODO: Replace with user's assigned tasks from database */}
-        <Section title="My Tasks" delay={160}>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-xs md:text-sm text-black/80">
-              <thead>
-                <tr className="border-b border-[#E2E4F0]">
-                  <th className="pb-3 pr-6 font-semibold">Name</th>
-                  <th className="pb-3 pr-6 font-semibold">Priority</th>
-                  <th className="pb-3 pr-6 font-semibold">Topic</th>
-                  <th className="pb-3 pr-6 font-semibold">Status</th>
-                  <th className="pb-3 font-semibold">Assignee</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-4 pr-6 align-middle">
-                    <span className="text-black/60 mr-1">#67</span>
-                    Follow CL on IG!
-                  </td>
-                  <td className="py-4 pr-6 align-middle">
-                    <span className="rounded-full bg-[#FFE3E3] px-3 py-1 text-xs font-medium text-[#E1225C]">
-                      High
-                    </span>
-                  </td>
-                  <td className="py-4 pr-6 align-middle">
-                    <span className="rounded-full bg-[#FFE6D5] px-3 py-1 text-xs font-medium text-[#D26A00]">
-                      Bug
-                    </span>
-                  </td>
-                  <td className="py-4 pr-6 align-middle">
-                    <span className="rounded-full bg-[#E2F7E6] px-3 py-1 text-xs font-medium text-[#1F7A3D]">
-                      In-Progress
-                    </span>
-                  </td>
-                  <td className="py-4 align-middle">
-                    <span className={AVATAR_STYLES.small}>
-                      <Image
-                        src="/images/default-avatar.svg"
-                        alt="Task assignee avatar"
-                        width={32}
-                        height={32}
-                        className="h-full w-full object-cover"
-                      />
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <Section title="my tasks" delay={160}>
+          {isLoading ? (
+            <p className="text-sm text-black/50">loading tasks...</p>
+          ) : myTasks.length === 0 ? (
+            <p className="text-sm text-black/50">no tasks assigned to you yet</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-xs md:text-sm text-black/80">
+                <thead>
+                  <tr className="border-b border-[#E2E4F0]">
+                    <th className="pb-3 pr-6 font-semibold">name</th>
+                    <th className="pb-3 pr-6 font-semibold">priority</th>
+                    <th className="pb-3 pr-6 font-semibold">label</th>
+                    <th className="pb-3 pr-6 font-semibold">status</th>
+                    <th className="pb-3 font-semibold">assignees</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myTasks.map((task) => {
+                    const priorityStyle = getPriorityStyles(task.priority);
+                    const statusStyle = getStatusStyles(task.status);
+                    return (
+                      <tr key={task.id}>
+                        <td className="py-4 pr-6 align-middle">
+                          <span className="text-black/60 mr-1">#{task.id}</span>
+                          {task.name}
+                        </td>
+                        <td className="py-4 pr-6 align-middle">
+                          <span 
+                            className="rounded-full px-3 py-1 text-xs font-medium"
+                            style={{ backgroundColor: priorityStyle.bg, color: priorityStyle.text }}
+                          >
+                            {task.priority}
+                          </span>
+                        </td>
+                        <td className="py-4 pr-6 align-middle">
+                          <span 
+                            className="rounded-full px-3 py-1 text-xs font-medium text-black/70"
+                            style={{ backgroundColor: task.label_color }}
+                          >
+                            {task.label}
+                          </span>
+                        </td>
+                        <td className="py-4 pr-6 align-middle">
+                          <span 
+                            className="rounded-full px-3 py-1 text-xs font-medium"
+                            style={{ backgroundColor: statusStyle.bg, color: statusStyle.text }}
+                          >
+                            {statusStyle.label}
+                          </span>
+                        </td>
+                        <td className="py-4 align-middle">
+                          <div className="flex -space-x-2">
+                            {task.assignments.slice(0, 3).map((assignment, idx) => (
+                              <span key={idx} className={AVATAR_STYLES.small}>
+                                <Image
+                                  src="/images/default-avatar.svg"
+                                  alt={`${assignment.assignee.display_name} avatar`}
+                                  width={32}
+                                  height={32}
+                                  className="h-full w-full object-cover"
+                                />
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Section>
       </div>
 
