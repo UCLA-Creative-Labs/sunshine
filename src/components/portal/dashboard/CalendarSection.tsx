@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getUpcomingEvents } from "@/lib/eventsService";
+import { getUpcomingEvents } from "@/lib/supabase/eventsService";
 import { ProjectEvent } from "@/types/events";
 import ProjectEventCard from "@/components/portal/ProjectEventCard";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllAnnouncements } from "@/lib/eventsService";
+import { getAllAnnouncements } from "@/lib/supabase/eventsService";
 import { ProjectAnnouncement } from "@/types/events";
 import ProjectAnnouncementCard from "@/components/portal/ProjectAnnouncementCard";
 

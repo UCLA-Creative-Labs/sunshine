@@ -1,4 +1,4 @@
-import { supabase } from './supabase/client';
+import { supabase } from './client';
 import { ProjectEvent, ProjectAnnouncement } from '@/types/events';
 
 /**
