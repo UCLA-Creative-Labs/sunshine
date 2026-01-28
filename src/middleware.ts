@@ -6,11 +6,6 @@ export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const response = NextResponse.next();
 
-    // Redirect /portal to /login
-    if (pathname === '/portal') {
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
-
     // Protect all /portal routes
     if (pathname.startsWith('/portal')) {
         try {
