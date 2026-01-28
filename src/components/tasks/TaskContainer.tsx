@@ -12,8 +12,7 @@ interface TaskContainerProps {
 }
 
 /**
- * Container component that handles task actions (edit/delete)
- * and provides the actions menu to child components
+ * component that handles task actions (edit/delete)
  */
 export function TaskContainer({ taskId, canEdit, onRefresh, children }: TaskContainerProps) {
   const { deleteTaskAction } = useTaskActions();
@@ -28,7 +27,7 @@ export function TaskContainer({ taskId, canEdit, onRefresh, children }: TaskCont
   };
 
   const handleEdit = () => {
-    // TODO: Implement edit modal
+    // TODO: Implement edit function
     alert('Edit functionality coming soon!');
   };
 

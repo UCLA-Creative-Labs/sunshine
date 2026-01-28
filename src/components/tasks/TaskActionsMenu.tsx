@@ -36,7 +36,7 @@ export function TaskActionsMenu({ onEdit, onDelete, canEdit }: TaskActionsMenuPr
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
         top: rect.bottom + 4,
-        left: rect.right - 128, // 128px = w-32
+        left: rect.right - 128,
       });
     }
     
