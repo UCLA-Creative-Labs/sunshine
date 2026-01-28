@@ -27,6 +27,21 @@ export interface AssignTaskInput {
 }
 
 /**
+ * input type for updating an existing task
+ */
+export interface UpdateTaskInput {
+  name?: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  due_date?: string;
+  label?: string;
+  label_color?: string;
+  parent_task_id?: number;
+  points_estimate?: number;
+}
+
+/**
  * ui-only validated input 
  */
 export interface CreateTaskFormState {

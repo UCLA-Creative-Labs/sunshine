@@ -3,7 +3,8 @@ import { Task, TaskAssignment, TaskWithAssignments } from '../types/database';
 import {
   CreateTaskInput,
   AssignTaskInput,
-  TaskOperationResult
+  TaskOperationResult,
+  UpdateTaskInput
 } from '../types/tasks';
 
 // Handles all task-related database operations.
@@ -113,4 +114,57 @@ export async function getTasksWithAssignments(
   }
 
   return { data: data as TaskWithAssignments[], error: null, success: true };
+}
+
+/**
+ * updates an existing task
+ */
+export async function updateTask(
+  taskId: string,
+  input: UpdateTaskInput
+): Promise<TaskOperationResult<Task>> {
+  const { data, error } = await supabase
+    .from('tasks')
+    .update(input)
+    .eq('id', taskId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating task:', error);
+    return { data: null, error: error.message, success: false };
+  }
+
+  return { data: data as Task, error: null, success: true };
+}
+
+/**
+ * deletes a task and its assignments
+ */
+export async function deleteTask(
+  taskId: string
+): Promise<TaskOperationResult<null>> {
+  // Delete task assignments first (due to foreign key constraint)
+  const { error: assignmentsError } = await supabase
+    .from('task_assignments')
+    .delete()
+    .eq('task_id', taskId);
+
+  if (assignmentsError) {
+    console.error('Error deleting task assignments:', assignmentsError);
+    return { data: null, error: assignmentsError.message, success: false };
+  }
+
+  // Delete the task
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('id', taskId);
+
+  if (error) {
+    console.error('Error deleting task:', error);
+    return { data: null, error: error.message, success: false };
+  }
+
+  return { data: null, error: null, success: true };
 }
