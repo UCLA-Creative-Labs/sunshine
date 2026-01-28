@@ -8,7 +8,7 @@ import "../../../styles/QuarterProjectCard.scss";
 import { useParams } from "next/navigation";
 import QuarterProjectCardList from '../QuarterProjectCardList';
 
-import { getProjectsByYear } from '@/lib/projectService';
+import { getProjectsByYear } from '@/lib/supabase/projectService';
 import { Project } from '@/types/project';
 
 export default function About() {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   RxHome,
@@ -9,6 +9,10 @@ import {
   RxPerson,
   RxFileText,
 } from "react-icons/rx";
+import { getProjectByUserId } from "@/lib/supabase/projectService";
+
+// Hardcoded user ID - to be replaced with auth later
+const HARDCODED_USER_ID = "57fb265d-0e1d-4b1e-adef-f9380ebd670d";
 
 export type MembershipPortalSidebarItem = {
   id: string;
@@ -45,6 +49,21 @@ export default function MembershipPortalSidebar({
 }: MembershipPortalSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [fetchedProjectName, setFetchedProjectName] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchProjectName() {
+      try {
+        const project = await getProjectByUserId(HARDCODED_USER_ID);
+        if (project && project.projectName) {
+          setFetchedProjectName(project.projectName);
+        }
+      } catch (error) {
+        console.error("Failed to fetch project name for sidebar:", error);
+      }
+    }
+    fetchProjectName();
+  }, []);
 
   const handleSelect = useCallback(
     (item: MembershipPortalSidebarItem) => {
@@ -56,7 +75,7 @@ export default function MembershipPortalSidebar({
     [pathname, router]
   );
 
-  return ( 
+  return (
     <aside
       className={`flex min-h-screen flex-col border-r-[2px] border-[#CDCCC8] bg-white px-6 py-6 w-60 ${className}`}
     >
@@ -67,7 +86,7 @@ export default function MembershipPortalSidebar({
             className="font-bold"
             style={{ color: "#6468B0", fontSize: "24px", lineHeight: 1.1 }}
           >
-            {projectName}
+            {fetchedProjectName || projectName}
           </span>
         </div>
       </div>
