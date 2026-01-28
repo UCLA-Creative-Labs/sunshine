@@ -10,7 +10,6 @@ interface UseProjectMembersReturn {
 
 /**
  * hook for fetching project members
- * used to populate assignee selection in task creation
  */
 export function useProjectMembers(projectId: string | null): UseProjectMembersReturn {
   const [members, setMembers] = useState<ProjectMemberWithProfile[]>([]);

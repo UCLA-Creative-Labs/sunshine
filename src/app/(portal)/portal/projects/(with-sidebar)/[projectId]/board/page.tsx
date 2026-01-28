@@ -14,7 +14,7 @@ export default function Page({ params }: { params: { projectId: string } }) {
       </div>
     );
   }
-
+  // TODO: use an actual guard to protect unautenticated users from accessing page
   if (error || !userId) {
     return (
       <div className="flex items-center justify-center py-12">

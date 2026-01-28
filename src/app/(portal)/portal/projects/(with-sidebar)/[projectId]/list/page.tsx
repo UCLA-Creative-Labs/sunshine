@@ -1,7 +1,7 @@
 "use client";
 
 import ProjectListContent from "@/components/ProjectListContent";
-// import { useAuth } from "@/lib/hooks/useAuth";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { use } from 'react';
 
 // TODO: add route guard to verify user is a project member
@@ -16,7 +16,7 @@ export default function Page({ params }: { params: Promise<{ projectId: string }
       </div>
     );
   }
-
+   // TODO: use an actual guard to protect unautenticated users from accessing page
   if (error || !userId) {
     return (
       <div className="flex items-center justify-center py-12">

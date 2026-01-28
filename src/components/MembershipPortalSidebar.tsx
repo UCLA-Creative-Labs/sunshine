@@ -45,13 +45,12 @@ export default function MembershipPortalSidebar({
   const pathname = usePathname();
   const router = useRouter();
 
-  // extract projectId from current URL
   const projectId = useMemo(() => {
     const match = pathname?.match(/\/portal\/projects\/([^\/]+)/);
     return match ? match[1] : null;
   }, [pathname]);
 
-  // build navigation items with dynamic projectId
+  // avigation items with  projectId
   const navItems = useMemo(() => {
     if (items) return items;
     

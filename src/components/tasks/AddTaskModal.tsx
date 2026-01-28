@@ -14,12 +14,7 @@ interface AddTaskModalProps {
 }
 
 /**
- * modal dialog for creating a new task
- * 
- * design: 
- * - single responsibility: only handles modal display logic
- * - delegates form logic to TaskForm component
- * - receives callbacks from parent (dependency inversion)
+ * dialog for creating a new task
  */
 export function AddTaskModal({
   isOpen,
