@@ -4,7 +4,7 @@ import React, { memo, useEffect, useState } from "react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
-import { getProjectByUserId } from "@/lib/projectService";
+import { getProjectByUserId } from "@/lib/supabase/projectService";
 import { Project } from "@/types/project";
 
 const CARD_STYLES = {
@@ -96,7 +96,7 @@ function ActivityItem({ name, time, action, comment }: ActivityItemProps) {
 }
 
 // Hardcoded user ID - to be replaced with auth later
-const HARDCODED_USER_ID = "c46f1f9a-eb86-4233-b151-34fc009b4d06";
+const HARDCODED_USER_ID = "57fb265d-0e1d-4b1e-adef-f9380ebd670d";
 
 // TODO: Fetch project data from database (description, leads, tasks, activity)
 export default function MyProjectContent() {

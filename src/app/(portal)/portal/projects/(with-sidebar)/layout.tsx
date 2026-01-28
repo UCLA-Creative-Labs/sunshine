@@ -1,6 +1,6 @@
 "use client";
 
-import MembershipPortalSidebar from "@/components/MembershipPortalSidebar";
+import MembershipPortalSidebar from "@/components/portal/project/MembershipPortalSidebar";
 
 export default function ProjectsSidebarLayout({
   children,

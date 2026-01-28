@@ -9,10 +9,10 @@ import {
   RxPerson,
   RxFileText,
 } from "react-icons/rx";
-import { getProjectByUserId } from "@/lib/projectService";
+import { getProjectByUserId } from "@/lib/supabase/projectService";
 
 // Hardcoded user ID - to be replaced with auth later
-const HARDCODED_USER_ID = "c46f1f9a-eb86-4233-b151-34fc009b4d06";
+const HARDCODED_USER_ID = "57fb265d-0e1d-4b1e-adef-f9380ebd670d";
 
 export type MembershipPortalSidebarItem = {
   id: string;
