@@ -15,8 +15,9 @@ export async function getProjectMembers(
       *,
       user:profiles!project_members_user_id_fkey (
         id,
+        email,
         display_name,
-        email
+        created_at
       )
     `)
     .eq('project_id', projectId);
@@ -26,5 +27,13 @@ export async function getProjectMembers(
     return { data: null, error: error.message, success: false };
   }
 
-  return { data: data as ProjectMemberWithProfile[], error: null, success: true };
+  const members = data?.map(member => ({
+    ...member,
+    user: {
+      ...member.user,
+      display_name: member.user.display_name || member.user.email?.split('@')[0] || 'Unknown',
+    }
+  })) || [];
+
+  return { data: members as ProjectMemberWithProfile[], error: null, success: true };
 }
