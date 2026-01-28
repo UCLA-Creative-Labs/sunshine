@@ -1,10 +1,11 @@
 "use client";
 
+import { use } from 'react';
 import ProjectBoardContent from "@/components/ProjectBoardContent";
 import { useAuth } from "@/lib/hooks/useAuth";
 
-// TODO: add route guard to verify user is a project member
-export default function Page({ params }: { params: { projectId: string } }) {
+export default function Page({ params }: { params: Promise<{ projectId: string }> }) {
+  const { projectId } = use(params);
   const { userId, isLoading, error } = useAuth();
 
   if (isLoading) {
@@ -14,7 +15,7 @@ export default function Page({ params }: { params: { projectId: string } }) {
       </div>
     );
   }
-  // TODO: use an actual guard to protect unautenticated users from accessing page
+
   if (error || !userId) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -31,7 +32,7 @@ export default function Page({ params }: { params: { projectId: string } }) {
         </h1>
       </section>
       <ProjectBoardContent 
-        projectId={params.projectId}
+        projectId={projectId}
         currentUserId={userId}
       />
     </>

@@ -71,16 +71,17 @@ interface BoardCardProps {
   delay?: number;
 }
 
-function getInitials(name: string): string {
+function getInitials(name: string | undefined | null): string {
+  if (!name) return "?";
   return name.split(" ").map((part) => part[0]).join("");
 }
 
 function AvatarStack({ initials }: { initials: string[] }) {
   return (
     <div className="flex -space-x-2">
-      {initials.map((initial) => (
+      {initials.map((initial, idx) => (
         <div
-          key={initial}
+          key={idx}
           className="flex h-8 w-8 items-center justify-center rounded-full border border-white bg-[#FFEFAE] text-[11px] font-semibold text-black/70 shadow-sm"
         >
           {initial}
@@ -150,10 +151,12 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const assigneeOptions = members.map((m) => ({
-    id: m.user.id,
-    display_name: m.user.display_name,
-  }));
+  const assigneeOptions = members
+    .filter((m) => m.user.id !== currentUserId)
+    .map((m) => ({
+      id: m.user.id,
+      display_name: m.user.display_name,
+    }));
 
   // handle task creation
   const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
