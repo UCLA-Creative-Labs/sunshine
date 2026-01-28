@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../supabase/client';
 
 interface UseUserRoleReturn {
   role: 'member' | 'lead' | 'manager' | null;

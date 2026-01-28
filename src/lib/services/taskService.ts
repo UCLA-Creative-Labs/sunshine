@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { supabase } from '../supabase/client';
 import { Task, TaskAssignment, TaskWithAssignments } from '../types/database';
 import {
   CreateTaskInput,
