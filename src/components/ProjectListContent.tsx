@@ -5,12 +5,14 @@ import { useTasks } from '@/lib/hooks/useTasks';
 import { useCreateTask } from '@/lib/hooks/useCreateTask';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { useUserRole } from '@/lib/hooks/useUserRole';
+import { useTaskActions } from '@/lib/hooks/useTaskActions';
 import { AddTaskModal } from './tasks/AddTaskModal';
+import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { CreateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus } from '@/lib/types/database';
 
 type StatusId = "todo" | "in_progress" | "in_review" | "done";
-type Priority = "low" | "medium" | "high";
+type Priority = "low" | "medium" | "high" | "urgent";
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -72,7 +74,8 @@ function mapTaskStatusToStatusId(status: TaskStatus): StatusId {
 }
 
 // helper to get assignee initials from display name
-function getInitials(displayName: string): string {
+function getInitials(displayName: string | undefined | null): string {
+  if (!displayName) return "?";
   return displayName
     .split(' ')
     .map(word => word[0])
@@ -84,9 +87,9 @@ function getInitials(displayName: string): string {
 function AssigneeGroup({ assignees }: { assignees: string[] }) {
   return (
     <div className="flex -space-x-2">
-      {assignees.map((initials) => (
+      {assignees.map((initials, idx) => (
         <div
-          key={initials}
+          key={idx}
           className="flex h-7 w-7 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70 shadow-sm"
         >
           {initials}
@@ -100,10 +103,11 @@ const PRIORITY_STYLES: Record<Priority, { bg: string; dot: string; label: string
   low: { bg: "bg-[#E5F3FF]", dot: "bg-[#3F86FF]", label: "Low" },
   medium: { bg: "bg-[#FFF3DC]", dot: "bg-[#FF9100]", label: "Medium" },
   high: { bg: "bg-[#FFE7EA]", dot: "bg-[#E1225C]", label: "High" },
+  urgent: { bg: "bg-[#FFE7EA]", dot: "bg-[#E1225C]", label: "Urgent" },
 };
 
 function PriorityPill({ priority }: { priority: Priority }) {
-  const style = PRIORITY_STYLES[priority];
+  const style = PRIORITY_STYLES[priority] || PRIORITY_STYLES.medium;
 
   return (
     <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium text-black/70 ${style.bg}`}>
@@ -119,9 +123,12 @@ interface StatusSectionProps {
   isOpen: boolean;
   onToggle: () => void;
   delay?: number;
+  onEditTask: (taskId: string) => void;
+  onDeleteTask: (taskId: string) => void;
+  canEdit: boolean;
 }
 
-function StatusSection({ status, tasks, isOpen, onToggle, delay = 0 }: StatusSectionProps) {
+function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onDeleteTask, canEdit }: StatusSectionProps) {
   const meta = STATUS_META[status];
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
@@ -184,11 +191,12 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0 }: StatusSec
                 <div className="overflow-x-auto">
                   <table className="min-w-full table-fixed text-left text-xs md:text-sm text-black/80">
                   <colgroup>
-                    <col className="w-[34%]" />
-                    <col className="w-[18%]" />
-                    <col className="w-[18%]" />
-                    <col className="w-[15%]" />
-                    <col className="w-[15%]" />
+                    <col className="w-[32%]" />
+                    <col className="w-[16%]" />
+                    <col className="w-[16%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[8%]" />
                   </colgroup>
                   <thead className="border-b border-[#E2E4F0] bg-[#F9FAFB]">
                     <tr>
@@ -197,11 +205,12 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0 }: StatusSec
                       <th className="px-6 py-3 font-semibold">Due Date</th>
                       <th className="px-6 py-3 font-semibold">People</th>
                       <th className="px-6 py-3 font-semibold">Priority</th>
+                      <th className="px-6 py-3 font-semibold"></th>
                     </tr>
                   </thead>
                 <tbody>
                   {tasks.map((task) => (
-                    <tr key={task.id} className="border-b border-[#E2E4F0] transition-colors duration-150 hover:bg-gray-50/50 cursor-pointer">
+                    <tr key={task.id} className="border-b border-[#E2E4F0] transition-colors duration-150 hover:bg-gray-50/50">
                       <td className="px-6 py-3 align-middle">
                         <div className="flex items-center h-full">
                           <span className="truncate">{task.name}</span>
@@ -234,6 +243,15 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0 }: StatusSec
                           <PriorityPill priority={task.priority} />
                         </div>
                       </td>
+                      <td className="px-6 py-3 align-middle">
+                        <div className="flex items-center justify-center h-full">
+                          <TaskActionsMenu 
+                            onEdit={() => onEditTask(task.id)}
+                            onDelete={() => onDeleteTask(task.id)}
+                            canEdit={canEdit}
+                          />
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -259,14 +277,17 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
+  const { deleteTaskAction } = useTaskActions();
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const assigneeOptions = members.map((m) => ({
-    id: m.user.id,
-    display_name: m.user.display_name,
-  }));
+  const assigneeOptions = members
+    .filter((m) => m.user.id !== currentUserId)
+    .map((m) => ({
+      id: m.user.id,
+      display_name: m.user.display_name,
+    }));
 
   // handle task creation
   const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
@@ -275,6 +296,22 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
       setIsModalOpen(false);
       refetch();
     }
+  };
+
+  // handle task deletion
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    
+    const success = await deleteTaskAction(taskId);
+    if (success) {
+      refetch();
+    }
+  };
+
+  // handle task edit (placeholder for now)
+  const handleEditTask = (taskId: string) => {
+    // TODO: Implement edit modal
+    alert('Edit functionality coming soon!');
   };
 
   // transform db tasks to list tasks
@@ -360,6 +397,9 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             isOpen={openSections["todo"]}
             onToggle={() => toggleSection("todo")}
             delay={100}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
+            canEdit={canCreateTasks}
           />
           <StatusSection
             status="in_progress"
@@ -367,6 +407,9 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             isOpen={openSections["in_progress"]}
             onToggle={() => toggleSection("in_progress")}
             delay={200}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
+            canEdit={canCreateTasks}
           />
           <StatusSection
             status="in_review"
@@ -374,6 +417,9 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             isOpen={openSections["in_review"]}
             onToggle={() => toggleSection("in_review")}
             delay={300}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
+            canEdit={canCreateTasks}
           />
           <StatusSection
             status="done"
@@ -381,6 +427,9 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             isOpen={openSections["done"]}
             onToggle={() => toggleSection("done")}
             delay={400}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
+            canEdit={canCreateTasks}
           />
         </div>
       )}
