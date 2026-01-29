@@ -6,7 +6,7 @@ import { FaGithub } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
 import { useTasks } from '@/lib/hooks/useTasks';
 import { getProjectById } from '@/lib/supabase/projectService';
-import { Project } from '@/types/project';
+import { Project } from '@/lib/types/database';
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
@@ -155,7 +155,7 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
             <p className="text-sm text-black/50">Loading project details...</p>
           ) : (
             <p className="text-sm md:text-base text-black/80">
-              {project?.projectDescription || "No description available."}
+              {project?.project_description || "No description available."}
             </p>
           )}
         </Section>
@@ -163,9 +163,9 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
         <Section title="Project Leads" delay={80}>
           {projectLoading ? (
             <p className="text-sm text-black/50">Loading leads...</p>
-          ) : project?.projectLeads && project.projectLeads.length > 0 ? (
+          ) : project?.project_leads && project.project_leads.length > 0 ? (
             <div className="flex flex-wrap gap-4">
-              {project.projectLeads.map((lead, index) => (
+              {project.project_leads.map((lead, index) => (
                 <div key={index} className="flex items-center gap-4">
                   <div className={AVATAR_STYLES.large}>
                     <Image

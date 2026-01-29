@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import { Project } from '@/types/project';
+import { Project } from '@/lib/types/database';
 
 export async function getProjectsByYear(year: string): Promise<Project[]> {
     const { data, error } = await supabase

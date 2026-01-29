@@ -17,6 +17,7 @@ export interface Project {
   updated_at: string;
   project_name: string;
   project_description: string | null;
+  project_leads: string[] | null;
   year: string;
   quarter: string;
   github_url: string | null;
