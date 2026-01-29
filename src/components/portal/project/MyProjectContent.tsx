@@ -1,19 +1,10 @@
 "use client";
 
-<<<<<<< HEAD
 import React, { memo, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
 import { useTasks } from '@/lib/hooks/useTasks';
-=======
-import React, { memo, useEffect, useState } from "react";
-import Image from "next/image";
-import { FaGithub } from "react-icons/fa6";
-import { SiFigma, SiNotion } from "react-icons/si";
-import { getProjectByUserId } from "@/lib/supabase/projectService";
-import { Project } from "@/types/project";
->>>>>>> origin/membership_portal
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
@@ -103,84 +94,6 @@ function ActivityItem({ name, time, action, comment }: ActivityItemProps) {
   );
 }
 
-<<<<<<< HEAD
-interface MyProjectContentProps {
-  projectId: string;
-  currentUserId: string;
-}
-
-// TODO: fetch project data from database (description, leads, activity)
-export default function MyProjectContent({ projectId, currentUserId }: MyProjectContentProps) {
-  // fetch all tasks for the project
-  const { tasks: allTasks, isLoading } = useTasks(projectId);
-
-  // filter tasks assigned to current user
-  const myTasks = useMemo(() => {
-    return allTasks.filter(task => 
-      task.assignments.some(assignment => assignment.assignee.id === currentUserId)
-    );
-  }, [allTasks, currentUserId]);
-
-  // helper to get priority badge styles
-  const getPriorityStyles = (priority: string) => {
-    const styles = {
-      low: { bg: '#E5F3FF', text: '#3F86FF' },
-      medium: { bg: '#FFF3DC', text: '#FF9100' },
-      high: { bg: '#FFE3E3', text: '#E1225C' },
-      urgent: { bg: '#FFE3E3', text: '#E1225C' },
-    };
-    return styles[priority as keyof typeof styles] || styles.medium;
-  };
-
-  // helper to get status badge styles
-  const getStatusStyles = (status: string) => {
-    const styles = {
-      todo: { bg: '#FFE7EA', text: '#E1225C', label: 'todo' },
-      in_progress: { bg: '#E2F7E6', text: '#1F7A3D', label: 'in progress' },
-      in_review: { bg: '#FFF3DC', text: '#FF9100', label: 'in review' },
-      done: { bg: '#ECE3FF', text: '#6200EA', label: 'done' },
-    };
-    return styles[status as keyof typeof styles] || styles.todo;
-  };
-  return (
-    <div className="grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
-      {/* Left column */}
-      <div className="space-y-14">
-        {/* TODO: Replace with project.description from database */}
-        <Section title="Project Description" delay={0}>
-          <p className="text-sm md:text-base text-black/80">
-       The Yang Bang Ultimate Project was going great until Travis farted like a nuclear test. Sunny smelled it and instantly stepped down from the project. Shawn smells it too and then dies!
-          </p>
-        </Section>
-
-        {/* TODO: Replace with project.leads from database */}
-        <Section title="Project Leads" delay={80}>
-          <div className="flex items-center gap-4">
-            <div className={AVATAR_STYLES.large}>
-              <Image
-                src="/images/default-avatar.svg"
-                alt="Project lead avatar"
-                width={56}
-                height={56}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[#E1225C]">
-                Lebron James
-              </p>
-              <p className="text-xs text-black/70">Project Lead</p>
-            </div>
-          </div>
-        </Section>
-
-        <Section title="My Tasks" delay={160}>
-          {isLoading ? (
-            <p className="text-sm text-black/50">Loading tasks...</p>
-          ) : myTasks.length === 0 ? (
-            <p className="text-sm text-black/50">No tasks assigned to you yet</p>
-          ) : (
-=======
 // Hardcoded user ID - to be replaced with auth later
 const HARDCODED_USER_ID = "57fb265d-0e1d-4b1e-adef-f9380ebd670d";
 
@@ -279,148 +192,12 @@ export default function MyProjectContent() {
 
           {/* TODO: Replace with user's assigned tasks from database */}
           <Section title="My Tasks" delay={160}>
->>>>>>> origin/membership_portal
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-xs md:text-sm text-black/80">
                 <thead>
                   <tr className="border-b border-[#E2E4F0]">
                     <th className="pb-3 pr-6 font-semibold">Name</th>
                     <th className="pb-3 pr-6 font-semibold">Priority</th>
-<<<<<<< HEAD
-                    <th className="pb-3 pr-6 font-semibold">Label</th>
-                    <th className="pb-3 pr-6 font-semibold">Status</th>
-                    <th className="pb-3 font-semibold">Assignees</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {myTasks.map((task) => {
-                    const priorityStyle = getPriorityStyles(task.priority);
-                    const statusStyle = getStatusStyles(task.status);
-                    return (
-                      <tr key={task.id}>
-                        <td className="py-4 pr-6 align-middle">
-                          <span className="text-black/60 mr-1">#{task.id}</span>
-                          {task.name}
-                        </td>
-                        <td className="py-4 pr-6 align-middle">
-                          <span 
-                            className="rounded-full px-3 py-1 text-xs font-medium"
-                            style={{ backgroundColor: priorityStyle.bg, color: priorityStyle.text }}
-                          >
-                            {task.priority}
-                          </span>
-                        </td>
-                        <td className="py-4 pr-6 align-middle">
-                          <span 
-                            className="rounded-full px-3 py-1 text-xs font-medium text-black/70"
-                            style={{ backgroundColor: task.label_color }}
-                          >
-                            {task.label}
-                          </span>
-                        </td>
-                        <td className="py-4 pr-6 align-middle">
-                          <span 
-                            className="rounded-full px-3 py-1 text-xs font-medium"
-                            style={{ backgroundColor: statusStyle.bg, color: statusStyle.text }}
-                          >
-                            {statusStyle.label}
-                          </span>
-                        </td>
-                        <td className="py-4 align-middle">
-                          <div className="flex -space-x-2">
-                            {task.assignments.slice(0, 3).map((assignment, idx) => (
-                              <span key={idx} className={AVATAR_STYLES.small}>
-                                <Image
-                                  src="/images/default-avatar.svg"
-                                  alt={`${assignment.assignee.display_name} avatar`}
-                                  width={32}
-                                  height={32}
-                                  className="h-full w-full object-cover"
-                                />
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </Section>
-      </div>
-
-      {/* Right column */}
-      <div className="space-y-14">
-        {/* TODO: Replace with project.recentActivity from database */}
-        <Section title="Recent Activity" delay={240}>
-          <div className="space-y-7 text-xs md:text-sm text-black/80">
-            <ActivityItem
-              name="Sunny Vinay"
-              time="9:05 AM"
-              action={<>Created task <TaskLink>"Design onboarding flow"</TaskLink></>}
-            />
-            <ActivityItem
-              name="Shawn Lin"
-              time="9:42 AM"
-              action="Commented on sprint planning"
-              comment="Can we move this story to the next sprint?"
-            />
-            <ActivityItem
-              name="Stephanie Pham"
-              time="10:15 AM"
-              action={<>Updated status of <TaskLink>"Landing page redesign"</TaskLink> to In Progress</>}
-            />
-            <ActivityItem
-              name="Travis Nguyen"
-              time="11:02 AM"
-              action='Completed task "Hook up API to dashboard"'
-            />
-            <ActivityItem
-              name="MJ Bagaoisan"
-              time="11:45 AM"
-              action="Reviewed pull request #42"
-            />
-            <ActivityItem
-              name="LeBron James"
-              time="12:10 PM"
-              action="Assigned as project lead"
-            />
-          </div>
-        </Section>
-
-        <Section
-          title="Quick Links"
-          delay={320}
-        >
-          <div className="flex items-center justify-center gap-6 text-sm text-black/80">
-            <a
-              href="#"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-              aria-label="GitHub"
-            >
-              <FaGithub className="h-5 w-5" />
-            </a>
-            <a
-              href="#"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-              aria-label="Figma"
-            >
-              <SiFigma className="h-5 w-5" />
-            </a>
-            <a
-              href="#"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-              aria-label="Notion"
-            >
-              <SiNotion className="h-5 w-5" />
-            </a>
-          </div>
-        </Section>
-      </div>
-    </div>
-=======
                     <th className="pb-3 pr-6 font-semibold">Topic</th>
                     <th className="pb-3 pr-6 font-semibold">Status</th>
                     <th className="pb-3 font-semibold">Assignee</th>
@@ -535,6 +312,5 @@ export default function MyProjectContent() {
         </div>
       </div>
     </>
->>>>>>> origin/membership_portal
   );
 }
