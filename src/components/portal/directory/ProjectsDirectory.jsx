@@ -53,7 +53,7 @@ const ProjectsDirectory = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { getAllProjects } = await import('@/lib/projectService');
+        const { getAllProjects } = await import('@/lib/supabase/projectService');
         const allProjects = await getAllProjects();
 
         // Transform data to match UI expectations

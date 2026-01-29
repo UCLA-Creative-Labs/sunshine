@@ -72,7 +72,7 @@ export default function MembershipPortalSidebar({
     [pathname, router]
   );
 
-  return ( 
+  return (
     <aside
       className={`flex min-h-screen flex-col border-r-[2px] border-[#CDCCC8] bg-white px-6 py-6 w-60 ${className}`}
     >
