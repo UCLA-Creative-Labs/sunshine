@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { supabase } from './supabase/client';
-=======
 import { supabase } from './client';
->>>>>>> origin/membership_portal
 import { Project } from '@/types/project';
 
 export async function getProjectsByYear(year: string): Promise<Project[]> {
@@ -31,14 +27,7 @@ export async function getAllProjects(): Promise<Project[]> {
 
     return (data || []) as Project[];
 }
-<<<<<<< HEAD
-=======
 
-/**
- * Fetches the project associated with a user via the project_members join table.
- * @param userId - The user ID to look up
- * @returns The user's project or null if not found
- */
 export async function getProjectByUserId(userId: string): Promise<Project | null> {
     const { data, error } = await supabase
         .from('project_members')
@@ -51,7 +40,6 @@ export async function getProjectByUserId(userId: string): Promise<Project | null
         return null;
     }
 
-    // The joined projects data is nested under the 'projects' key
     const projectData = data.projects;
 
     if (!projectData || Array.isArray(projectData)) {
@@ -60,4 +48,3 @@ export async function getProjectByUserId(userId: string): Promise<Project | null
 
     return projectData as unknown as Project;
 }
->>>>>>> origin/membership_portal
