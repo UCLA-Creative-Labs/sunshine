@@ -150,12 +150,13 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
   return (
     <div className="grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
       <div className="space-y-14">
-        <Section title="Project Description" delay={0}>
+        
+        <Section title="Project Description" delay={80}>
           {projectLoading ? (
             <p className="text-sm text-black/50">Loading project details...</p>
           ) : (
             <p className="text-sm md:text-base text-black/80">
-              {project?.project_description || "No description available."}
+              {project?.projectDescription || "No description available."}
             </p>
           )}
         </Section>
@@ -163,9 +164,9 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
         <Section title="Project Leads" delay={80}>
           {projectLoading ? (
             <p className="text-sm text-black/50">Loading leads...</p>
-          ) : project?.project_leads && project.project_leads.length > 0 ? (
+          ) : project?.projectLeads && project.projectLeads.length > 0 ? (
             <div className="flex flex-wrap gap-4">
-              {project.project_leads.map((lead, index) => (
+              {project.projectLeads.map((lead, index) => (
                 <div key={index} className="flex items-center gap-4">
                   <div className={AVATAR_STYLES.large}>
                     <Image

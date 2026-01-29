@@ -32,7 +32,7 @@ export async function getProjectById(projectId: string): Promise<Project | null>
     const { data, error } = await supabase
         .from('projects')
         .select('*')
-        .eq('project_id', projectId)
+        .eq('id', projectId)
         .single();
 
     if (error || !data) {

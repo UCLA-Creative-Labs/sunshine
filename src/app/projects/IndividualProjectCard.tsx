@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
 export interface IndividualProjectProps {
-  project_name: string;
-  project_leads: string[] | null;
-  project_description: string | null;
+  projectName: string;
+  projectLeads: string[] | null;
+  projectDescription: string | null;
   logo_url?: string | null;
   prototype_url?: string | null;
-  demo_day_url?: string | null;
-  insta_post_url?: string | null;
+  demoDayUrl?: string | null;
+  instaPostUrl?: string | null;
 };
 
 function joinStrings(strings: string[] | undefined | null): string {
@@ -15,7 +15,7 @@ function joinStrings(strings: string[] | undefined | null): string {
   return strings.filter(str => str.trim() !== "").join(", ");
 }
 
-const IndividualProjectCard = ({ project_name, project_leads, project_description, logo_url, prototype_url, demo_day_url, insta_post_url }: IndividualProjectProps) => {
+const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, logo_url, prototype_url, demoDayUrl, instaPostUrl }: IndividualProjectProps) => {
   const [isExpanded, expand] = useState(false);
 
   return (
@@ -24,23 +24,23 @@ const IndividualProjectCard = ({ project_name, project_leads, project_descriptio
         {logo_url && <img src={logo_url} alt="Project Logo" className="w-16 h-16 mr-4 rounded-lg" />}
         <div className="flex-1">
           <h2 className="text-xl font-bold">
-            {project_name}: {joinStrings(project_leads)}
+            {projectName}: {joinStrings(projectLeads)}
           </h2>
-          {!isExpanded ? <p className="mt-2 line-clamp-3 flex-1">{project_description || 'No description available.'}</p> : <p className="mt-2">{project_description || 'No description available.'}</p>}
+          {!isExpanded ? <p className="mt-2 line-clamp-3 flex-1">{projectDescription || 'No description available.'}</p> : <p className="mt-2">{projectDescription || 'No description available.'}</p>}
         </div>
       </div>
       {isExpanded ?
         <div className="flex flex-col md:flex-row mt-6">
           <div className={`mt-4 ${prototype_url ? 'md:w-1/2' : 'w-full'}`}>
             <p>
-              <strong>Project Leads:</strong> {joinStrings(project_leads)}
+              <strong>Project Leads:</strong> {joinStrings(projectLeads)}
             </p>
             <p>
               <strong>Project Members:</strong> Not available in current schema
             </p>
             <div className="mt-4 flex space-x-4">
               <a
-                href={demo_day_url || '#'}
+                href={demoDayUrl || '#'}
                 className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -48,7 +48,7 @@ const IndividualProjectCard = ({ project_name, project_leads, project_descriptio
                 Demo Day Slides
               </a>
               <a
-                href={insta_post_url || '#'}
+                href={instaPostUrl || '#'}
                 className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
                 target="_blank"
                 rel="noopener noreferrer"
