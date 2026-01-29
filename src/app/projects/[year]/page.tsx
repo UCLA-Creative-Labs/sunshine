@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 import QuarterProjectCardList from '../QuarterProjectCardList';
 
 import { getProjectsByYear } from '@/lib/supabase/projectService';
-import { Project } from '@/types/project';
+import { Project } from '@/lib/types/database';
 
 export default function About() {
 

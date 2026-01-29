@@ -1,5 +1,5 @@
 import IndividualProjectCard from "./IndividualProjectCard";
-import { Project } from '@/types/project';
+import { Project } from '@/lib/types/database';
 
 interface QuarterListProps {
     projects: Project[];

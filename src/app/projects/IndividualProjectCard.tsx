@@ -1,15 +1,13 @@
 import { useState } from 'react';
 
 export interface IndividualProjectProps {
-  projectName: string;
-  projectLeads: string[];
-  projectDescription: string;
-  logoUrl?: string;
-  prototypeUrl?: string;
-  projectManagers: string[];
-  projectMembers: string[];
-  demoDayUrl?: string;
-  instaPostUrl?: string;
+  project_name: string;
+  project_leads: string[] | null;
+  project_description: string | null;
+  logo_url?: string | null;
+  prototype_url?: string | null;
+  demo_day_url?: string | null;
+  insta_post_url?: string | null;
 };
 
 function joinStrings(strings: string[] | undefined | null): string {
@@ -17,32 +15,32 @@ function joinStrings(strings: string[] | undefined | null): string {
   return strings.filter(str => str.trim() !== "").join(", ");
 }
 
-const IndividualProjectCard = ({ projectName, projectLeads = [], projectDescription, logoUrl, prototypeUrl, projectManagers = [], projectMembers = [], demoDayUrl, instaPostUrl }: IndividualProjectProps) => {
+const IndividualProjectCard = ({ project_name, project_leads, project_description, logo_url, prototype_url, demo_day_url, insta_post_url }: IndividualProjectProps) => {
   const [isExpanded, expand] = useState(false);
 
   return (
     <div className="border rounded-lg p-6 shadow-md">
       <div className="flex items-start">
-        {logoUrl && <img src={logoUrl} alt="Project Logo" className="w-16 h-16 mr-4 rounded-lg" />}
+        {logo_url && <img src={logo_url} alt="Project Logo" className="w-16 h-16 mr-4 rounded-lg" />}
         <div className="flex-1">
           <h2 className="text-xl font-bold">
-            {projectName}: {joinStrings(projectLeads)}
+            {project_name}: {joinStrings(project_leads)}
           </h2>
-          {!isExpanded ? <p className="mt-2 line-clamp-3 flex-1">{projectDescription}</p> : <p className="mt-2">{projectDescription}</p>}
+          {!isExpanded ? <p className="mt-2 line-clamp-3 flex-1">{project_description || 'No description available.'}</p> : <p className="mt-2">{project_description || 'No description available.'}</p>}
         </div>
       </div>
       {isExpanded ?
         <div className="flex flex-col md:flex-row mt-6">
-          <div className={`mt-4 ${prototypeUrl ? 'md:w-1/2' : 'w-full'}`}>
+          <div className={`mt-4 ${prototype_url ? 'md:w-1/2' : 'w-full'}`}>
             <p>
-              <strong>Project Manager(s):</strong> {joinStrings(projectManagers)}
+              <strong>Project Leads:</strong> {joinStrings(project_leads)}
             </p>
             <p>
-              <strong>Project Members:</strong> {joinStrings(projectMembers)}
+              <strong>Project Members:</strong> Not available in current schema
             </p>
             <div className="mt-4 flex space-x-4">
               <a
-                href={demoDayUrl}
+                href={demo_day_url || '#'}
                 className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -50,7 +48,7 @@ const IndividualProjectCard = ({ projectName, projectLeads = [], projectDescript
                 Demo Day Slides
               </a>
               <a
-                href={instaPostUrl}
+                href={insta_post_url || '#'}
                 className="px-4 py-2 border-2 border-black rounded-lg hover:bg-gray-100 transition font-bold"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -59,9 +57,9 @@ const IndividualProjectCard = ({ projectName, projectLeads = [], projectDescript
               </a>
             </div>
           </div>
-          {prototypeUrl && (
+          {prototype_url && (
             <div className="md:w-1/2 mt-6 md:mt-4">
-              <iframe src={prototypeUrl} className="w-full h-96 rounded-lg" />
+              <iframe src={prototype_url || ''} className="w-full h-96 rounded-lg" />
             </div>
           )}
         </div> : <></>}
