@@ -28,6 +28,21 @@ export async function getAllProjects(): Promise<Project[]> {
     return (data || []) as Project[];
 }
 
+export async function getProjectById(projectId: string): Promise<Project | null> {
+    const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('project_id', projectId)
+        .single();
+
+    if (error || !data) {
+        console.error('Error fetching project by ID:', error);
+        return null;
+    }
+
+    return data as Project;
+}
+
 export async function getProjectByUserId(userId: string): Promise<Project | null> {
     const { data, error } = await supabase
         .from('project_members')

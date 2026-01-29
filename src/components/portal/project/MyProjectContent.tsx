@@ -1,10 +1,12 @@
 "use client";
 
-import React, { memo, useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
 import { useTasks } from '@/lib/hooks/useTasks';
+import { getProjectById } from '@/lib/supabase/projectService';
+import { Project } from '@/types/project';
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
@@ -101,6 +103,23 @@ interface MyProjectContentProps {
 
 export default function MyProjectContent({ projectId, currentUserId }: MyProjectContentProps) {
   const { tasks: allTasks, isLoading } = useTasks(projectId);
+  const [project, setProject] = useState<Project | null>(null);
+  const [projectLoading, setProjectLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProject() {
+      try {
+        setProjectLoading(true);
+        const data = await getProjectById(projectId);
+        setProject(data);
+      } catch (err) {
+        console.error('Failed to load project data:', err);
+      } finally {
+        setProjectLoading(false);
+      }
+    }
+    fetchProject();
+  }, [projectId]);
 
   const myTasks = useMemo(() => {
     return allTasks.filter(task => 
@@ -132,29 +151,43 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
     <div className="grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
       <div className="space-y-14">
         <Section title="Project Description" delay={0}>
-          <p className="text-sm md:text-base text-black/80">
-            The Yang Bang Ultimate Project was going great until Travis farted like a nuclear test. Sunny smelled it and instantly stepped down from the project. Shawn smells it too and then dies!
-          </p>
+          {projectLoading ? (
+            <p className="text-sm text-black/50">Loading project details...</p>
+          ) : (
+            <p className="text-sm md:text-base text-black/80">
+              {project?.projectDescription || "No description available."}
+            </p>
+          )}
         </Section>
 
         <Section title="Project Leads" delay={80}>
-          <div className="flex items-center gap-4">
-            <div className={AVATAR_STYLES.large}>
-              <Image
-                src="/images/default-avatar.svg"
-                alt="Project lead avatar"
-                width={56}
-                height={56}
-                className="h-full w-full object-cover"
-              />
+          {projectLoading ? (
+            <p className="text-sm text-black/50">Loading leads...</p>
+          ) : project?.projectLeads && project.projectLeads.length > 0 ? (
+            <div className="flex flex-wrap gap-4">
+              {project.projectLeads.map((lead, index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <div className={AVATAR_STYLES.large}>
+                    <Image
+                      src="/images/default-avatar.svg"
+                      alt={`${lead} avatar`}
+                      width={56}
+                      height={56}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-[#E1225C]">
+                      {lead}
+                    </p>
+                    <p className="text-xs text-black/70">Project Lead</p>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-[#E1225C]">
-                Lebron James
-              </p>
-              <p className="text-xs text-black/70">Project Lead</p>
-            </div>
-          </div>
+          ) : (
+            <p className="text-sm text-black/50">No project leads assigned.</p>
+          )}
         </Section>
 
         <Section title="My Tasks" delay={160}>
