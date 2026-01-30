@@ -1,38 +1,15 @@
-export type UserPermission = 'none' | 'member' | 'admin';
 export type ProjectRole = 'member' | 'lead' | 'manager';
 export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type InviteStatus = 'active' | 'expired' | 'revoked';
+export type { Project } from '@/types/project';
+import { Project } from '@/types/project';
 
 export interface Profiles {
   id: string;
   created_at: string;
   email: string;
   display_name: string;
-}
-
-export interface Project {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  projectName: string;
-  projectDescription: string | null;
-  projectLeads: string[] | null;
-  projectManagers: string[] | null;
-  projectMembers: string[] | null;
-  year: string;
-  quarter: string;
-  github_url: string | null;
-  figma_url: string | null;
-  notion_url: string | null;
-  demoDayUrl: string | null;
-  instaPostUrl: string | null;
-  logo_url: string | null;
-  prototype_url: string | null;
-  github_repo_owner: string | null;
-  github_repo_name: string | null;
-  github_installation_id: number | null;
-  is_archived: boolean;
 }
 
 export interface ProjectMember {
@@ -94,32 +71,32 @@ export interface ProjectInvite {
   times_used: number;
 }
 
-export interface GithubIntegration {
-  id: number;
-  created_at: string;
-  project_id: string;
-  task_id: number | null;
-  delivery_id: string;
-  event_type: string;
-  action: string;
-  github_id: number;
-  github_node_id: string | null;
-  github_number: number;
-  payload: Record<string, any>;
-  processed: boolean;
-  processed_at: string | null;
-  error_message: string | null;
-}
+// export interface GithubIntegration {
+//   id: number;
+//   created_at: string;
+//   project_id: string;
+//   task_id: number | null;
+//   delivery_id: string;
+//   event_type: string;
+//   action: string;
+//   github_id: number;
+//   github_node_id: string | null;
+//   github_number: number;
+//   payload: Record<string, any>;
+//   processed: boolean;
+//   processed_at: string | null;
+//   error_message: string | null;
+// }
 
-export interface ActivityLog {
-  id: number;
-  created_at: string;
-  user_id: string | null;
-  action: string;
-  project_id: string | null;
-  task_id: number | null;
-  metadata: Record<string, any> | null;
-}
+// export interface ActivityLog {
+//   id: number;
+//   created_at: string;
+//   user_id: string | null;
+//   action: string;
+//   project_id: string | null;
+//   task_id: number | null;
+//   metadata: Record<string, any> | null;
+// }
 
 export interface ProjectWithMembers extends Project {
   members: (ProjectMember & { user: Profiles })[];
