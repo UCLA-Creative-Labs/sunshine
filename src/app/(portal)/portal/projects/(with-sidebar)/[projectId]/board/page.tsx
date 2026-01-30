@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from 'react';
-import ProjectBoardContent from "@/components/ProjectBoardContent";
+import ProjectBoardContent from "@/components/portal/project/ProjectBoardContent";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 export default function Page({ params }: { params: Promise<{ projectId: string }> }) {

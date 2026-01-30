@@ -6,8 +6,8 @@ import { useCreateTask } from '@/lib/hooks/useCreateTask';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useTaskActions } from '@/lib/hooks/useTaskActions';
-import { AddTaskModal } from './tasks/AddTaskModal';
-import { TaskActionsMenu } from './tasks/TaskActionsMenu';
+import { AddTaskModal } from './portal/tasks/AddTaskModal';
+import { TaskActionsMenu } from './portal/tasks/TaskActionsMenu';
 import { CreateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus } from '@/lib/types/database';
 
