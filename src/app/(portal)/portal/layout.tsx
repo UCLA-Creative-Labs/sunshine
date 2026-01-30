@@ -6,7 +6,7 @@ import MembershipPortalNavbar from '@/components/MembershipPortalNavbar';
 const portalTabs = [
     { id: 'dashboard', label: 'Dashboard', href: '/portal' },
     { id: 'project-directory', label: 'Project Directory', href: '/portal/directory' },
-    { id: 'my-project', label: 'My Project', href: '/portal/projects/overview' },
+    { id: 'my-project', label: 'My Project', href: '/portal/my-project' },
     { id: 'member-directory', label: 'Member Directory', href: '/portal/members-directory' },
     { id: 'profile', label: 'Profile', href: '/portal/profile' },
 ];

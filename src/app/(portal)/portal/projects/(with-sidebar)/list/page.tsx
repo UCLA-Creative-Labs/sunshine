@@ -1,8 +1,15 @@
 "use client";
 
-import ProjectListContent from "@/components/ProjectListContent";
+import ProjectListContent from "@/components/portal/project/ProjectListContent";
 
+// TODO: convert to dynamic route /portal/projects/[projectId]/list
+// TODO: implement route guard to verify user is a project member
+// TODO: get currentUserId from Supabase Auth session
 export default function Page() {
+  // replace with actual projectId from route params and userId from auth session
+  const projectId = "your-project-id-here";
+  const currentUserId = "your-user-id-here";
+
   return (
     <>
       <section className="space-y-2">
@@ -10,7 +17,10 @@ export default function Page() {
           List
         </h1>
       </section>
-      <ProjectListContent />
+      <ProjectListContent 
+        projectId={projectId}
+        currentUserId={currentUserId}
+      />
     </>
   );
 }

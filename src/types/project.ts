@@ -1,12 +1,12 @@
 export interface Project {
-    id: number;
+    id: string;
     year: string;
     quarter: string;
     projectName: string;
-    projectLeads: string[];
+    projectLeads: string[] | null;
     projectDescription: string;
-    projectManagers: string[];
-    projectMembers: string[];
+    projectManagers: string[] | null;
+    projectMembers: string[] | null;
     logoUrl?: string;
     prototypeUrl?: string;
     demoDayUrl?: string;

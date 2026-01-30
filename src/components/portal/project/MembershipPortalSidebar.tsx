@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   RxHome,
@@ -9,10 +9,6 @@ import {
   RxPerson,
   RxFileText,
 } from "react-icons/rx";
-import { getProjectByUserId } from "@/lib/supabase/projectService";
-
-// Hardcoded user ID - to be replaced with auth later
-const HARDCODED_USER_ID = "57fb265d-0e1d-4b1e-adef-f9380ebd670d";
 
 export type MembershipPortalSidebarItem = {
   id: string;
@@ -33,37 +29,38 @@ const NAV_STYLES = {
   inactive: "text-gray-600 hover:bg-gray-100",
 } as const;
 
-// TODO: we should use /portal/projects/[id] for dynamic project IDs
-const DEFAULT_ITEMS: MembershipPortalSidebarItem[] = [
-  { id: "overview", label: "Overview", href: "/portal/projects/overview", icon: RxHome },
-  { id: "board", label: "Board", href: "/portal/projects/board", icon: RxDashboard },
-  { id: "list", label: "List", href: "/portal/projects/list", icon: RxRows },
-  { id: "members", label: "Members", href: "/portal/projects/members", icon: RxPerson },
-  { id: "docs", label: "Docs", href: "/portal/projects/docs", icon: RxFileText },
+const BASE_ITEMS = [
+  { id: "overview", label: "Overview", path: "overview", icon: RxHome },
+  { id: "board", label: "Board", path: "board", icon: RxDashboard },
+  { id: "list", label: "List", path: "list", icon: RxRows },
+  { id: "members", label: "Members", path: "members", icon: RxPerson },
+  { id: "docs", label: "Docs", path: "docs", icon: RxFileText },
 ];
 
 export default function MembershipPortalSidebar({
   projectName = "Project Name",
-  items = DEFAULT_ITEMS,
+  items,
   className = "",
 }: MembershipPortalSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [fetchedProjectName, setFetchedProjectName] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchProjectName() {
-      try {
-        const project = await getProjectByUserId(HARDCODED_USER_ID);
-        if (project && project.projectName) {
-          setFetchedProjectName(project.projectName);
-        }
-      } catch (error) {
-        console.error("Failed to fetch project name for sidebar:", error);
-      }
-    }
-    fetchProjectName();
-  }, []);
+  const projectId = useMemo(() => {
+    const match = pathname?.match(/\/portal\/projects\/([^\/]+)/);
+    return match ? match[1] : null;
+  }, [pathname]);
+
+  // avigation items with  projectId
+  const navItems = useMemo(() => {
+    if (items) return items;
+    
+    if (!projectId) return [];
+
+    return BASE_ITEMS.map(item => ({
+      ...item,
+      href: `/portal/projects/${projectId}/${item.path}`,
+    }));
+  }, [projectId, items]);
 
   const handleSelect = useCallback(
     (item: MembershipPortalSidebarItem) => {
@@ -86,13 +83,13 @@ export default function MembershipPortalSidebar({
             className="font-bold"
             style={{ color: "#6468B0", fontSize: "24px", lineHeight: 1.1 }}
           >
-            {fetchedProjectName || projectName}
+            {projectName}
           </span>
         </div>
       </div>
 
       <nav className="flex flex-col gap-4" aria-label="Member portal sections">
-        {items.map((item) => {
+        {navItems.map((item) => {
           const isActive = item.href ? pathname?.startsWith(item.href) : false;
           const Icon = item.icon;
           const navClassName = [
