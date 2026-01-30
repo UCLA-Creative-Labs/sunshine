@@ -1,6 +1,6 @@
 "use client";
 
-import ProjectListContent from "@/components/ProjectListContent";
+import ProjectListContent from "@/components/portal/project/ProjectListContent";
 
 // TODO: convert to dynamic route /portal/projects/[projectId]/list
 // TODO: implement route guard to verify user is a project member

@@ -1,6 +1,6 @@
 "use client";
 
-import ProjectListContent from "@/components/ProjectListContent";
+import ProjectListContent from "@/components/portal/project/ProjectListContent";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { use } from 'react';
 

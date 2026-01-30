@@ -6,8 +6,8 @@ import { useCreateTask } from '@/lib/hooks/useCreateTask';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useTaskActions } from '@/lib/hooks/useTaskActions';
-import { AddTaskModal } from './portal/tasks/AddTaskModal';
-import { TaskActionsMenu } from './portal/tasks/TaskActionsMenu';
+import { AddTaskModal } from './tasks/AddTaskModal';
+import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { CreateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus } from '@/lib/types/database';
 
@@ -25,13 +25,19 @@ function useMountAnimation(delay: number) {
   return mounted;
 }
 
+interface Assignee {
+  id: string;
+  name: string;
+  initials: string;
+}
+
 interface ListTask {
   id: string;
   name: string;
   status: StatusId;
   statusLabel: string;
   dueDate: string;
-  assignees: string[];
+  assignees: Assignee[];
   priority: Priority;
   label: string;
   labelColor: string;
@@ -84,17 +90,32 @@ function getInitials(displayName: string | undefined | null): string {
     .slice(0, 2);
 }
 
-function AssigneeGroup({ assignees }: { assignees: string[] }) {
+function AssigneeGroup({ assignees }: { assignees: Assignee[] }) {
   return (
     <div className="flex -space-x-2">
-      {assignees.map((initials, idx) => (
+      {assignees.slice(0, 3).map((assignee, idx) => (
         <div
           key={idx}
-          className="flex h-7 w-7 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70 shadow-sm"
+          className="group relative flex h-7 w-7 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70 shadow-sm hover:z-10 transition-transform hover:scale-110 cursor-default"
         >
-          {initials}
+          {assignee.initials}
+          {/* Tooltip */}
+          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg z-50">
+            {assignee.name}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+          </div>
         </div>
       ))}
+      {assignees.length > 3 && (
+        <div className="group relative flex h-7 w-7 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70 shadow-sm hover:z-10 transition-transform hover:scale-110 cursor-default">
+          +{assignees.length - 3}
+          {/* Tooltip showing remaining assignees */}
+          <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg z-50">
+            {assignees.slice(3).map(a => a.name).join(', ')}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -327,7 +348,16 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
           day: '2-digit',
         }).replace(/\//g, '/')
       : 'no due date',
-    assignees: task.assignments.map(a => getInitials(a.assignee.display_name)),
+    assignees: task.assignments.map(a => ({
+      id: a.assignee.id,
+      name: a.assignee.display_name || a.assignee.email?.split('@')[0] || 'Unknown',
+      initials: (a.assignee.display_name || a.assignee.email?.split('@')[0] || '?')
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    })),
     priority: task.priority as Priority,
     label: task.label,
     labelColor: task.label_color,

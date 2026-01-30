@@ -6,8 +6,8 @@ import { useCreateTask } from '@/lib/hooks/useCreateTask';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useTaskActions } from '@/lib/hooks/useTaskActions';
-import { AddTaskModal } from '../tasks/AddTaskModal';
-import { TaskActionsMenu } from '../tasks/TaskActionsMenu';
+import { AddTaskModal } from './tasks/AddTaskModal';
+import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { CreateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 
@@ -69,7 +69,7 @@ interface BoardCardProps {
   title: string;
   tag?: string;
   tagColor?: string;
-  assignees?: string[];
+  assignees?: Array<{ id: string; name: string; initials: string }>;
   dueDate?: string;
   delay?: number;
   onEdit?: () => void;
@@ -100,6 +100,7 @@ function AvatarStack({ initials }: { initials: string[] }) {
 function BoardCard({ taskId, title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onDelete, canEdit = false }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
+  const isSingleAssignee = assignees.length === 1;
 
   return (
     <div
@@ -130,18 +131,31 @@ function BoardCard({ taskId, title, tag, tagColor = "#E5E7EB", assignees = [], d
         )}
       </div>
       {assignees.length > 0 && (
-        <div className="mt-3 flex -space-x-2">
-          {assignees.slice(0, 3).map((initials, idx) => (
+        <div className={`mt-3 flex items-center ${isSingleAssignee ? 'gap-2' : '-space-x-2'}`}>
+          {assignees.slice(0, 3).map((assignee, idx) => (
             <div
               key={idx}
-              className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70"
+              className="group relative flex h-6 w-6 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70 hover:z-10 transition-transform hover:scale-110 cursor-default"
             >
-              {initials}
+              {assignee.initials}
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg z-50">
+                {assignee.name}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+              </div>
             </div>
           ))}
+          {isSingleAssignee && assignees[0] && (
+            <span className="text-[10px] font-medium text-black/70">
+              {assignees[0].name}
+            </span>
+          )}
           {assignees.length > 3 && (
-            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70">
+            <div className="group relative flex h-6 w-6 items-center justify-center rounded-full border border-white bg-[#E5E7EB] text-[10px] font-semibold text-black/70 hover:z-10 transition-transform hover:scale-110 cursor-default">
               +{assignees.length - 3}
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-lg z-50">
+                {assignees.slice(3).map(a => a.name).join(', ')}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-gray-900"></div>
+              </div>
             </div>
           )}
         </div>
@@ -224,16 +238,18 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     });
   };
 
-  // helper to get assignee initials
-  const getAssigneeInitials = (task: TaskWithAssignments) => {
-    return task.assignments.map(a => 
-      a.assignee.display_name
+  // helper to get assignee info
+  const getAssigneeInfo = (task: TaskWithAssignments) => {
+    return task.assignments.map(a => ({
+      id: a.assignee.id,
+      name: a.assignee.display_name || a.assignee.email?.split('@')[0] || 'Unknown',
+      initials: (a.assignee.display_name || a.assignee.email?.split('@')[0] || '?')
         .split(' ')
         .map(word => word[0])
         .join('')
         .toUpperCase()
         .slice(0, 2)
-    );
+    }));
   };
   const today = useMemo(() => new Date().toLocaleDateString("en-US", {
     month: "short",
@@ -291,7 +307,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
-                  assignees={getAssigneeInitials(task)}
+                  assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task.id.toString())}
@@ -309,7 +325,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
-                  assignees={getAssigneeInitials(task)}
+                  assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task.id.toString())}
@@ -327,7 +343,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
-                  assignees={getAssigneeInitials(task)}
+                  assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task.id.toString())}
@@ -345,7 +361,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
-                  assignees={getAssigneeInitials(task)}
+                  assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task.id.toString())}
