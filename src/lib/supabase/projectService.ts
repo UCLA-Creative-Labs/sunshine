@@ -54,3 +54,24 @@ export async function getProjectByUserId(userId: string): Promise<Project | null
 
     return projectData as unknown as Project;
 }
+
+/**
+ * Creates a new project in the database.
+ * @param project - The project data without the id (auto-generated)
+ * @returns The created project or null if creation failed
+ */
+export async function createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
+    const { data, error } = await supabase
+        .from('projects')
+        .insert(project)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error creating project:', error);
+        throw new Error(error.message);
+    }
+
+    return data as Project;
+}
+

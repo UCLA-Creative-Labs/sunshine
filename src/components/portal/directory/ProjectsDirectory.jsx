@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './ProjectsDirectory.css';
 import ProjectCard from './ProjectCard';
 import ProjectModal from './ProjectModal';
@@ -8,6 +8,8 @@ import SectionHeader from './SectionHeader';
 import StatsBar from './StatsBar';
 import Controls from './Controls';
 import Header from './Header';
+import FloatingAddButton from './FloatingAddButton';
+import CreateProjectModal from './CreateProjectModal';
 
 // Projects Directory Component
 const ProjectsDirectory = () => {
@@ -29,7 +31,8 @@ const ProjectsDirectory = () => {
   const [loading, setLoading] = useState(true);
   const [activeProjects, setActiveProjects] = useState([]);
   const [archivedProjects, setArchivedProjects] = useState([]);
-  const [selectedProject, setSelectedProject] = useState(null);;
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Helper to generate consistent colors from names
   const getColor = (name) => {
@@ -50,36 +53,44 @@ const ProjectsDirectory = () => {
       .toUpperCase();
   };
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const { getAllProjects } = await import('@/lib/supabase/projectService');
-        const allProjects = await getAllProjects();
+  const fetchProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { getAllProjects } = await import('@/lib/supabase/projectService');
+      const allProjects = await getAllProjects();
 
-        // Transform data to match UI expectations
-        const formattedProjects = allProjects.map(p => ({
-          ...p,
-          name: p.projectName,
-          description: p.projectDescription,
-          leads: (p.projectLeads || []).map(lead => ({
-            initials: getInitials(lead),
-            color: getColor(lead),
-            name: lead
-          })),
-          memberCount: (p.projectMembers || []).length,
-          quarter: `${p.quarter} ${p.year}`
-        }));
+      // Transform data to match UI expectations
+      const formattedProjects = allProjects.map(p => ({
+        ...p,
+        name: p.projectName,
+        description: p.projectDescription,
+        leads: (p.projectLeads || []).map(lead => ({
+          initials: getInitials(lead),
+          color: getColor(lead),
+          name: lead
+        })),
+        memberCount: (p.projectMembers || []).length,
+        quarter: `${p.quarter} ${p.year}`
+      }));
 
-        setProjects(formattedProjects);
-      } catch (error) {
-        console.error("Failed to fetch projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+      setProjects(formattedProjects);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const handleCreateProject = async (projectData) => {
+    const { createProject } = await import('@/lib/supabase/projectService');
+    await createProject(projectData);
+    // Refresh the projects list
+    await fetchProjects();
+  };
 
   useEffect(() => {
     // Apply filters and search
@@ -206,6 +217,15 @@ const ProjectsDirectory = () => {
         <ProjectModal
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
+        />
+      )}
+
+      <FloatingAddButton onClick={() => setIsCreateModalOpen(true)} />
+
+      {isCreateModalOpen && (
+        <CreateProjectModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreateProject}
         />
       )}
     </div>
