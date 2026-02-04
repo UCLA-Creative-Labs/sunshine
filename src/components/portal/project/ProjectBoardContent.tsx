@@ -73,8 +73,10 @@ interface BoardCardProps {
   dueDate?: string;
   delay?: number;
   onEdit?: () => void;
+  onMarkComplete?: () => void;
   onDelete?: () => void;
   canEdit?: boolean;
+  isCompleted?: boolean;
 }
 
 function getInitials(name: string | undefined | null): string {
@@ -97,7 +99,7 @@ function AvatarStack({ initials }: { initials: string[] }) {
   );
 }
 
-function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onDelete, canEdit = false }: BoardCardProps) {
+function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onMarkComplete, onDelete, canEdit = false, isCompleted = false }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
   const isSingleAssignee = assignees.length === 1;
@@ -109,11 +111,13 @@ function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, 
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs md:text-sm font-medium text-black/80 truncate flex-1">{title}</p>
-        {onEdit && onDelete && (
+        {onEdit && onMarkComplete && onDelete && (
           <TaskActionsMenu 
             onEdit={onEdit}
+            onMarkComplete={onMarkComplete}
             onDelete={onDelete}
             canEdit={canEdit}
+            isCompleted={isCompleted}
           />
         )}
       </div>
@@ -223,6 +227,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     }
   };
 
+  const handleMarkComplete = async (task: TaskWithAssignments) => {
+    const input: UpdateTaskInput = {
+      status: 'done',
+    };
+    
+    const success = await updateTaskAction(String(task.id), input);
+    if (success) {
+      refetch();
+    }
+  };
+
   // group tasks by status
   const tasksByStatus = useMemo(() => {
     const groups: Record<TaskStatus, TaskWithAssignments[]> = {
@@ -320,8 +335,10 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -337,8 +354,10 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -354,8 +373,10 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -371,8 +392,10 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>

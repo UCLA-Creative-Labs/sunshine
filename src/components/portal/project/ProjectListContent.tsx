@@ -146,12 +146,13 @@ interface StatusSectionProps {
   onToggle: () => void;
   delay?: number;
   onEditTask: (task: TaskWithAssignments) => void;
+  onMarkComplete: (task: TaskWithAssignments) => void;
   onDeleteTask: (taskId: string) => void;
   canEdit: boolean;
   dbTasks: TaskWithAssignments[];
 }
 
-function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onDeleteTask, canEdit, dbTasks }: StatusSectionProps) {
+function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onMarkComplete, onDeleteTask, canEdit, dbTasks }: StatusSectionProps) {
   const meta = STATUS_META[status];
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
@@ -273,8 +274,13 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask,
                               const dbTask = dbTasks.find(t => t.id.toString() === task.id);
                               if (dbTask) onEditTask(dbTask);
                             }}
+                            onMarkComplete={() => {
+                              const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                              if (dbTask) onMarkComplete(dbTask);
+                            }}
                             onDelete={() => onDeleteTask(task.id)}
                             canEdit={canEdit}
+                            isCompleted={task.status === 'done'}
                           />
                         </div>
                       </td>
@@ -335,7 +341,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     }
   };
 
-  // handle task edit (placeholder for now)
+  
   const handleEditTask = (task: TaskWithAssignments) => {
     setEditingTask(task);
   };
@@ -346,6 +352,17 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     const success = await updateTaskAction(String(editingTask.id), input);
     if (success) {
       setEditingTask(null);
+      refetch();
+    }
+  };
+
+  const handleMarkComplete = async (task: TaskWithAssignments) => {
+    const input: UpdateTaskInput = {
+      status: 'done',
+    };
+    
+    const success = await updateTaskAction(String(task.id), input);
+    if (success) {
       refetch();
     }
   };
@@ -443,6 +460,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("todo")}
             delay={100}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
@@ -454,6 +472,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("in_progress")}
             delay={200}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
@@ -465,6 +484,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("in_review")}
             delay={300}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
@@ -476,6 +496,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("done")}
             delay={400}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
