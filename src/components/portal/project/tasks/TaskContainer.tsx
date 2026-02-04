@@ -27,8 +27,8 @@ export function TaskContainer({ taskId, canEdit, onRefresh, children }: TaskCont
   };
 
   const handleEdit = () => {
-    // TODO: Implement edit function
-    alert('Edit functionality coming soon!');
+    // Edit functionality is now handled in parent components
+    console.warn('Edit should be handled in parent component');
   };
 
   const actionsMenu = (
