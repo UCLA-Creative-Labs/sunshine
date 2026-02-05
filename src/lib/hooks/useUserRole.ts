@@ -30,38 +30,54 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
       setIsLoading(true);
       setError(null);
 
-      // Fetch user's RBAC role from user_context_roles
+      // Fetch user's RBAC role from project_members (project-specific)
       const { data: roleData, error: roleError } = await supabase
-        .from('user_context_roles')
-        .select('role:roles(id, name, context, description)')
+        .from('project_members')
+        .select('rbac_role:roles!project_members_rbac_role_id_fkey(id, name, context, description)')
+        .eq('project_id', projectId)
         .eq('user_id', userId)
-        .eq('context', 'external')
         .single();
 
+      let projectRole: Role | null = null;
       if (roleError) {
         setError(roleError.message);
         setRole(null);
       } else {
-        const fetchedRole = roleData?.role;
+        const fetchedRole = roleData?.rbac_role;
         if (fetchedRole && typeof fetchedRole === 'object' && !Array.isArray(fetchedRole)) {
-          setRole(fetchedRole as Role);
+          projectRole = fetchedRole as Role;
+          setRole(projectRole);
         } else {
           setRole(null);
         }
       }
 
-      // Check permissions
-      const { data: canEdit } = await supabase.rpc('user_has_permission', {
-        p_user_id: userId,
-        p_permission_name: 'project.edit',
-      });
-      setCanCreateTasks(canEdit || false);
+      // Check permissions for the project role
+      const roleId = projectRole?.id || null;
 
-      const { data: canManage } = await supabase.rpc('user_has_permission', {
-        p_user_id: userId,
-        p_permission_name: 'project.add_member',
-      });
-      setCanManageMembers(canManage || false);
+      if (roleId) {
+        const { data: rolePermissions } = await supabase
+          .from('role_permissions')
+          .select('permissions(name)')
+          .eq('role_id', roleId);
+
+        const permissionNames = (rolePermissions || []).flatMap((entry) => {
+          const permissions = entry.permissions as { name?: string } | { name?: string }[] | null | undefined;
+          if (Array.isArray(permissions)) {
+            return permissions.map((permission) => permission.name).filter(Boolean);
+          }
+          if (permissions?.name) {
+            return [permissions.name];
+          }
+          return [];
+        });
+
+        setCanCreateTasks(permissionNames.includes('project.edit'));
+        setCanManageMembers(permissionNames.includes('project.add_member'));
+      } else {
+        setCanCreateTasks(false);
+        setCanManageMembers(false);
+      }
 
       setIsLoading(false);
     };
