@@ -4,7 +4,8 @@ import {
   addMembersToProject,
   AvailableMember,
 } from '../services/inviteService';
-import { ProjectRole } from '../types/database';
+import { Role } from '../types/database';
+import { supabase } from '../supabase/client';
 
 interface UseInviteMembersReturn {
   availableMembers: AvailableMember[];
@@ -14,12 +15,14 @@ interface UseInviteMembersReturn {
   toggleUserSelection: (userId: string) => void;
   selectAll: () => void;
   clearSelection: () => void;
-  inviteMembers: (role: ProjectRole) => Promise<boolean>;
+  inviteMembers: (roleId?: number) => Promise<boolean>;
   inviting: boolean;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   filteredMembers: AvailableMember[];
   refresh: () => void;
+  availableRoles: Role[];
+  rolesLoading: boolean;
 }
 
 export function useInviteMembers(
@@ -32,6 +35,8 @@ export function useInviteMembers(
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [inviting, setInviting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
 
   const fetchMembers = useCallback(async () => {
     setLoading(true);
@@ -48,9 +53,26 @@ export function useInviteMembers(
     setLoading(false);
   }, [projectId]);
 
+  const fetchRoles = useCallback(async () => {
+    setRolesLoading(true);
+    const { data, error } = await supabase
+      .from('roles')
+      .select('id, name, context, description')
+      .eq('context', 'external')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching roles:', error);
+    } else {
+      setAvailableRoles(data as Role[] || []);
+    }
+    setRolesLoading(false);
+  }, []);
+
   useEffect(() => {
     fetchMembers();
-  }, [fetchMembers]);
+    fetchRoles();
+  }, [fetchMembers, fetchRoles]);
 
   const toggleUserSelection = useCallback((userId: string) => {
     setSelectedUserIds(prev =>
@@ -69,15 +91,15 @@ export function useInviteMembers(
   }, []);
 
   const inviteMembers = useCallback(
-    async (role: ProjectRole): Promise<boolean> => {
+    async (roleId?: number): Promise<boolean> => {
       if (selectedUserIds.length === 0) return false;
 
       setInviting(true);
       const result = await addMembersToProject(
         projectId,
         selectedUserIds,
-        role,
-        currentUserId
+        currentUserId,
+        roleId
       );
       setInviting(false);
 
@@ -115,5 +137,7 @@ export function useInviteMembers(
     setSearchQuery,
     filteredMembers,
     refresh: fetchMembers,
+    availableRoles,
+    rolesLoading,
   };
 }

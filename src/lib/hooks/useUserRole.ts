@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase/client';
+import { Role } from '../types/database';
 
 interface UseUserRoleReturn {
-  role: 'member' | 'lead' | 'manager' | null;
+  role: Role | null;
   isLoading: boolean;
   error: string | null;
   canCreateTasks: boolean;
+  canManageMembers: boolean;
 }
 
 /**
- * hook to get user's role in a specific project
+ * Hook to get user's role and permissions in a specific project using RBAC system
  */
 export function useUserRole(projectId: string | null, userId: string | null): UseUserRoleReturn {
-  const [role, setRole] = useState<'member' | 'lead' | 'manager' | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canCreateTasks, setCanCreateTasks] = useState(false);
+  const [canManageMembers, setCanManageMembers] = useState(false);
 
   useEffect(() => {
     if (!projectId || !userId) {
@@ -26,19 +30,38 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
       setIsLoading(true);
       setError(null);
 
-      const { data, error } = await supabase
-        .from('project_members')
-        .select('role')
-        .eq('project_id', projectId)
+      // Fetch user's RBAC role from user_context_roles
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_context_roles')
+        .select('role:roles(id, name, context, description)')
         .eq('user_id', userId)
+        .eq('context', 'external')
         .single();
 
-      if (error) {
-        setError(error.message);
+      if (roleError) {
+        setError(roleError.message);
         setRole(null);
       } else {
-        setRole(data?.role || null);
+        const fetchedRole = roleData?.role;
+        if (fetchedRole && typeof fetchedRole === 'object' && !Array.isArray(fetchedRole)) {
+          setRole(fetchedRole as Role);
+        } else {
+          setRole(null);
+        }
       }
+
+      // Check permissions
+      const { data: canEdit } = await supabase.rpc('user_has_permission', {
+        p_user_id: userId,
+        p_permission_name: 'project.edit',
+      });
+      setCanCreateTasks(canEdit || false);
+
+      const { data: canManage } = await supabase.rpc('user_has_permission', {
+        p_user_id: userId,
+        p_permission_name: 'project.add_member',
+      });
+      setCanManageMembers(canManage || false);
 
       setIsLoading(false);
     };
@@ -46,12 +69,11 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
     fetchUserRole();
   }, [projectId, userId]);
 
-  const canCreateTasks = role === 'lead' || role === 'manager';
-
   return {
     role,
     isLoading,
     error,
     canCreateTasks,
+    canManageMembers,
   };
 }
