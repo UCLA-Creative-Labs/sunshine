@@ -75,3 +75,25 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<Proje
     return data as Project;
 }
 
+/**
+ * Updates an existing project in the database.
+ * @param projectId - The ID of the project to update
+ * @param updates - The partial project data to update
+ * @returns The updated project or null if update failed
+ */
+export async function updateProject(projectId: number, updates: Partial<Project>): Promise<Project | null> {
+    const { data, error } = await supabase
+        .from('projects')
+        .update(updates)
+        .eq('id', projectId)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error updating project:', error);
+        throw new Error(error.message);
+    }
+
+    return data as Project;
+}
+

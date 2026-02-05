@@ -2,15 +2,22 @@
 
 import React, { memo, useEffect, useState } from "react";
 import Image from "next/image";
-import { FaGithub } from "react-icons/fa6";
+import { FaGithub, FaPencil, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
-import { getProjectByUserId } from "@/lib/supabase/projectService";
+import { getProjectByUserId, updateProject } from "@/lib/supabase/projectService";
+
+
+
 import { Project } from "@/types/project";
+
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
   titleDefault: "mb-3 text-xl font-semibold tracking-tight text-black",
 } as const;
+
+
+
 
 const AVATAR_STYLES = {
   large: "flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#E5E7EB]",
@@ -104,6 +111,12 @@ export default function MyProjectContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<Project>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+
   useEffect(() => {
     async function fetchProject() {
       try {
@@ -144,22 +157,175 @@ export default function MyProjectContent() {
     );
   }
 
+  const handleEditClick = () => {
+    if (project) {
+      setEditForm({
+        projectName: project.projectName,
+        projectDescription: project.projectDescription,
+        year: project.year,
+        quarter: project.quarter,
+      });
+      setIsEditing(true);
+    }
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setEditForm({});
+  };
+
+  const handleSaveClick = async () => {
+    if (!project) return;
+
+    try {
+      setIsSaving(true);
+      const updatedProject = await updateProject(project.id, editForm);
+      if (updatedProject) {
+        setProject(updatedProject);
+        setIsEditing(false);
+      }
+    } catch (err) {
+      console.error("Failed to save project:", err);
+      setError("Failed to save changes");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleInputChange = (field: keyof Project, value: string) => {
+    setEditForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleYearStep = (direction: 'next' | 'prev') => {
+    const currentYearStr = editForm.year || "23-24";
+    // Parse start year from "YY-YY" format
+    let startYear = parseInt("20" + currentYearStr.split("-")[0]);
+
+    if (isNaN(startYear)) startYear = 2023; // Default fallback
+
+    const newStartYear = direction === 'next' ? startYear + 1 : startYear - 1;
+
+    // Format back to "YY-YY"
+    const startStr = newStartYear.toString().slice(-2);
+    const endStr = (newStartYear + 1).toString().slice(-2);
+    const newYearStr = `${startStr}-${endStr}`;
+
+    handleInputChange("year", newYearStr);
+  };
+
   return (
     <>
+
       {/* Project Name from database */}
-      <section className="space-y-2 mb-10">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-          {project.projectName || "My Project"}
-        </h1>
+      <section className="space-y-4 mb-10">
+        <div className="flex items-start justify-between gap-4">
+          {isEditing ? (
+            <div className="flex-1 space-y-4">
+              <input
+                type="text"
+                value={editForm.projectName || ""}
+                onChange={(e) => handleInputChange("projectName", e.target.value)}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 text-3xl md:text-4xl font-semibold tracking-tight focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-300 transition-all"
+                placeholder="Project Name"
+              />
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Quarter Segmented Control */}
+                <div className="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
+                  {["Fall", "Winter", "Spring"].map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => handleInputChange("quarter", q)}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${editForm.quarter === q
+                        ? "bg-white text-black shadow-sm"
+                        : "text-gray-500 hover:text-black"
+                        }`}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Year Stepper */}
+                <div className="flex items-center rounded-xl border border-gray-200 bg-white px-2 py-1">
+                  <button
+                    onClick={() => handleYearStep('prev')}
+                    className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <FaChevronLeft className="w-3 h-3" />
+                  </button>
+                  <span className="w-20 text-center font-medium text-sm">
+                    {editForm.year || "23-24"}
+                  </span>
+                  <button
+                    onClick={() => handleYearStep('next')}
+                    className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <FaChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
+                {project.projectName || "My Project"}
+              </h1>
+              <p className="text-black/60">
+                {project.quarter} {project.year}
+              </p>
+            </div>
+          )}
+
+          {/* Edit Actions */}
+          <div className="flex-shrink-0">
+            {isEditing ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCancelClick}
+                  disabled={isSaving}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveClick}
+                  disabled={isSaving}
+                  className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleEditClick}
+                className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <FaPencil className="h-3 w-3" />
+                Edit
+              </button>
+            )}
+          </div>
+        </div>
       </section>
+
       <div className="grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
         {/* Left column */}
         <div className="space-y-14">
           {/* Project Description from database */}
           <Section title="Project Description" delay={0}>
-            <p className="text-sm md:text-base text-black/80">
-              {project.projectDescription || "No description available."}
-            </p>
+            {isEditing ? (
+              <textarea
+                value={editForm.projectDescription || ""}
+                onChange={(e) => handleInputChange("projectDescription", e.target.value)}
+                className="w-full min-h-[150px] rounded-xl border border-gray-200 px-4 py-3 text-sm md:text-base focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-300 transition-all resize-y"
+                placeholder="Project Description"
+              />
+            ) : (
+              <p className="text-sm md:text-base text-black/80 whitespace-pre-wrap">
+                {project.projectDescription || "No description available."}
+              </p>
+            )}
+
           </Section>
 
           {/* Project Leads from database */}
