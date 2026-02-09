@@ -7,9 +7,10 @@ import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useTaskActions } from '@/lib/hooks/useTaskActions';
 import { AddTaskModal } from './tasks/AddTaskModal';
+import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
-import { CreateTaskInput } from '@/lib/types/tasks';
-import { TaskStatus } from '@/lib/types/database';
+import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
+import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 
 type StatusId = "todo" | "in_progress" | "in_review" | "done";
 type Priority = "low" | "medium" | "high" | "urgent";
@@ -144,12 +145,14 @@ interface StatusSectionProps {
   isOpen: boolean;
   onToggle: () => void;
   delay?: number;
-  onEditTask: (taskId: string) => void;
+  onEditTask: (task: TaskWithAssignments) => void;
+  onMarkComplete: (task: TaskWithAssignments) => void;
   onDeleteTask: (taskId: string) => void;
   canEdit: boolean;
+  dbTasks: TaskWithAssignments[];
 }
 
-function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onDeleteTask, canEdit }: StatusSectionProps) {
+function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onMarkComplete, onDeleteTask, canEdit, dbTasks }: StatusSectionProps) {
   const meta = STATUS_META[status];
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
@@ -267,9 +270,17 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask,
                       <td className="px-6 py-3 align-middle">
                         <div className="flex items-center justify-center h-full">
                           <TaskActionsMenu 
-                            onEdit={() => onEditTask(task.id)}
+                            onEdit={() => {
+                              const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                              if (dbTask) onEditTask(dbTask);
+                            }}
+                            onMarkComplete={() => {
+                              const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                              if (dbTask) onMarkComplete(dbTask);
+                            }}
                             onDelete={() => onDeleteTask(task.id)}
                             canEdit={canEdit}
+                            isCompleted={task.status === 'done'}
                           />
                         </div>
                       </td>
@@ -298,10 +309,11 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { deleteTaskAction } = useTaskActions();
+  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions();
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskWithAssignments | null>(null);
 
   const assigneeOptions = members
     .filter((m) => m.user.id !== currentUserId)
@@ -329,10 +341,30 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     }
   };
 
-  // handle task edit (placeholder for now)
-  const handleEditTask = (taskId: string) => {
-    // TODO: Implement edit modal
-    alert('Edit functionality coming soon!');
+  
+  const handleEditTask = (task: TaskWithAssignments) => {
+    setEditingTask(task);
+  };
+
+  const handleEditSubmit = async (input: UpdateTaskInput) => {
+    if (!editingTask) return;
+    
+    const success = await updateTaskAction(String(editingTask.id), input);
+    if (success) {
+      setEditingTask(null);
+      refetch();
+    }
+  };
+
+  const handleMarkComplete = async (task: TaskWithAssignments) => {
+    const input: UpdateTaskInput = {
+      status: 'done',
+    };
+    
+    const success = await updateTaskAction(String(task.id), input);
+    if (success) {
+      refetch();
+    }
   };
 
   // transform db tasks to list tasks
@@ -428,8 +460,10 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("todo")}
             delay={100}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
+            dbTasks={dbTasks}
           />
           <StatusSection
             status="in_progress"
@@ -438,8 +472,10 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("in_progress")}
             delay={200}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
+            dbTasks={dbTasks}
           />
           <StatusSection
             status="in_review"
@@ -448,8 +484,10 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("in_review")}
             delay={300}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
+            dbTasks={dbTasks}
           />
           <StatusSection
             status="done"
@@ -458,8 +496,10 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onToggle={() => toggleSection("done")}
             delay={400}
             onEditTask={handleEditTask}
+            onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
             canEdit={canCreateTasks}
+            dbTasks={dbTasks}
           />
         </div>
       )}
@@ -472,6 +512,16 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
         projectMembers={assigneeOptions}
         isSubmitting={isCreating}
       />
+
+      {editingTask && (
+        <EditTaskModal
+          isOpen={!!editingTask}
+          onClose={() => setEditingTask(null)}
+          onSubmit={handleEditSubmit}
+          task={editingTask}
+          isSubmitting={isUpdating}
+        />
+      )}
 
       {createError && (
         <div className="fixed bottom-4 right-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 shadow-lg">
