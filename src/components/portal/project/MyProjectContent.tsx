@@ -227,6 +227,7 @@ export default function MyProjectContent() {
                 onChange={(e) => handleInputChange("projectName", e.target.value)}
                 className="w-full rounded-xl border border-gray-200 px-4 py-2 text-3xl md:text-4xl font-semibold tracking-tight focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-300 transition-all"
                 placeholder="Project Name"
+                aria-label="Project Name"
               />
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Quarter Segmented Control */}
@@ -319,6 +320,7 @@ export default function MyProjectContent() {
                 onChange={(e) => handleInputChange("projectDescription", e.target.value)}
                 className="w-full min-h-[150px] rounded-xl border border-gray-200 px-4 py-3 text-sm md:text-base focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-300 transition-all resize-y"
                 placeholder="Project Description"
+                aria-label="Project Description"
               />
             ) : (
               <p className="text-sm md:text-base text-black/80 whitespace-pre-wrap">
