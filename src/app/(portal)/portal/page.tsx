@@ -3,24 +3,24 @@
 // Dashboard/Home page for the membership portal
 // Route: /portal
 
-import { useState } from "react";
+import { useRef, useCallback } from "react";
 import AnnouncementsSection from "@/components/portal/dashboard/AnnouncementsSection";
 import CurrentProjectSection from "@/components/portal/dashboard/CurrentProjectSection";
 import CalendarSection from "@/components/portal/dashboard/CalendarSection";
 import TodoListSection from "@/components/portal/dashboard/TodoListSection";
 
 export default function PortalDashboard() {
-    const [refetchEvents, setRefetchEvents] = useState<(() => Promise<void>) | null>(null);
+    const refetchEventsRef = useRef<(() => Promise<void>) | null>(null);
 
-    const handleRefetchReady = (refetch: () => Promise<void>) => {
-        setRefetchEvents(() => refetch);
-    };
+    const handleRefetchReady = useCallback((refetch: () => Promise<void>) => {
+        refetchEventsRef.current = refetch;
+    }, []);
 
-    const handleEventCreated = async () => {
-        if (refetchEvents) {
-            await refetchEvents();
+    const handleEventCreated = useCallback(async () => {
+        if (refetchEventsRef.current) {
+            await refetchEventsRef.current();
         }
-    };
+    }, []);
 
     return (
         <div className="flex-1 text-black px-6 py-8 md:px-10 md:py-10">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getUpcomingEvents } from "@/lib/supabase/eventsService";
 import { ProjectEvent } from "@/types/events";
 import ProjectEventCard from "@/components/portal/ProjectEventCard";
@@ -41,22 +41,22 @@ export default function CalendarSection({ onRefetchReady }: CalendarSectionProps
   const [loading, setLoading] = useState(true);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     setLoading(true);
     const data = await getUpcomingEvents();
     setEvents(data);
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [fetchEvents]);
 
   useEffect(() => {
     if (onRefetchReady) {
       onRefetchReady(fetchEvents);
     }
-  }, [onRefetchReady]);
+  }, [onRefetchReady, fetchEvents]);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDayOfMonth = getFirstDayOfMonth(currentYear, currentMonth);
