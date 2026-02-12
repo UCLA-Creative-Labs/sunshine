@@ -1,4 +1,4 @@
-export type AnnouncementVisibility = 'project' | 'team' | 'club_wide';
+export type AnnouncementVisibility = 'project' | 'team' | 'board' | 'club_wide';
 export type BoardTeam = 'tech' | 'finance' | 'marketing' | 'design';
 
 export interface ProjectEvent {

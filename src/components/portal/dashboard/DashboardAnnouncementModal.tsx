@@ -153,6 +153,17 @@ export function DashboardAnnouncementModal({
                 </button>
                 <button
                   type="button"
+                  onClick={() => setVisibility('board')}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    visibility === 'board'
+                      ? 'bg-[#3F86FF] text-white'
+                      : 'bg-[#E5E7EB] text-black/70 hover:bg-[#D4D7E5]'
+                  }`}
+                >
+                  Board-Wide
+                </button>
+                <button
+                  type="button"
                   onClick={() => setVisibility('club_wide')}
                   className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                     visibility === 'club_wide'
