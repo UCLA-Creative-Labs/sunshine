@@ -26,7 +26,11 @@ function getFirstDayOfMonth(year: number, month: number): number {
   return new Date(year, month, 1).getDay();
 }
 
-export default function CalendarSection() {
+interface CalendarSectionProps {
+  onRefetchReady?: (refetch: () => Promise<void>) => void;
+}
+
+export default function CalendarSection({ onRefetchReady }: CalendarSectionProps) {
   const mounted = useMountAnimation(160);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3";
 
@@ -37,16 +41,22 @@ export default function CalendarSection() {
   const [loading, setLoading] = useState(true);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
-  useEffect(() => {
-    async function fetchEvents() {
-      setLoading(true);
-      const data = await getUpcomingEvents();
-      setEvents(data);
-      setLoading(false);
-    }
+  const fetchEvents = async () => {
+    setLoading(true);
+    const data = await getUpcomingEvents();
+    setEvents(data);
+    setLoading(false);
+  };
 
+  useEffect(() => {
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    if (onRefetchReady) {
+      onRefetchReady(fetchEvents);
+    }
+  }, [onRefetchReady]);
 
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDayOfMonth = getFirstDayOfMonth(currentYear, currentMonth);
