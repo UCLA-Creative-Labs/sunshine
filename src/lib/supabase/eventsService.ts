@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import { ProjectEvent, ProjectAnnouncement } from '@/types/events';
+import { ProjectEvent, ProjectAnnouncement, CreateEventInput, CreateAnnouncementInput } from '@/types/events';
 
 /**
  * Get all upcoming events across all projects
@@ -137,4 +137,42 @@ export async function getProjectAnnouncements(
   }
 
   return (data || []) as ProjectAnnouncement[];
+}
+
+/**
+ * Create a new event for a project
+ * RLS enforces that only the project's lead can create events
+ */
+export async function createEvent(input: CreateEventInput): Promise<ProjectEvent | null> {
+  const { data, error } = await supabase
+    .from('project_events')
+    .insert(input)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating event:', error);
+    throw new Error(error.message);
+  }
+
+  return data as ProjectEvent;
+}
+
+/**
+ * Create a new announcement for a project
+ * RLS enforces that only the project's lead (or director/president for team/club-wide) can create
+ */
+export async function createAnnouncement(input: CreateAnnouncementInput): Promise<ProjectAnnouncement | null> {
+  const { data, error } = await supabase
+    .from('project_announcements')
+    .insert(input)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating announcement:', error);
+    throw new Error(error.message);
+  }
+
+  return data as ProjectAnnouncement;
 }

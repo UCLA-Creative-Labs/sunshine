@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa6";
 import { SiFigma, SiNotion } from "react-icons/si";
 import { useTasks } from '@/lib/hooks/useTasks';
+import { useUserRole } from '@/lib/hooks/useUserRole';
 import { getProjectById } from '@/lib/supabase/projectService';
+import { getProjectEvents, getProjectAnnouncements, createEvent, createAnnouncement } from '@/lib/supabase/eventsService';
 import { Project } from '@/lib/types/database';
+import { ProjectEvent, ProjectAnnouncement, CreateEventInput, CreateAnnouncementInput } from '@/types/events';
+import { AddEventModal } from './events/AddEventModal';
+import { AddAnnouncementModal } from './events/AddAnnouncementModal';
+import ProjectEventCard from '@/components/portal/ProjectEventCard';
+import ProjectAnnouncementCard from '@/components/portal/ProjectAnnouncementCard';
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
@@ -103,8 +110,14 @@ interface MyProjectContentProps {
 
 export default function MyProjectContent({ projectId, currentUserId }: MyProjectContentProps) {
   const { tasks: allTasks, isLoading } = useTasks(projectId);
+  const { canPostEvents } = useUserRole(projectId, currentUserId);
   const [project, setProject] = useState<Project | null>(null);
   const [projectLoading, setProjectLoading] = useState(true);
+  const [events, setEvents] = useState<ProjectEvent[]>([]);
+  const [announcements, setAnnouncements] = useState<ProjectAnnouncement[]>([]);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     async function fetchProject() {
@@ -120,6 +133,47 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
     }
     fetchProject();
   }, [projectId]);
+
+  const fetchEvents = useCallback(async () => {
+    const data = await getProjectEvents(projectId, { includeCompleted: false });
+    setEvents(data);
+  }, [projectId]);
+
+  const fetchAnnouncements = useCallback(async () => {
+    const data = await getProjectAnnouncements(projectId);
+    setAnnouncements(data);
+  }, [projectId]);
+
+  useEffect(() => {
+    fetchEvents();
+    fetchAnnouncements();
+  }, [fetchEvents, fetchAnnouncements]);
+
+  const handleCreateEvent = async (input: CreateEventInput) => {
+    setIsSubmitting(true);
+    try {
+      await createEvent(input);
+      await fetchEvents();
+      setShowEventModal(false);
+    } catch (err) {
+      console.error('Failed to create event:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCreateAnnouncement = async (input: CreateAnnouncementInput) => {
+    setIsSubmitting(true);
+    try {
+      await createAnnouncement(input);
+      await fetchAnnouncements();
+      setShowAnnouncementModal(false);
+    } catch (err) {
+      console.error('Failed to create announcement:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const myTasks = useMemo(() => {
     return allTasks.filter(task => 
@@ -265,6 +319,58 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
             </div>
           )}
         </Section>
+
+        <section className="space-y-4 transform transition-all duration-300 ease-out">
+          <div className="flex items-center justify-between">
+            <h2 className={CARD_STYLES.titleDefault}>Upcoming Events</h2>
+            {canPostEvents && (
+              <button
+                onClick={() => setShowEventModal(true)}
+                className="flex items-center gap-1.5 rounded-lg bg-[#3F86FF] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#346edd] transition-colors"
+              >
+                <span className="text-base leading-none">+</span>
+                <span>Add Event</span>
+              </button>
+            )}
+          </div>
+          <div className={CARD_STYLES.base}>
+            {events.length === 0 ? (
+              <p className="text-sm text-black/50">No upcoming events</p>
+            ) : (
+              <div className="space-y-4">
+                {events.map(event => (
+                  <ProjectEventCard key={event.id} event={event} compact />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-4 transform transition-all duration-300 ease-out">
+          <div className="flex items-center justify-between">
+            <h2 className={CARD_STYLES.titleDefault}>Announcements</h2>
+            {canPostEvents && (
+              <button
+                onClick={() => setShowAnnouncementModal(true)}
+                className="flex items-center gap-1.5 rounded-lg bg-[#3F86FF] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#346edd] transition-colors"
+              >
+                <span className="text-base leading-none">+</span>
+                <span>Add Announcement</span>
+              </button>
+            )}
+          </div>
+          <div className={CARD_STYLES.base}>
+            {announcements.length === 0 ? (
+              <p className="text-sm text-black/50">No announcements</p>
+            ) : (
+              <div className="space-y-4">
+                {announcements.map(announcement => (
+                  <ProjectAnnouncementCard key={announcement.id} announcement={announcement} compact />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       </div>
 
       <div className="space-y-14">
@@ -333,6 +439,22 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
           </div>
         </Section>
       </div>
+
+      <AddEventModal
+        isOpen={showEventModal}
+        onClose={() => setShowEventModal(false)}
+        onSubmit={handleCreateEvent}
+        projectId={projectId}
+        isSubmitting={isSubmitting}
+      />
+
+      <AddAnnouncementModal
+        isOpen={showAnnouncementModal}
+        onClose={() => setShowAnnouncementModal(false)}
+        onSubmit={handleCreateAnnouncement}
+        projectId={projectId}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }
