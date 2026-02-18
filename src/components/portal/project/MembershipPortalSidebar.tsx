@@ -8,6 +8,7 @@ import {
   RxRows,
   RxPerson,
   RxFileText,
+  RxGear,
 } from "react-icons/rx";
 
 export type MembershipPortalSidebarItem = {
@@ -19,6 +20,7 @@ export type MembershipPortalSidebarItem = {
 
 export interface MembershipPortalSidebarProps {
   projectName?: string;
+  logoUrl?: string;
   items?: MembershipPortalSidebarItem[];
   className?: string;
 }
@@ -35,10 +37,12 @@ const BASE_ITEMS = [
   { id: "list", label: "List", path: "list", icon: RxRows },
   { id: "members", label: "Members", path: "members", icon: RxPerson },
   { id: "docs", label: "Docs", path: "docs", icon: RxFileText },
+  { id: "settings", label: "Settings", path: "settings", icon: RxGear },
 ];
 
 export default function MembershipPortalSidebar({
   projectName,
+  logoUrl,
   items,
   className = "",
 }: MembershipPortalSidebarProps) {
@@ -77,7 +81,12 @@ export default function MembershipPortalSidebar({
       className={`flex min-h-screen flex-col border-r-[2px] border-[#CDCCC8] bg-white px-6 py-6 w-60 ${className}`}
     >
       <div className="mt-4 mb-12 flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-[#FFB3D9]" />
+        {logoUrl && (
+          <div className="h-10 w-10 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={logoUrl} alt="Project logo" className="h-full w-full object-contain" />
+          </div>
+        )}
         <div className="flex flex-col">
           <span
             className="font-bold"
