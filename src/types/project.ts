@@ -7,7 +7,10 @@ export interface Project {
     projectDescription: string;
     projectManagers: string[] | null;
     projectMembers: string[] | null;
-    logoUrl?: string;
+    logoUrl?: string | null;
+    githubUrl?: string | null;
+    figmaUrl?: string | null;
+    notionUrl?: string | null;
     prototypeUrl?: string;
     demoDayUrl?: string;
     instaPostUrl?: string;

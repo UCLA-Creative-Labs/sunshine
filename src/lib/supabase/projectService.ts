@@ -1,6 +1,14 @@
 import { supabase } from './client';
 import { Project } from '@/types/project';
 
+export interface ProjectSettingsUpdate {
+  projectName?: string;
+  githubUrl?: string | null;
+  figmaUrl?: string | null;
+  notionUrl?: string | null;
+  logoUrl?: string | null;
+}
+
 export async function getProjectsByYear(year: string): Promise<Project[]> {
     const { data, error } = await supabase
         .from('projects')
@@ -84,3 +92,48 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<Proje
     return data as Project;
 }
 
+export async function updateProjectSettings(
+  projectId: string,
+  updates: ProjectSettingsUpdate
+): Promise<Project | null> {
+  const { data, error } = await supabase
+    .from('projects')
+    .update(updates)
+    .eq('id', projectId)
+    .select('*')
+    .single();
+
+  if (error || !data) {
+    console.error('Error updating project settings:', error);
+    return null;
+  }
+
+  return data as Project;
+}
+
+export async function uploadProjectLogo(
+  projectId: string,
+  file: File,
+  bucketName = 'project_logos'
+): Promise<string | null> {
+  const fileExt = file.name.split('.').pop() || 'png';
+  const fileName = `logo-${Date.now()}.${fileExt}`;
+  const filePath = `${projectId}/${fileName}`;
+
+  const { error: uploadError } = await supabase
+    .storage
+    .from(bucketName)
+    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+  if (uploadError) {
+    console.error('Error uploading project logo:', uploadError);
+    return null;
+  }
+
+  const { data: publicUrl } = supabase
+    .storage
+    .from(bucketName)
+    .getPublicUrl(filePath);
+
+  return publicUrl?.publicUrl || null;
+}
