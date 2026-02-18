@@ -1,10 +1,33 @@
-"use client";
+import MembershipPortalSidebar from "@/components/portal/project/MembershipPortalSidebar";
+import { createClient } from "@/lib/supabase/server";
 
 interface ProjectLayoutProps {
   children: React.ReactNode;
   params: Promise<{ projectId: string }>;
 }
 
-export default function ProjectLayout({ children }: ProjectLayoutProps) {
-  return <>{children}</>;
+export default async function ProjectLayout({ children, params }: ProjectLayoutProps) {
+  const { projectId } = await params;
+
+  let projectName: string | undefined;
+  if (projectId) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('projects')
+      .select('projectName')
+      .eq('id', projectId)
+      .single();
+    projectName = data?.projectName ?? undefined;
+  }
+
+  return (
+    <div className="flex flex-1 text-black">
+      <MembershipPortalSidebar className="flex-shrink-0" projectName={projectName} />
+      <div className="flex-1 px-6 py-8 md:px-10 md:py-10">
+        <div className="mx-auto max-w-5xl space-y-6">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
 }

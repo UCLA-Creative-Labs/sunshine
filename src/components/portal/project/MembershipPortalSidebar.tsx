@@ -38,7 +38,7 @@ const BASE_ITEMS = [
 ];
 
 export default function MembershipPortalSidebar({
-  projectName = "Project Name",
+  projectName,
   items,
   className = "",
 }: MembershipPortalSidebarProps) {
@@ -50,10 +50,10 @@ export default function MembershipPortalSidebar({
     return match ? match[1] : null;
   }, [pathname]);
 
-  // avigation items with  projectId
+  // Build nav items using the projectId extracted from the current path
   const navItems = useMemo(() => {
     if (items) return items;
-    
+
     if (!projectId) return [];
 
     return BASE_ITEMS.map(item => ({

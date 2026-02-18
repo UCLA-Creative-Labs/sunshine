@@ -11,6 +11,7 @@ import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
+import { getProfileDisplayName } from '@/lib/utils/profileName';
 
 const BUTTON_STYLES = {
   addTask: "mt-1 flex w-full items-center justify-center rounded-xl border border-dashed border-black/15 bg-white/60 px-3 py-2 text-[11px] md:text-xs font-medium text-black/70 transition-all duration-150 ease-out hover:bg-white hover:border-black/30 hover:-translate-y-0.5",
@@ -190,7 +191,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     .filter((m) => m.user.id !== currentUserId)
     .map((m) => ({
       id: m.user.id,
-      display_name: m.user.display_name,
+      display_name: getProfileDisplayName(m.user),
     }));
 
   // handle task creation
@@ -308,6 +309,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
             Tasks
           </h1>
+          <p className="text-sm font-semibold text-black">Tasks</p>
           <p className="text-[11px] md:text-xs text-black/50">{today}</p>
         </div>
         <div className="flex items-center gap-4">

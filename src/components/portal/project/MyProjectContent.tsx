@@ -10,7 +10,7 @@ import { Project } from '@/lib/types/database';
 
 const CARD_STYLES = {
   base: "rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl",
-  titleDefault: "mb-3 text-xl font-semibold tracking-tight text-black",
+  titleDefault: "mb-3 text-2xl font-semibold tracking-tight text-black",
 } as const;
 
 const AVATAR_STYLES = {

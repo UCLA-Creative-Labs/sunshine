@@ -11,6 +11,7 @@ import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
+import { getProfileDisplayName } from '@/lib/utils/profileName';
 
 type StatusId = "todo" | "in_progress" | "in_review" | "done";
 type Priority = "low" | "medium" | "high" | "urgent";
@@ -78,17 +79,6 @@ const STATUS_META: Record<StatusId, { label: string; bandBg: string; textColor: 
 // helper to map database task status to ui status id
 function mapTaskStatusToStatusId(status: TaskStatus): StatusId {
   return status as StatusId;
-}
-
-// helper to get assignee initials from display name
-function getInitials(displayName: string | undefined | null): string {
-  if (!displayName) return "?";
-  return displayName
-    .split(' ')
-    .map(word => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
 }
 
 function AssigneeGroup({ assignees }: { assignees: Assignee[] }) {
@@ -319,7 +309,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     .filter((m) => m.user.id !== currentUserId)
     .map((m) => ({
       id: m.user.id,
-      display_name: m.user.display_name,
+      display_name: getProfileDisplayName(m.user),
     }));
 
   // handle task creation
