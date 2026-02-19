@@ -1,4 +1,37 @@
-export type ProjectRole = 'member' | 'lead' | 'manager';
+export type RoleContext = 'internal' | 'external';
+
+export interface Role {
+  id: number;
+  context: RoleContext;
+  name: string;
+  description: string | null;
+  created_at: string;
+}
+
+export interface Permission {
+  id: number;
+  name: string;
+  description: string | null;
+}
+
+export interface RolePermission {
+  role_id: number;
+  permission_id: number;
+  role?: Role;
+  permission?: Permission;
+}
+
+export interface UserContextRole {
+  user_id: string;
+  role_id: number;
+  context: RoleContext;
+  role?: Role;
+}
+
+// ============================================================================
+// LEGACY TYPES (Deprecated - use RBAC system instead)
+// ============================================================================
+
 export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type InviteStatus = 'active' | 'expired' | 'revoked';
@@ -18,7 +51,7 @@ export interface ProjectMember {
   updated_at: string;
   project_id: string;
   user_id: string;
-  role: ProjectRole;
+  rbac_role_id: number | null;
   joined_at: string;
   invited_by: string | null;
   invite_id: number | null;
@@ -64,7 +97,7 @@ export interface ProjectInvite {
   project_id: string;
   created_by: string;
   invite_code: string;
-  role_to_assign: ProjectRole;
+  rbac_role_id: number | null;
   status: InviteStatus;
   expires_at: string | null;
   max_uses: number | null;

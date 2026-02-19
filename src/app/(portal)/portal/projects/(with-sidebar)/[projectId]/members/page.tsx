@@ -6,17 +6,18 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import InviteMemberModal from '@/components/portal/InviteMemberModal';
-import { ProjectRole } from '@/lib/types/database';
 
-function getRoleBadgeStyles(role: ProjectRole) {
-  switch (role) {
-    case 'lead':
-      return 'bg-purple-100 text-purple-700';
-    case 'manager':
-      return 'bg-blue-100 text-blue-700';
-    default:
-      return 'bg-gray-100 text-gray-600';
+function getRoleBadgeStyles(roleName: string | undefined) {
+  if (!roleName) return 'bg-gray-100 text-gray-600';
+  
+  const lowerName = roleName.toLowerCase();
+  if (lowerName.includes('lead')) {
+    return 'bg-purple-100 text-purple-700';
   }
+  if (lowerName.includes('manager') || lowerName.includes('admin')) {
+    return 'bg-blue-100 text-blue-700';
+  }
+  return 'bg-gray-100 text-gray-600';
 }
 
 export default function MembersPage({
@@ -26,7 +27,7 @@ export default function MembersPage({
 }) {
   const { projectId } = use(params);
   const { userId, isLoading: authLoading, error: authError } = useAuth();
-  const { canCreateTasks } = useUserRole(projectId, userId);
+  const { canManageMembers } = useUserRole(projectId, userId);
   const { members, isLoading: membersLoading, refetch } = useProjectMembers(projectId);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
@@ -53,7 +54,7 @@ export default function MembersPage({
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
             Members
           </h1>
-          {canCreateTasks && (
+          {canManageMembers && (
             <button
               onClick={() => setIsInviteModalOpen(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -110,9 +111,9 @@ export default function MembersPage({
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-block px-2 py-1 text-xs font-medium rounded capitalize ${getRoleBadgeStyles(member.role)}`}
+                        className={`inline-block px-2 py-1 text-xs font-medium rounded capitalize ${getRoleBadgeStyles(member.rbac_role?.name)}`}
                       >
-                        {member.role}
+                        {member.rbac_role?.name || 'No role'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-sm">

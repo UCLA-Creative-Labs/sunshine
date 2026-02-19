@@ -1,18 +1,20 @@
 import { supabase } from '../supabase/client';
 import { TaskOperationResult } from '../types/tasks';
+import { Role } from '../types/database';
 
 export interface UserProject {
   project_id: string;
-  role: 'member' | 'lead' | 'manager';
+  role: Role | null;
   project_name: string;
 }
 
 export async function getUserCurrentProject(
   userId: string
 ): Promise<TaskOperationResult<UserProject | null>> {
+  // Fetch project membership
   const { data, error } = await supabase
     .from('project_members')
-    .select('project_id, role, projects!project_members_project_id_fkey(projectName)')
+    .select('project_id, projects!project_members_project_id_fkey(projectName)')
     .eq('user_id', userId)
     .limit(1)
     .maybeSingle();
@@ -29,10 +31,23 @@ export async function getUserCurrentProject(
   const projects = data.projects as any;
   const projectName = projects?.projectName || 'Unknown Project';
 
+  // Fetch RBAC role
+  const { data: roleData } = await supabase
+    .from('user_context_roles')
+    .select('role:roles(id, name, context, description)')
+    .eq('user_id', userId)
+    .eq('context', 'external')
+    .single();
+
+  const fetchedRole = roleData?.role;
+  const userRole = (fetchedRole && typeof fetchedRole === 'object' && !Array.isArray(fetchedRole))
+    ? fetchedRole as Role
+    : null;
+
   return {
     data: {
       project_id: data.project_id,
-      role: data.role as 'member' | 'lead' | 'manager',
+      role: userRole,
       project_name: projectName,
     },
     error: null,
