@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase/client';
+import { Role } from '../types/database';
 
 interface UseUserRoleReturn {
-  role: 'member' | 'lead' | 'manager' | null;
+  role: Role | null;
   isLoading: boolean;
   error: string | null;
   canCreateTasks: boolean;
+  canManageMembers: boolean;
 }
 
 /**
- * hook to get user's role in a specific project
+ * Hook to get user's role and permissions in a specific project using RBAC system
  */
 export function useUserRole(projectId: string | null, userId: string | null): UseUserRoleReturn {
-  const [role, setRole] = useState<'member' | 'lead' | 'manager' | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [canCreateTasks, setCanCreateTasks] = useState(false);
+  const [canManageMembers, setCanManageMembers] = useState(false);
 
   useEffect(() => {
     if (!projectId || !userId) {
@@ -26,18 +30,53 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
       setIsLoading(true);
       setError(null);
 
-      const { data, error } = await supabase
+      // Fetch user's RBAC role from project_members (project-specific)
+      const { data: roleData, error: roleError } = await supabase
         .from('project_members')
-        .select('role')
+        .select('rbac_role:roles!project_members_rbac_role_id_fkey(id, name, context, description)')
         .eq('project_id', projectId)
         .eq('user_id', userId)
         .single();
 
-      if (error) {
-        setError(error.message);
+      let projectRole: Role | null = null;
+      if (roleError) {
+        setError(roleError.message);
         setRole(null);
       } else {
-        setRole(data?.role || null);
+        const fetchedRole = roleData?.rbac_role;
+        if (fetchedRole && typeof fetchedRole === 'object' && !Array.isArray(fetchedRole)) {
+          projectRole = fetchedRole as Role;
+          setRole(projectRole);
+        } else {
+          setRole(null);
+        }
+      }
+
+      // Check permissions for the project role
+      const roleId = projectRole?.id || null;
+
+      if (roleId) {
+        const { data: rolePermissions } = await supabase
+          .from('role_permissions')
+          .select('permissions(name)')
+          .eq('role_id', roleId);
+
+        const permissionNames = (rolePermissions || []).flatMap((entry) => {
+          const permissions = entry.permissions as { name?: string } | { name?: string }[] | null | undefined;
+          if (Array.isArray(permissions)) {
+            return permissions.map((permission) => permission.name).filter(Boolean);
+          }
+          if (permissions?.name) {
+            return [permissions.name];
+          }
+          return [];
+        });
+
+        setCanCreateTasks(permissionNames.includes('project.edit'));
+        setCanManageMembers(permissionNames.includes('project.add_member'));
+      } else {
+        setCanCreateTasks(false);
+        setCanManageMembers(false);
       }
 
       setIsLoading(false);
@@ -46,12 +85,11 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
     fetchUserRole();
   }, [projectId, userId]);
 
-  const canCreateTasks = role === 'lead' || role === 'manager';
-
   return {
     role,
     isLoading,
     error,
     canCreateTasks,
+    canManageMembers,
   };
 }

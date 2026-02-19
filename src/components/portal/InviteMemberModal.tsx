@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useInviteMembers } from '@/lib/hooks/useInviteMembers';
-import { ProjectRole } from '@/lib/types/database';
 
 interface InviteMemberModalProps {
   projectId: string;
@@ -19,7 +18,7 @@ export default function InviteMemberModal({
   onClose,
   onSuccess,
 }: InviteMemberModalProps) {
-  const [selectedRole, setSelectedRole] = useState<ProjectRole>('member');
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
 
   const {
     loading,
@@ -33,12 +32,15 @@ export default function InviteMemberModal({
     searchQuery,
     setSearchQuery,
     filteredMembers,
+    availableRoles,
+    rolesLoading,
   } = useInviteMembers(projectId, currentUserId);
 
   if (!isOpen) return null;
 
   const handleInvite = async () => {
-    const success = await inviteMembers(selectedRole);
+    // Use selected RBAC role, or default to 'project member'
+    const success = await inviteMembers(selectedRoleId || undefined);
     if (success) {
       onSuccess?.();
       onClose();
@@ -133,15 +135,22 @@ export default function InviteMemberModal({
             <label className="text-sm font-medium text-gray-700">
               Role:
             </label>
-            <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value as ProjectRole)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="member">Member</option>
-              <option value="lead">Lead</option>
-              <option value="manager">Manager</option>
-            </select>
+            {rolesLoading ? (
+              <div className="text-sm text-gray-500">Loading roles...</div>
+            ) : (
+              <select
+                value={selectedRoleId || ''}
+                onChange={(e) => setSelectedRoleId(e.target.value ? Number(e.target.value) : null)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Default (Project Member)</option>
+                {availableRoles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="flex justify-end gap-3">
