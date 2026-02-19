@@ -138,3 +138,31 @@ export async function getProjectAnnouncements(
 
   return (data || []) as ProjectAnnouncement[];
 }
+
+/**
+ * Create a new event
+ */
+export async function createEvent(
+  eventData: Omit<ProjectEvent, 'id' | 'created_at' | 'updated_at'>
+): Promise<{ data: ProjectEvent | null; error: string | null }> {
+  // Set defaults
+  const eventPayload = {
+    ...eventData,
+    status: eventData.status || 'upcoming',
+    is_public: eventData.is_public ?? true,
+    rsvp_required: eventData.rsvp_required ?? false,
+  };
+
+  const { data, error } = await supabase
+    .from('project_events')
+    .insert(eventPayload)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating event:', error);
+    return { data: null, error: error.message };
+  }
+
+  return { data: data as ProjectEvent, error: null };
+}
