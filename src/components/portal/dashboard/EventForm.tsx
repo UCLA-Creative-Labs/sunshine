@@ -109,6 +109,8 @@ export function EventForm({
       image_url: null,
       status: 'upcoming',
       is_public: true,
+      visibility: 'project',
+      target_team: null,
     };
 
     await onSubmit(eventData);

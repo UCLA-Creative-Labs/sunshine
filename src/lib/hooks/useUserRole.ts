@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabase/client';
 import { Role } from '../types/database';
 
+
 interface UseUserRoleReturn {
   role: Role | null;
   isLoading: boolean;
   error: string | null;
   canCreateTasks: boolean;
   canManageMembers: boolean;
+  canPostEvents: boolean;
 }
 
 /**
@@ -19,6 +21,7 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
   const [error, setError] = useState<string | null>(null);
   const [canCreateTasks, setCanCreateTasks] = useState(false);
   const [canManageMembers, setCanManageMembers] = useState(false);
+  const [canPostEvents, setCanPostEvents] = useState(false);
 
   useEffect(() => {
     if (!projectId || !userId) {
@@ -74,9 +77,11 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
 
         setCanCreateTasks(permissionNames.includes('project.edit'));
         setCanManageMembers(permissionNames.includes('project.add_member'));
+        setCanPostEvents(projectRole?.name === 'project lead');
       } else {
         setCanCreateTasks(false);
         setCanManageMembers(false);
+        setCanPostEvents(false);
       }
 
       setIsLoading(false);
@@ -91,5 +96,6 @@ export function useUserRole(projectId: string | null, userId: string | null): Us
     error,
     canCreateTasks,
     canManageMembers,
+    canPostEvents,
   };
 }

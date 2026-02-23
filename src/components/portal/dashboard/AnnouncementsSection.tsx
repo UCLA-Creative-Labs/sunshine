@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getAllAnnouncements } from "@/lib/supabase/eventsService";
-import { ProjectAnnouncement } from "@/types/events";
+import { useEffect, useState, useCallback } from "react";
+import { getAllAnnouncements, createAnnouncement } from "@/lib/supabase/eventsService";
+import { ProjectAnnouncement, CreateAnnouncementInput } from "@/types/events";
 import ProjectAnnouncementCard from "@/components/portal/ProjectAnnouncementCard";
+import { DashboardAnnouncementModal } from "./DashboardAnnouncementModal";
+import { supabase } from "@/lib/supabase/client";
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -22,25 +24,99 @@ export default function AnnouncementsSection() {
 
   const [announcements, setAnnouncements] = useState<ProjectAnnouncement[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [canPost, setCanPost] = useState(false);
+  const [userProjects, setUserProjects] = useState<{ id: string; projectName: string; isLead: boolean }[]>([]);
+  const [isDirectorOrPresident, setIsDirectorOrPresident] = useState(false);
+
+  const fetchAnnouncements = useCallback(async () => {
+    setLoading(true);
+    const data = await getAllAnnouncements(6);
+    setAnnouncements(data);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchAnnouncements() {
-      setLoading(true);
-      const data = await getAllAnnouncements(6); // Limit to 6 announcements
-      setAnnouncements(data);
-      setLoading(false);
+    fetchAnnouncements();
+  }, [fetchAnnouncements]);
+
+  // Check if user can post (is a project lead, director, or president)
+  useEffect(() => {
+    async function checkPermissions() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Check if user is a director or president (internal RBAC)
+      const { data: internalRoles } = await supabase
+        .from('user_context_roles')
+        .select('roles!inner(name)')
+        .eq('user_id', user.id);
+
+      const roleNames = (internalRoles || []).map(
+        (r) => ((r.roles as unknown as { name: string })?.name)
+      );
+      const isDirectorOrPresident = roleNames.some(
+        (name) => name === 'director' || name === 'president'
+      );
+
+      // Check which projects the user leads
+      const { data: memberships } = await supabase
+        .from('project_members')
+        .select('project_id, rbac_role_id, roles!inner(name), projects!inner(id, "projectName")')
+        .eq('user_id', user.id);
+
+      const projects = (memberships || []).map((m) => {
+        const role = (m.roles as unknown as { name: string })?.name;
+        const proj = m.projects as unknown as { id: string; projectName: string };
+        return {
+          id: proj?.id,
+          projectName: proj?.projectName,
+          isLead: role === 'project lead',
+        };
+      }).filter((p) => p.id);
+
+      const leadsAnyProject = projects.some((p) => p.isLead);
+
+      setUserProjects(projects.filter((p) => p.isLead));
+      setIsDirectorOrPresident(isDirectorOrPresident);
+      setCanPost(isDirectorOrPresident || leadsAnyProject);
     }
 
-    fetchAnnouncements();
+    checkPermissions();
   }, []);
+
+  const handleCreateAnnouncement = async (input: CreateAnnouncementInput) => {
+    setIsSubmitting(true);
+    try {
+      await createAnnouncement(input);
+      await fetchAnnouncements();
+      setShowModal(false);
+    } catch (err) {
+      console.error('Failed to create announcement:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section
       className={`transform transition-all duration-300 ease-out ${enterClasses}`}
     >
-      <h2 className="text-xs font-semibold tracking-wide text-black/50 uppercase mb-4">
-        Announcements
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xs font-semibold tracking-wide text-black/50 uppercase">
+          Announcements
+        </h2>
+        {canPost && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-[#3F86FF] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#346edd] transition-colors"
+          >
+            <span className="text-base leading-none">+</span>
+            <span>New Announcement</span>
+          </button>
+        )}
+      </div>
       <div className="rounded-2xl border border-[#D4D7E5] bg-white p-6 shadow-sm">
         {loading ? (
           <div className="text-center text-black/60 py-8">
@@ -62,6 +138,15 @@ export default function AnnouncementsSection() {
           </div>
         )}
       </div>
+
+      <DashboardAnnouncementModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleCreateAnnouncement}
+        userProjects={userProjects}
+        isDirectorOrPresident={isDirectorOrPresident}
+        isSubmitting={isSubmitting}
+      />
     </section>
   );
 }
