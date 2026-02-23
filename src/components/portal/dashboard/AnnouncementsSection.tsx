@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { getAllAnnouncements, createAnnouncement } from "@/lib/supabase/eventsService";
 import { ProjectAnnouncement, CreateAnnouncementInput } from "@/types/events";
-import ProjectAnnouncementCard from "@/components/portal/ProjectAnnouncementCard";
 import { DashboardAnnouncementModal } from "./DashboardAnnouncementModal";
 import { supabase } from "@/lib/supabase/client";
 
@@ -47,7 +46,6 @@ export default function AnnouncementsSection() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if user is a director or president (internal RBAC)
       const { data: internalRoles } = await supabase
         .from('user_context_roles')
         .select('roles!inner(name)')
@@ -60,7 +58,6 @@ export default function AnnouncementsSection() {
         (name) => name === 'director' || name === 'president'
       );
 
-      // Check which projects the user leads
       const { data: memberships } = await supabase
         .from('project_members')
         .select('project_id, rbac_role_id, roles!inner(name), projects!inner(id, "projectName")')
@@ -129,11 +126,13 @@ export default function AnnouncementsSection() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {announcements.map((announcement) => (
-              <ProjectAnnouncementCard
+              <div
                 key={announcement.id}
-                announcement={announcement}
-                compact
-              />
+                className="rounded-lg border border-[#E2E4F0] p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <h3 className="font-semibold text-black mb-1">{announcement.title}</h3>
+                <p className="text-sm text-black/60">{announcement.description}</p>
+              </div>
             ))}
           </div>
         )}

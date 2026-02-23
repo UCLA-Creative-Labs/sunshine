@@ -36,6 +36,9 @@ export async function getAllProjects(): Promise<Project[]> {
     return (data || []) as Project[];
 }
 
+/**
+ * Fetches a project by its ID.
+ */
 export async function getProjectById(projectId: string): Promise<Project | null> {
     const { data, error } = await supabase
         .from('projects')
@@ -44,14 +47,17 @@ export async function getProjectById(projectId: string): Promise<Project | null>
         .single();
 
     if (error || !data) {
-        console.error('Error fetching project by ID:', error);
+        console.error('Error fetching project by id:', error);
         return null;
     }
 
-    return data as Project;
+    return data as unknown as Project;
 }
 
-export async function getProjectByUserId(userId:string): Promise<Project | null> {
+/**
+ * Fetches the project associated with a user via the project_members join table.
+ */
+export async function getProjectByUserId(userId: string): Promise<Project | null> {
     const { data, error } = await supabase
         .from('project_members')
         .select('project_id, projects(*)')
@@ -74,8 +80,6 @@ export async function getProjectByUserId(userId:string): Promise<Project | null>
 
 /**
  * Creates a new project in the database.
- * @param project - The project data without the id (auto-generated)
- * @returns The created project or null if creation failed
  */
 export async function createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
     const { data, error } = await supabase
@@ -86,6 +90,25 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<Proje
 
     if (error) {
         console.error('Error creating project:', error);
+        throw new Error(error.message);
+    }
+
+    return data as Project;
+}
+
+/**
+ * Updates an existing project in the database.
+ */
+export async function updateProject(projectId: number, updates: Partial<Project>): Promise<Project | null> {
+    const { data, error } = await supabase
+        .from('projects')
+        .update(updates)
+        .eq('id', projectId)
+        .select()
+        .single();
+
+    if (error) {
+        console.error('Error updating project:', error);
         throw new Error(error.message);
     }
 

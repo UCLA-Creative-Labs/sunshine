@@ -45,15 +45,9 @@ export default function MembershipPortalNavbar({
 
   const derivedFromHrefId = (() => {
     if (!pathname) return undefined;
-    const aliasMatches: Array<{ prefix: string; id: string }> = [
-      { prefix: "/portal/projects/", id: "my-project" },
-    ];
-    const aliasMatch = aliasMatches.find(({ prefix }) => pathname.startsWith(prefix));
-    if (aliasMatch) return aliasMatch.id;
-
     const matchingTabs = tabs.filter((tab) => tab.href && pathname.startsWith(tab.href));
     if (matchingTabs.length === 0) return undefined;
-    const bestMatch = matchingTabs.reduce((a, b) =>
+    const bestMatch = matchingTabs.reduce((a, b) => 
       (a.href?.length ?? 0) > (b.href?.length ?? 0) ? a : b
     );
     return bestMatch.id;

@@ -17,7 +17,6 @@ interface ProfileSectionProps {
     bio: string;
     isEditingBio: boolean;
     achievements: Achievement[];
-    roles?: any[];
     onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onBioChange: (value: string) => void;
     onEditBioStart: () => void;
@@ -30,7 +29,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     bio,
     isEditingBio,
     achievements,
-    roles = [],
     onImageChange,
     onBioChange,
     onEditBioStart,
@@ -109,23 +107,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                     <p className="text-sm text-gray-500 mb-4">
                         Joined {formatDate(profile.joined_date)}
                     </p>
-
-                    {/* Roles */}
-                    {roles.length > 0 && (
-                        <div className="mb-4">
-                            <p className="text-sm font-medium text-black mb-2">Roles:</p>
-                            <div className="flex flex-wrap gap-2">
-                                {roles.map((role, index) => (
-                                    <span
-                                        key={index}
-                                        className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-                                    >
-                                        {role.context}: {role.roles.name}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     {/* Bio */}
                     <div className="mb-4">

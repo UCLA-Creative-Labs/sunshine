@@ -22,30 +22,19 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const supabase = createClient();
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const supabase = createClient();
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        setError(error.message);
-        return;
-      }
-
-      if (!data.session) {
-        setError("Failed to create session. Please try again.");
-        return;
-      }
-
-      router.push("/portal");
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("An unexpected error occurred. Please try again.");
-    } finally {
+    if (error) {
+      setError(error.message);
       setIsLoading(false);
+    } else {
+      // Redirect to portal on successful login
+      router.push("/portal");
     }
   };
 
