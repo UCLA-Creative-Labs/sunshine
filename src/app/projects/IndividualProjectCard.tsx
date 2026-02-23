@@ -4,10 +4,10 @@ export interface IndividualProjectProps {
   projectName: string;
   projectLeads: string[];
   projectDescription: string;
-  logoUrl?: string;
+  logoUrl?: string | null;
   prototypeUrl?: string;
-  projectManagers: string[];
-  projectMembers: string[];
+  projectManagers: string[] | null;
+  projectMembers: string[] | null;
   demoDayUrl?: string;
   instaPostUrl?: string;
 };

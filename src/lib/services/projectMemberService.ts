@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client';
 import { ProjectMember, Profiles, Role } from '../types/database';
+import { getProfileDisplayName } from '../utils/profileName';
 import { TaskOperationResult } from '../types/tasks';
 
 export interface ProjectMemberWithProfile extends ProjectMember {
@@ -17,7 +18,8 @@ export async function getProjectMembers(
       user:profiles!project_members_user_id_fkey (
         id,
         email,
-        display_name,
+        first_name,
+        last_name,
         created_at
       ),
       rbac_role:roles!project_members_rbac_role_id_fkey (
@@ -40,7 +42,7 @@ export async function getProjectMembers(
     rbac_role: member.rbac_role as Role | undefined,
     user: {
       ...member.user,
-      display_name: member.user.display_name || member.user.email?.split('@')[0] || 'Unknown',
+      display_name: getProfileDisplayName(member.user),
     },
   }));
 

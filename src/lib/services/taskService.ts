@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client';
 import { Task, TaskAssignment, TaskWithAssignments } from '../types/database';
+import { getProfileDisplayName } from '../utils/profileName';
 import {
   CreateTaskInput,
   AssignTaskInput,
@@ -95,12 +96,14 @@ export async function getTasksWithAssignments(
         assigned_by,
         assignee:profiles!task_assignments_user_id_fkey (
           id,
-          display_name,
+          first_name,
+          last_name,
           email
         ),
         assigned_by_profile:profiles!task_assignments_assigned_by_fkey (
           id,
-          display_name,
+          first_name,
+          last_name,
           email
         )
       )
@@ -113,7 +116,24 @@ export async function getTasksWithAssignments(
     return { data: null, error: error.message, success: false };
   }
 
-  return { data: data as TaskWithAssignments[], error: null, success: true };
+  const tasksWithNames = (data || []).map((task) => ({
+    ...task,
+    assignments: (task.assignments || []).map((assignment) => ({
+      ...assignment,
+      assignee: {
+        ...assignment.assignee,
+        display_name: getProfileDisplayName(assignment.assignee),
+      },
+      assigned_by_profile: assignment.assigned_by_profile
+        ? {
+          ...assignment.assigned_by_profile,
+          display_name: getProfileDisplayName(assignment.assigned_by_profile),
+        }
+        : null,
+    })),
+  }));
+
+  return { data: tasksWithNames as TaskWithAssignments[], error: null, success: true };
 }
 
 /**
