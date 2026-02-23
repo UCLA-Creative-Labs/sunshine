@@ -38,8 +38,6 @@ export async function getAllProjects(): Promise<Project[]> {
 
 /**
  * Fetches a project by its ID.
- * @param projectId - The project ID to look up
- * @returns The project or null if not found
  */
 export async function getProjectById(projectId: string): Promise<Project | null> {
     const { data, error } = await supabase
@@ -58,8 +56,6 @@ export async function getProjectById(projectId: string): Promise<Project | null>
 
 /**
  * Fetches the project associated with a user via the project_members join table.
- * @param userId - The user ID to look up
- * @returns The user's project or null if not found
  */
 export async function getProjectByUserId(userId: string): Promise<Project | null> {
     const { data, error } = await supabase
@@ -73,7 +69,6 @@ export async function getProjectByUserId(userId: string): Promise<Project | null
         return null;
     }
 
-    // The joined projects data is nested under the 'projects' key
     const projectData = data.projects;
 
     if (!projectData || Array.isArray(projectData)) {
@@ -85,8 +80,6 @@ export async function getProjectByUserId(userId: string): Promise<Project | null
 
 /**
  * Creates a new project in the database.
- * @param project - The project data without the id (auto-generated)
- * @returns The created project or null if creation failed
  */
 export async function createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
     const { data, error } = await supabase
@@ -105,9 +98,6 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<Proje
 
 /**
  * Updates an existing project in the database.
- * @param projectId - The ID of the project to update
- * @param updates - The partial project data to update
- * @returns The updated project or null if update failed
  */
 export async function updateProject(projectId: number, updates: Partial<Project>): Promise<Project | null> {
     const { data, error } = await supabase

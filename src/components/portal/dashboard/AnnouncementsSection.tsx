@@ -17,19 +17,6 @@ function useMountAnimation(delay: number) {
   return mounted;
 }
 
-interface Announcement {
-  id: number;
-  title: string;
-  preview: string;
-}
-
-// TODO: Fetch announcements from database
-const PLACEHOLDER_ANNOUNCEMENTS: Announcement[] = [
-  { id: 1, title: "Announcement 1", preview: "Preview text..." },
-  { id: 2, title: "Announcement 2", preview: "Preview text..." },
-  { id: 3, title: "Announcement 3", preview: "Preview text..." },
-];
-
 export default function AnnouncementsSection() {
   const mounted = useMountAnimation(0);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3";
@@ -59,7 +46,6 @@ export default function AnnouncementsSection() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if user is a director or president (internal RBAC)
       const { data: internalRoles } = await supabase
         .from('user_context_roles')
         .select('roles!inner(name)')
@@ -72,7 +58,6 @@ export default function AnnouncementsSection() {
         (name) => name === 'director' || name === 'president'
       );
 
-      // Check which projects the user leads
       const { data: memberships } = await supabase
         .from('project_members')
         .select('project_id, rbac_role_id, roles!inner(name), projects!inner(id, "projectName")')
@@ -130,17 +115,27 @@ export default function AnnouncementsSection() {
         )}
       </div>
       <div className="rounded-2xl border border-[#D4D7E5] bg-white p-6 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {PLACEHOLDER_ANNOUNCEMENTS.map((announcement) => (
-            <div
-              key={announcement.id}
-              className="rounded-lg border border-[#E2E4F0] p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              <h3 className="font-semibold text-black mb-1">{announcement.title}</h3>
-              <p className="text-sm text-black/60">{announcement.preview}</p>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center text-black/60 py-8">
+            Loading announcements...
+          </div>
+        ) : announcements.length === 0 ? (
+          <div className="text-center text-black/60 py-8">
+            No announcements at this time.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {announcements.map((announcement) => (
+              <div
+                key={announcement.id}
+                className="rounded-lg border border-[#E2E4F0] p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <h3 className="font-semibold text-black mb-1">{announcement.title}</h3>
+                <p className="text-sm text-black/60">{announcement.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <DashboardAnnouncementModal

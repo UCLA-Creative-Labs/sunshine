@@ -376,7 +376,6 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
                 {project.projectDescription || "No description available."}
               </p>
             )}
-
           </Section>
 
           {/* Project Leads from database */}
@@ -437,7 +436,7 @@ export default function MyProjectContent({ projectId, currentUserId }: MyProject
                         Bug
                       </span>
                     </td>
-                    <td className="py-4 pr-6 align-middle">
+<td className="py-4 pr-6 align-middle">
                       <span className="rounded-full bg-[#E2F7E6] px-3 py-1 text-xs font-medium text-[#1F7A3D]">
                         In-Progress
                       </span>
