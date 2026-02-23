@@ -42,7 +42,9 @@ export interface Profiles {
   id: string;
   created_at: string;
   email: string;
-  display_name: string;
+  first_name: string | null;
+  last_name: string | null;
+  display_name?: string | null;
 }
 
 export interface ProjectMember {

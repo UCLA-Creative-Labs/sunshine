@@ -3,6 +3,9 @@ import { supabase } from './client';
 export interface Profile {
   id: string;
   email: string;
+  first_name: string | null;
+  last_name: string | null;
+  display_name?: string | null;
   created_at: string;
 }
 

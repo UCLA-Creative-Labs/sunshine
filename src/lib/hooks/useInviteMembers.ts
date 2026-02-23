@@ -118,7 +118,7 @@ export function useInviteMembers(
   const filteredMembers = availableMembers.filter(member => {
     const query = searchQuery.toLowerCase();
     return (
-      member.display_name.toLowerCase().includes(query) ||
+      (member.display_name?.toLowerCase().includes(query) ?? false) ||
       member.email.toLowerCase().includes(query)
     );
   });

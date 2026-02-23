@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client';
 import { Profiles } from '../types/database';
+import { getProfileDisplayName } from '../utils/profileName';
 import { TaskOperationResult } from '../types/tasks';
 
 export type AvailableMember = Profiles;
@@ -21,7 +22,7 @@ export async function getAvailableMembers(
 
   let query = supabase
     .from('profiles')
-    .select('id, email, display_name, created_at');
+    .select('id, email, first_name, last_name, created_at');
 
   if (existingUserIds.length > 0) {
     query = query.not('id', 'in', `(${existingUserIds.join(',')})`);
@@ -34,7 +35,12 @@ export async function getAvailableMembers(
     return { data: null, error: error.message, success: false };
   }
 
-  return { data: data as AvailableMember[], error: null, success: true };
+  const membersWithNames = (data || []).map((member) => ({
+    ...member,
+    display_name: getProfileDisplayName(member),
+  }));
+
+  return { data: membersWithNames as AvailableMember[], error: null, success: true };
 }
 
 /**
