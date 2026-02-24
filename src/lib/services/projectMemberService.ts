@@ -1,9 +1,11 @@
 import { supabase } from '../supabase/client';
-import { ProjectMember, Profiles } from '../types/database';
+import { ProjectMember, Profiles, Role } from '../types/database';
+import { getProfileDisplayName } from '../utils/profileName';
 import { TaskOperationResult } from '../types/tasks';
 
 export interface ProjectMemberWithProfile extends ProjectMember {
   user: Profiles;
+  rbac_role?: Role;
 }
 
 export async function getProjectMembers(
@@ -16,7 +18,15 @@ export async function getProjectMembers(
       user:profiles!project_members_user_id_fkey (
         id,
         email,
-        display_name,
+        first_name,
+        last_name,
+        created_at
+      ),
+      rbac_role:roles!project_members_rbac_role_id_fkey (
+        id,
+        name,
+        context,
+        description,
         created_at
       )
     `)
@@ -27,13 +37,14 @@ export async function getProjectMembers(
     return { data: null, error: error.message, success: false };
   }
 
-  const members = data?.map(member => ({
+  const membersWithRoles = (data || []).map(member => ({
     ...member,
+    rbac_role: member.rbac_role as Role | undefined,
     user: {
       ...member.user,
-      display_name: member.user.display_name || member.user.email?.split('@')[0] || 'Unknown',
-    }
-  })) || [];
+      display_name: getProfileDisplayName(member.user),
+    },
+  }));
 
-  return { data: members as ProjectMemberWithProfile[], error: null, success: true };
+  return { data: membersWithRoles as ProjectMemberWithProfile[], error: null, success: true };
 }

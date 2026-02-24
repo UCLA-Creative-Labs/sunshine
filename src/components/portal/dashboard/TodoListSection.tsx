@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { CreateEventModal } from "./CreateEventModal";
+import { createEvent } from "@/lib/supabase/eventsService";
+import { ProjectEvent } from "@/types/events";
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -28,11 +32,18 @@ const INITIAL_TODOS: TodoItem[] = [
   { id: 5, text: "Task 5", completed: false },
 ];
 
-export default function TodoListSection() {
+interface TodoListSectionProps {
+  onEventCreated?: () => void;
+}
+
+export default function TodoListSection({ onEventCreated }: TodoListSectionProps) {
   const mounted = useMountAnimation(160);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3";
+  const { userId } = useAuth();
 
   const [todos, setTodos] = useState<TodoItem[]>(INITIAL_TODOS);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleTodo = (id: number) => {
     setTodos((prev) =>
@@ -45,6 +56,29 @@ export default function TodoListSection() {
   const addTask = () => {
     const newId = Math.max(...todos.map((t) => t.id), 0) + 1;
     setTodos((prev) => [...prev, { id: newId, text: `Task ${newId}`, completed: false }]);
+  };
+
+  const handleCreateEvent = async (eventData: Omit<ProjectEvent, 'id' | 'created_at' | 'updated_at'>) => {
+    if (!userId) return;
+
+    setIsSubmitting(true);
+    try {
+      const result = await createEvent(eventData);
+      if (result.error) {
+        console.error('Error creating event:', result.error);
+        alert('Failed to create event: ' + result.error);
+      } else {
+        setIsEventModalOpen(false);
+        if (onEventCreated) {
+          onEventCreated();
+        }
+      }
+    } catch (error) {
+      console.error('Error creating event:', error);
+      alert('Failed to create event. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -81,13 +115,31 @@ export default function TodoListSection() {
           ))}
         </div>
 
-        <button
-          onClick={addTask}
-          className="mt-4 text-sm text-black/60 hover:text-black transition-colors"
-        >
-          + Add task
-        </button>
+        <div className="mt-4 flex flex-col gap-2">
+          <button
+            onClick={addTask}
+            className="text-sm text-black/60 hover:text-black transition-colors"
+          >
+            + Add task
+          </button>
+          <button
+            onClick={() => setIsEventModalOpen(true)}
+            className="text-sm text-[#3F86FF] hover:text-[#346edd] transition-colors font-medium"
+          >
+            + Plan Event
+          </button>
+        </div>
       </div>
+
+      {userId && (
+        <CreateEventModal
+          isOpen={isEventModalOpen}
+          onClose={() => setIsEventModalOpen(false)}
+          onSubmit={handleCreateEvent}
+          userId={userId}
+          isSubmitting={isSubmitting}
+        />
+      )}
     </section>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import { use } from 'react';
 import ProjectBoardContent from "@/components/portal/project/ProjectBoardContent";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { use } from 'react';
 
 export default function Page({ params }: { params: Promise<{ projectId: string }> }) {
-  const { projectId } = use(params);
   const { userId, isLoading, error } = useAuth();
+  const { projectId } = use(params);
 
   if (isLoading) {
     return (
@@ -25,16 +25,9 @@ export default function Page({ params }: { params: Promise<{ projectId: string }
   }
 
   return (
-    <>
-      <section className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-          Board
-        </h1>
-      </section>
-      <ProjectBoardContent 
-        projectId={projectId}
-        currentUserId={userId}
-      />
-    </>
+    <ProjectBoardContent
+      projectId={projectId}
+      currentUserId={userId}
+    />
   );
 }

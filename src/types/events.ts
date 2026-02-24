@@ -1,6 +1,9 @@
+export type AnnouncementVisibility = 'project' | 'team' | 'board' | 'club_wide';
+export type BoardTeam = 'tech' | 'finance' | 'marketing' | 'design';
+
 export interface ProjectEvent {
   id: string;
-  project_id: string;
+  project_id: string | null;
   title: string;
   description: string | null;
   event_type: string | null;
@@ -16,13 +19,15 @@ export interface ProjectEvent {
   image_url: string | null;
   status: string;
   is_public: boolean;
+  visibility: AnnouncementVisibility;
+  target_team: BoardTeam | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface ProjectAnnouncement {
   id: string;
-  project_id: string;
+  project_id: string | null;
   title: string;
   description: string;
   announcement_type: string | null;
@@ -35,6 +40,11 @@ export interface ProjectAnnouncement {
   publish_date: string;
   expire_date: string | null;
   is_active: boolean;
+  visibility: AnnouncementVisibility;
+  target_team: BoardTeam | null;
   created_at: string;
   updated_at: string;
 }
+
+export type CreateEventInput = Omit<ProjectEvent, 'id' | 'created_at' | 'updated_at'>;
+export type CreateAnnouncementInput = Omit<ProjectAnnouncement, 'id' | 'created_at' | 'updated_at'>;

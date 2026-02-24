@@ -3,6 +3,9 @@ import { supabase } from './client';
 export interface Profile {
   id: string;
   email: string;
+  first_name: string | null;
+  last_name: string | null;
+  display_name?: string | null;
   created_at: string;
 }
 
@@ -19,6 +22,49 @@ export const profileService = {
 
     if (error) throw error;
     return data;
+  },
+
+  async getUserRoles(userId: string) {
+    const { data, error } = await supabase
+      .from('user_context_roles')
+      .select(`
+        context,
+        roles!inner(
+          name
+        )
+      `)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getUserProjects(userId: string) {
+    const { data, error } = await supabase
+      .from('project_members')
+      .select(`
+        rbac_role_id,
+        joined_at,
+        projects (
+          id,
+          projectName,
+          projectDescription,
+          projectLeads,
+          projectManagers,
+          projectMembers,
+          year,
+          quarter,
+          logoUrl,
+          prototypeUrl,
+          demoDayUrl,
+          instaPostUrl
+        )
+      `)
+      .eq('user_id', userId)
+      .order('joined_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
   },
 
   async getAllProfiles() {
