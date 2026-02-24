@@ -3,7 +3,7 @@
  * 
  * This is the main orchestrator component that:
  * - Manages all state (profile data, projects, form inputs, modals)
- * - Handles data fetching (TODO: connect to Supabase)
+ * - Handles data fetching from Supabase profiles table
  * - Calculates unlocked achievements based on level/points
  * - Coordinates between ProfileSection and UserProjectsList
  * - Handles all user interactions (image upload, bio editing, project CRUD)
@@ -18,49 +18,93 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-// import { supabase } from '@/lib/supabase/client';
+import { profileService } from '@/lib/supabase/profileService';
+import ProjectCard from '@/components/portal/directory/ProjectCard';
+import ProjectModal from '@/components/portal/directory/ProjectModal';
 
-import { Profile, Project } from './types';
+import { Profile } from './types';
 import { ACHIEVEMENT_THRESHOLDS, ACHIEVEMENT_CONFIG } from './constants';
 import ProfileSection from './ProfileSection';
-import UserProjectsList from './UserProjectsList';
 
 const ProfileContent = () => {
     const [profile, setProfile] = useState<Profile | null>(null);
+    const [roles, setRoles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [bio, setBio] = useState('');
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
-    const [showProjectModal, setShowProjectModal] = useState(false);
-    const [editingProject, setEditingProject] = useState<Project | null>(null);
-    
-    // Project form state
-    const [projectName, setProjectName] = useState('');
-    const [projectDescription, setProjectDescription] = useState('');
-    const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
-    const [projectImage, setProjectImage] = useState<string | null>(null);
-    const [projectLink, setProjectLink] = useState('');
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<any[]>([]);
+    const [selectedProject, setSelectedProject] = useState<any>(null);
 
-    // TODO: Replace with Supabase fetch when database is set up
-    // Initialize with default profile data
+    // Fetch current user profile from Supabase
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            const defaultProfile: Profile = {
-                id: 'temp-id',
-                first_name: 'First',
-                last_name: 'Last',
-                username: 'username',
-                bio: null,
-                profile_image_url: null,
-                level: 1,
-                points: 0,
-                joined_date: new Date().toISOString(),
-            };
-            setProfile(defaultProfile);
-            setLoading(false);
-        }, 500);
+        const fetchProfile = async () => {
+            try {
+                const profileData = await profileService.getCurrentProfile();
+                
+                // Transform Supabase profile to match UI expectations
+                const transformedProfile: Profile = {
+                    id: profileData.id,
+                    first_name: profileData.display_name || profileData.email.split('@')[0],
+                    last_name: '',
+                    username: profileData.email.split('@')[0],
+                    bio: null,
+                    profile_image_url: null,
+                    level: 1,
+                    points: 0,
+                    joined_date: profileData.created_at,
+                };
+                
+                setProfile(transformedProfile);
+                setBio(transformedProfile.bio || '');
+                
+                const userRoles = await profileService.getUserRoles(profileData.id);
+                setRoles(userRoles);
+                
+                // Fetch user projects
+                try {
+                    const userProjects = await profileService.getUserProjects(profileData.id);
+                    if (userProjects && userProjects.length > 0) {
+                        const formattedProjects = userProjects.map((p: any) => {
+                            const getColor = (name: string) => {
+                                const colors = ['#FFB6C1', '#ADD8E6', '#DDA0DD', '#F0E68C', '#98FB98', '#FFE4B5', '#E0BBE4', '#B4E7CE'];
+                                let hash = 0;
+                                for (let i = 0; i < name.length; i++) {
+                                    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                                }
+                                return colors[Math.abs(hash) % colors.length];
+                            };
+
+                            const getInitials = (name: string) => {
+                                return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+                            };
+
+                            return {
+                                ...p.projects,
+                                name: p.projects.projectName,
+                                description: p.projects.projectDescription,
+                                leads: (p.projects.projectLeads || []).map((lead: string) => ({
+                                    initials: getInitials(lead),
+                                    color: getColor(lead),
+                                    name: lead
+                                })),
+                                memberCount: (p.projects.projectMembers || []).length,
+                                quarter: `${p.projects.quarter} ${p.projects.year}`
+                            };
+                        });
+                        setProjects(formattedProjects);
+                    }
+                } catch (projectError) {
+                    console.error('Error fetching projects:', projectError);
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
     }, []);
 
     // Calculate unlocked achievements based on level and points
@@ -77,101 +121,27 @@ const ProfileContent = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // TODO: Upload to Supabase Storage when database is set up
+        // TODO: Upload to Supabase Storage when storage is set up
         // For now, just use local file preview
         const reader = new FileReader();
         reader.onloadend = () => {
             const result = reader.result as string;
             setProfileImage(result);
-            // TODO: Update profile in Supabase when connected
-            // await supabase.from('profiles').update({ profile_image_url: result }).eq('id', profile.id);
         };
         reader.readAsDataURL(file);
     };
 
-    const handleBioUpdate = () => {
-        // TODO: Update bio in Supabase when database is set up
-        // await supabase.from('profiles').update({ bio }).eq('id', profile.id);
-        if (profile) {
+    const handleBioUpdate = async () => {
+        if (!profile) return;
+        
+        try {
+            // TODO: Update bio in profiles table when bio field is added
+            // await profileService.updateProfile(profile.id, { bio });
             setProfile({ ...profile, bio });
+            setIsEditingBio(false);
+        } catch (error) {
+            console.error('Error updating bio:', error);
         }
-        setIsEditingBio(false);
-    };
-
-    const handleProjectImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProjectImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const togglePosition = (position: string) => {
-        setSelectedPositions(prev =>
-            prev.includes(position)
-                ? prev.filter(p => p !== position)
-                : [...prev, position]
-        );
-    };
-
-    const openProjectModal = (project?: Project) => {
-        if (project) {
-            setEditingProject(project);
-            setProjectName(project.name);
-            setProjectDescription(project.description);
-            setSelectedPositions([project.position]);
-            setProjectImage(project.image || null);
-            setProjectLink(project.link || '');
-        } else {
-            setEditingProject(null);
-            setProjectName('');
-            setProjectDescription('');
-            setSelectedPositions([]);
-            setProjectImage(null);
-            setProjectLink('');
-        }
-        setShowProjectModal(true);
-    };
-
-    const closeProjectModal = () => {
-        setShowProjectModal(false);
-        setEditingProject(null);
-        setProjectName('');
-        setProjectDescription('');
-        setSelectedPositions([]);
-        setProjectImage(null);
-        setProjectLink('');
-    };
-
-    const saveProject = () => {
-        if (!projectName.trim()) return;
-
-        // TODO: Save to Supabase when database is set up
-        const projectData: Project = {
-            id: editingProject?.id || Date.now(),
-            name: projectName,
-            description: projectDescription,
-            position: selectedPositions[0] || 'Other',
-            image: projectImage || undefined,
-            link: projectLink || undefined,
-        };
-
-        if (editingProject) {
-            // TODO: Update in Supabase
-            // await supabase.from('projects').update(projectData).eq('id', editingProject.id);
-            setProjects(prev =>
-                prev.map(p => (p.id === editingProject.id ? projectData : p))
-            );
-        } else {
-            // TODO: Insert into Supabase
-            // const { data } = await supabase.from('projects').insert(projectData).select().single();
-            setProjects(prev => [...prev, projectData]);
-        }
-
-        closeProjectModal();
     };
 
     if (loading) {
@@ -202,31 +172,36 @@ const ProfileContent = () => {
                     bio={bio}
                     isEditingBio={isEditingBio}
                     achievements={unlockedAchievements}
+                    roles={roles}
                     onImageChange={handleProfileImageChange}
                     onBioChange={setBio}
                     onEditBioStart={() => setIsEditingBio(true)}
                     onEditBioEnd={handleBioUpdate}
                 />
 
-                <UserProjectsList
-                    projects={projects}
-                    showModal={showProjectModal}
-                    editingProject={editingProject}
-                    projectName={projectName}
-                    projectDescription={projectDescription}
-                    selectedPositions={selectedPositions}
-                    projectImage={projectImage}
-                    projectLink={projectLink}
-                    onProjectClick={openProjectModal}
-                    onAddProjectClick={() => openProjectModal()}
-                    onCloseModal={closeProjectModal}
-                    onNameChange={setProjectName}
-                    onDescriptionChange={setProjectDescription}
-                    onPositionToggle={togglePosition}
-                    onImageChange={handleProjectImageChange}
-                    onLinkChange={setProjectLink}
-                    onSave={saveProject}
-                />
+                {/* My Projects Section */}
+                <div className="bg-white rounded-lg p-6">
+                    <h2 className="text-2xl font-bold text-black mb-4">My Projects</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {projects.map((project) => (
+                            <ProjectCard
+                                key={project.id}
+                                project={project}
+                                onClick={setSelectedProject}
+                            />
+                        ))}
+                    </div>
+                    {projects.length === 0 && (
+                        <p className="text-gray-500 text-center py-8">No projects yet</p>
+                    )}
+                </div>
+
+                {selectedProject && (
+                    <ProjectModal
+                        project={selectedProject}
+                        onClose={() => setSelectedProject(null)}
+                    />
+                )}
             </div>
         </div>
     );
