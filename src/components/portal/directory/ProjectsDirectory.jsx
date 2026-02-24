@@ -87,7 +87,40 @@ const ProjectsDirectory = () => {
 
   const handleCreateProject = async (projectData) => {
     const { createProject } = await import('@/lib/supabase/projectService');
-    await createProject(projectData);
+    const { supabase } = await import('@/lib/supabase/client');
+    const newProject = await createProject(projectData);
+
+    // Automatically add the creating user as a project lead
+    if (newProject) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: leadRole } = await supabase
+          .from('roles')
+          .select('id')
+          .eq('context', 'external')
+          .eq('name', 'project lead')
+          .single();
+
+        const roleId = leadRole?.id;
+
+        await supabase.from('project_members').insert({
+          project_id: newProject.id,
+          user_id: user.id,
+          rbac_role_id: roleId,
+          invited_by: user.id,
+          joined_at: new Date().toISOString(),
+        });
+
+        if (roleId) {
+          await supabase.from('user_context_roles').insert({
+            user_id: user.id,
+            role_id: roleId,
+            context: 'external',
+          });
+        }
+      }
+    }
+
     // Refresh the projects list
     await fetchProjects();
   };
