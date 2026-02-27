@@ -1,5 +1,6 @@
 import { supabase } from '../supabase/client';
-import { Profiles, ProjectRole } from '../types/database';
+import { Profiles } from '../types/database';
+import { getProfileDisplayName } from '../utils/profileName';
 import { TaskOperationResult } from '../types/tasks';
 
 export type AvailableMember = Profiles;
@@ -21,7 +22,7 @@ export async function getAvailableMembers(
 
   let query = supabase
     .from('profiles')
-    .select('id, email, display_name, created_at');
+    .select('id, email, first_name, last_name, created_at');
 
   if (existingUserIds.length > 0) {
     query = query.not('id', 'in', `(${existingUserIds.join(',')})`);
@@ -34,23 +35,45 @@ export async function getAvailableMembers(
     return { data: null, error: error.message, success: false };
   }
 
-  return { data: data as AvailableMember[], error: null, success: true };
+  const membersWithNames = (data || []).map((member) => ({
+    ...member,
+    display_name: getProfileDisplayName(member),
+  }));
+
+  return { data: membersWithNames as AvailableMember[], error: null, success: true };
 }
 
+/**
+ * Add members to project with RBAC role assignment
+ * @param roleId - The RBAC role ID to assign (optional, defaults to 'project member' role)
+ */
 export async function addMembersToProject(
   projectId: string,
   userIds: string[],
-  role: ProjectRole,
-  invitedBy: string
+  invitedBy: string,
+  roleId?: number
 ): Promise<TaskOperationResult<number>> {
   if (userIds.length === 0) {
     return { data: 0, error: 'No users selected', success: false };
   }
 
+  // If no roleId provided, fetch the default 'project member' role
+  let finalRoleId = roleId;
+  if (!finalRoleId) {
+    const { data: defaultRole } = await supabase
+      .from('roles')
+      .select('id')
+      .eq('context', 'external')
+      .eq('name', 'project member')
+      .single();
+
+    finalRoleId = defaultRole?.id;
+  }
+
   const membersToInsert = userIds.map(userId => ({
     project_id: projectId,
     user_id: userId,
-    role,
+    rbac_role_id: finalRoleId,
     invited_by: invitedBy,
     joined_at: new Date().toISOString(),
   }));
@@ -65,6 +88,25 @@ export async function addMembersToProject(
     return { data: null, error: error.message, success: false };
   }
 
+  // Add user_context_roles entries for each new member
+  if (finalRoleId) {
+    const userContextRoles = userIds.map(userId => ({
+      user_id: userId,
+      role_id: finalRoleId,
+      context: 'external' as const,
+    }));
+
+    const { error: roleError } = await supabase
+      .from('user_context_roles')
+      .insert(userContextRoles)
+      .select();
+
+    if (roleError) {
+      console.error('Error adding user context roles:', roleError);
+      // Don't fail the whole operation, just log the error
+    }
+  }
+
   return { data: data.length, error: null, success: true };
 }
 
@@ -72,6 +114,19 @@ export async function removeMemberFromProject(
   projectId: string,
   userId: string
 ): Promise<TaskOperationResult<boolean>> {
+  // Remove from user_context_roles
+  const { error: roleError } = await supabase
+    .from('user_context_roles')
+    .delete()
+    .eq('user_id', userId)
+    .eq('context', 'external');
+
+  if (roleError) {
+    console.error('Error removing user context role:', roleError);
+    // Continue with project_members deletion
+  }
+
+  // Remove from project_members
   const { error } = await supabase
     .from('project_members')
     .delete()

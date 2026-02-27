@@ -7,9 +7,11 @@ import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useTaskActions } from '@/lib/hooks/useTaskActions';
 import { AddTaskModal } from './tasks/AddTaskModal';
+import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
-import { CreateTaskInput } from '@/lib/types/tasks';
+import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
+import { getProfileDisplayName } from '@/lib/utils/profileName';
 
 const BUTTON_STYLES = {
   addTask: "mt-1 flex w-full items-center justify-center rounded-xl border border-dashed border-black/15 bg-white/60 px-3 py-2 text-[11px] md:text-xs font-medium text-black/70 transition-all duration-150 ease-out hover:bg-white hover:border-black/30 hover:-translate-y-0.5",
@@ -65,7 +67,6 @@ function BoardColumn({ title, accentColor, children, delay = 0, onAddTask }: Boa
 }
 
 interface BoardCardProps {
-  taskId: string;
   title: string;
   tag?: string;
   tagColor?: string;
@@ -73,8 +74,10 @@ interface BoardCardProps {
   dueDate?: string;
   delay?: number;
   onEdit?: () => void;
+  onMarkComplete?: () => void;
   onDelete?: () => void;
   canEdit?: boolean;
+  isCompleted?: boolean;
 }
 
 function getInitials(name: string | undefined | null): string {
@@ -97,7 +100,7 @@ function AvatarStack({ initials }: { initials: string[] }) {
   );
 }
 
-function BoardCard({ taskId, title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onDelete, canEdit = false }: BoardCardProps) {
+function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onMarkComplete, onDelete, canEdit = false, isCompleted = false }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
   const isSingleAssignee = assignees.length === 1;
@@ -109,11 +112,13 @@ function BoardCard({ taskId, title, tag, tagColor = "#E5E7EB", assignees = [], d
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs md:text-sm font-medium text-black/80 truncate flex-1">{title}</p>
-        {onEdit && onDelete && (
+        {onEdit && onMarkComplete && onDelete && (
           <TaskActionsMenu 
             onEdit={onEdit}
+            onMarkComplete={onMarkComplete}
             onDelete={onDelete}
             canEdit={canEdit}
+            isCompleted={isCompleted}
           />
         )}
       </div>
@@ -176,16 +181,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { deleteTaskAction } = useTaskActions();
+  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions();
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<TaskWithAssignments | null>(null);
 
   const assigneeOptions = members
     .filter((m) => m.user.id !== currentUserId)
     .map((m) => ({
       id: m.user.id,
-      display_name: m.user.display_name,
+      display_name: getProfileDisplayName(m.user),
     }));
 
   // handle task creation
@@ -208,9 +214,29 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   };
 
   // handle task edit (placeholder for now)
-  const handleEditTask = (taskId: string) => {
-    // TODO: Implement edit modal
-    alert('Edit functionality coming soon!');
+  const handleEditTask = (task: TaskWithAssignments) => {
+    setEditingTask(task);
+  };
+
+  const handleEditSubmit = async (input: UpdateTaskInput) => {
+    if (!editingTask) return;
+    
+    const success = await updateTaskAction(String(editingTask.id), input);
+    if (success) {
+      setEditingTask(null);
+      refetch();
+    }
+  };
+
+  const handleMarkComplete = async (task: TaskWithAssignments) => {
+    const input: UpdateTaskInput = {
+      status: 'done',
+    };
+    
+    const success = await updateTaskAction(String(task.id), input);
+    if (success) {
+      refetch();
+    }
   };
 
   // group tasks by status
@@ -283,6 +309,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
             Tasks
           </h1>
+          <p className="text-sm font-semibold text-black">Tasks</p>
           <p className="text-[11px] md:text-xs text-black/50">{today}</p>
         </div>
         <div className="flex items-center gap-4">
@@ -303,16 +330,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               {tasksByStatus.todo.map((task, idx) => (
                 <BoardCard
                   key={task.id}
-                  taskId={task.id.toString()}
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
                   assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
-                  onEdit={() => handleEditTask(task.id.toString())}
+                  onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -321,16 +349,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               {tasksByStatus.in_progress.map((task, idx) => (
                 <BoardCard
                   key={task.id}
-                  taskId={task.id.toString()}
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
                   assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
-                  onEdit={() => handleEditTask(task.id.toString())}
+                  onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -339,16 +368,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               {tasksByStatus.in_review.map((task, idx) => (
                 <BoardCard
                   key={task.id}
-                  taskId={task.id.toString()}
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
                   assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
-                  onEdit={() => handleEditTask(task.id.toString())}
+                  onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -357,16 +387,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
               {tasksByStatus.done.map((task, idx) => (
                 <BoardCard
                   key={task.id}
-                  taskId={task.id.toString()}
                   title={task.name}
                   tag={task.label}
                   tagColor={task.label_color}
                   assignees={getAssigneeInfo(task)}
                   dueDate={formatDate(task.due_date)}
                   delay={idx * 60}
-                  onEdit={() => handleEditTask(task.id.toString())}
+                  onEdit={() => handleEditTask(task)}
+                  onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString())}
                   canEdit={canCreateTasks}
+                  isCompleted={task.status === 'done'}
                 />
               ))}
             </BoardColumn>
@@ -382,6 +413,16 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
         projectMembers={assigneeOptions}
         isSubmitting={isCreating}
       />
+
+      {editingTask && (
+        <EditTaskModal
+          isOpen={!!editingTask}
+          onClose={() => setEditingTask(null)}
+          onSubmit={handleEditSubmit}
+          task={editingTask}
+          isSubmitting={isUpdating}
+        />
+      )}
 
       {createError && (
         <div className="fixed bottom-4 right-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 shadow-lg">

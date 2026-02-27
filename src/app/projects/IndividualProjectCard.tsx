@@ -1,14 +1,23 @@
 import { useState } from 'react';
-import { Project } from '@/types/project';
 
-type IndividualProjectProps = Project;
+export interface IndividualProjectProps {
+  projectName: string;
+  projectLeads: string[];
+  projectDescription: string;
+  logoUrl?: string | null;
+  prototypeUrl?: string;
+  projectManagers: string[] | null;
+  projectMembers: string[] | null;
+  demoDayUrl?: string;
+  instaPostUrl?: string;
+};
 
 function joinStrings(strings: string[] | undefined | null): string {
   if (!strings || !Array.isArray(strings)) return "";
   return strings.filter(str => str.trim() !== "").join(", ");
 }
 
-const IndividualProjectCard = ({ projectName, projectLeads, projectDescription, logoUrl, prototypeUrl, projectManagers, projectMembers, demoDayUrl, instaPostUrl }: IndividualProjectProps) => {
+const IndividualProjectCard = ({ projectName, projectLeads = [], projectDescription, logoUrl, prototypeUrl, projectManagers = [], projectMembers = [], demoDayUrl, instaPostUrl }: IndividualProjectProps) => {
   const [isExpanded, expand] = useState(false);
 
   return (

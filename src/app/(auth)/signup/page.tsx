@@ -39,7 +39,7 @@ export default function SignupPage() {
 
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -54,6 +54,26 @@ export default function SignupPage() {
       setError(error.message);
       setIsLoading(false);
     } else {
+      const user = data.user;
+      if (user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert(
+            {
+              id: user.id,
+              email: user.email,
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
+            },
+            { onConflict: 'id' }
+          );
+
+        if (profileError) {
+          setError(profileError.message);
+          setIsLoading(false);
+          return;
+        }
+      }
       // Redirect to portal after successful signup
       router.push("/portal");
     }
