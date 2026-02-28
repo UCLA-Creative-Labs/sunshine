@@ -1,5 +1,5 @@
 export type AnnouncementVisibility = 'project' | 'team' | 'board' | 'club_wide';
-export type BoardTeam = 'tech' | 'finance' | 'marketing' | 'design';
+export type BoardTeam = 'tech' | 'finance' | 'marketing' | 'design' | 'project_manager';
 
 export interface ProjectEvent {
   id: string;

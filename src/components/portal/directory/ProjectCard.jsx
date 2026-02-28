@@ -1,6 +1,13 @@
+import React from "react";
+import "./ProjectCard.css";
+
 const ProjectCard = ({ project, onClick }) => {
   return (
-    <div className="project-card" onClick={() => onClick && onClick(project)} style={{ cursor: 'pointer' }}>
+    <div
+      className="project-card"
+      onClick={() => onClick && onClick(project)}
+      style={{ cursor: "pointer" }}
+    >
       <h3>{project.name}</h3>
       <p className="project-description">{project.description}</p>
       <div className="project-leads">

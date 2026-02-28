@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { CreateAnnouncementInput } from '@/types/events';
+import { CreateAnnouncementInput, AnnouncementVisibility, BoardTeam } from '@/types/events';
 
 interface AnnouncementFormProps {
   projectId: string;
@@ -40,12 +40,30 @@ export function AnnouncementForm({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [expireDate, setExpireDate] = useState('');
+  const [visibility, setVisibility] = useState('project');
+  const [targetTeam, setTargetTeam] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const VISIBILITY_OPTIONS = [
+    { value: 'project', label: 'Project Members' },
+    { value: 'team', label: 'Specific Team' },
+    { value: 'board', label: 'Board Members' },
+    { value: 'club_wide', label: 'Club Wide' },
+  ];
+
+  const TEAM_OPTIONS = [
+    { value: 'tech', label: 'Tech' },
+    { value: 'finance', label: 'Finance' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'design', label: 'Design' },
+    { value: 'project_manager', label: 'Project Manager' },
+  ];
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!title.trim()) newErrors.title = 'Title is required';
     if (!description.trim()) newErrors.description = 'Description is required';
+    if (visibility === 'team' && !targetTeam) newErrors.targetTeam = 'Team is required when visibility is Team';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -68,8 +86,8 @@ export function AnnouncementForm({
       publish_date: new Date().toISOString(),
       expire_date: expireDate ? new Date(expireDate).toISOString() : null,
       is_active: true,
-      visibility: 'project',
-      target_team: null,
+      visibility: visibility as AnnouncementVisibility,
+      target_team: (visibility === 'team' ? targetTeam : null) as BoardTeam | null,
     };
 
     await onSubmit(input);
@@ -102,6 +120,37 @@ export function AnnouncementForm({
           placeholder="What do you want to announce?"
         />
         {errors.description && <p className={errorClass}>{errors.description}</p>}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Visibility</label>
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+            className={inputClass}
+          >
+            {VISIBILITY_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+        {visibility === 'team' && (
+          <div>
+            <label className={labelClass}>Target Team</label>
+            <select
+              value={targetTeam}
+              onChange={(e) => setTargetTeam(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Select a team</option>
+              {TEAM_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+            {errors.targetTeam && <p className={errorClass}>{errors.targetTeam}</p>}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

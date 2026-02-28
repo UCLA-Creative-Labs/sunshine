@@ -20,7 +20,8 @@
         "react": "latest",
         "react-dom": "latest",
         "react-icons": "^4.12.0",
-        "sharp": "^0.33.0"
+        "sharp": "^0.33.0",
+        "supabase": "^2.76.15"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
