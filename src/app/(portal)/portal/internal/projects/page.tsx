@@ -18,21 +18,20 @@ export default function InternalProjectsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    getAllProjects().then((data) => {
-      setProjects(data);
-
-      // Default to the latest quarter in the data
-      if (data.length > 0) {
-        const sorted = [...data].sort(
-          (a, b) =>
-            quarterSortKey(b.quarter, b.year) -
-            quarterSortKey(a.quarter, a.year)
-        );
-        setSelectedQuarter(`${sorted[0].quarter} ${sorted[0].year}`);
-      }
-
-      setLoading(false);
-    });
+    getAllProjects()
+      .then((data) => {
+        setProjects(data);
+        if (data.length > 0) {
+          const sorted = [...data].sort(
+            (a, b) =>
+              quarterSortKey(b.quarter, b.year) -
+              quarterSortKey(a.quarter, a.year)
+          );
+          setSelectedQuarter(`${sorted[0].quarter} ${sorted[0].year}`);
+        }
+      })
+      .catch((err) => console.error('Failed to load projects:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   const quarters = Array.from(
