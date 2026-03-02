@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T20:34:21.498Z"
+last_updated: "2026-03-02T21:51:37.041Z"
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -18,33 +18,33 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Internal role users can browse projects and manage project memberships without going through project leads
-**Current focus:** Phase 2 — Projects Committee
+**Current focus:** COMPLETE — All phases and plans finished
 
 ## Current Position
 
 Phase: 2 of 2 (Projects Committee)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-03-02 — Completed 02-01: Internal projects list page
+Plan: 2 of 2 in current phase
+Status: Complete
+Last activity: 2026-03-02 — Completed 02-02: Member management page
 
-Progress: [████████░░] 75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 4
 - Average duration: ~4 min
-- Total execution time: ~7 min
+- Total execution time: ~12 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | ~7 min | ~4 min |
-| 02-projects-committee | 1/2 | ~3 min | ~3 min |
+| 02-projects-committee | 2/2 | ~8 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~5 min), 01-02 (~2 min), 02-01 (~3 min)
+- Last 5 plans: 01-01 (~5 min), 01-02 (~2 min), 02-01 (~3 min), 02-02 (~5 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -67,6 +67,10 @@ Recent decisions affecting current work:
 - COMMITTEE_ITEMS const array in InternalSidebar — extend to add Finance/Marketing/Design in future
 - No search/filter on projects list — deferred per user request
 - Active row uses pathname.startsWith for prefix match (handles nested project routes)
+- Per-row error state as Record<number, string> keyed by member.id (no global error UI noise)
+- Roles fetched fresh from Supabase on mount with .eq('context', 'external') for always-current select options
+- savingRoleId state replaces select with Saving... span during async call to prevent double-submission
+- Inline confirm (Yes/Cancel) in table row — no modal or toast library needed for destructive actions
 
 ### Pending Todos
 
@@ -79,5 +83,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 02-01-PLAN.md
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

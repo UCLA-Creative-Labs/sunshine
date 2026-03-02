@@ -13,7 +13,7 @@ Two-phase delivery: first establish the access-gated shell (nav, routing, layout
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Access-gated internal route with nav tab, layout shell, and committee sidebar (completed 2026-03-02)
-- [ ] **Phase 2: Projects Committee** - Browse all projects and manage per-project member roles
+- [x] **Phase 2: Projects Committee** - Browse all projects and manage per-project member roles (completed 2026-03-02)
 
 ## Phase Details
 
@@ -46,8 +46,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Project list view with active-row highlight and navigation to member management
-- [ ] 02-02-PLAN.md — Member management page: display + add member modal + inline role change + inline remove
+- [x] 02-01-PLAN.md — Project list view with active-row highlight and navigation to member management
+- [x] 02-02-PLAN.md — Member management page: display + add member modal + inline role change + inline remove
 
 ## Progress
 
@@ -57,4 +57,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-02 |
-| 2. Projects Committee | 1/2 | In Progress|  |
+| 2. Projects Committee | 2/2 | Complete   | 2026-03-02 |

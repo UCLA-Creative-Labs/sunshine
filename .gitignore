@@ -44,3 +44,4 @@ next-env.d.ts
 /scripts/*.zip
 /scripts/output/
 /scripts/node_modules/
+.planning/
