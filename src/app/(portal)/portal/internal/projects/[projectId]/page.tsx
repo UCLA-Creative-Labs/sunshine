@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import { updateMemberRole, removeMember } from '@/lib/services/projectMemberService';
 import { getProjectById } from '@/lib/supabase/projectService';
@@ -10,13 +10,11 @@ import { Project } from '@/types/project';
 import { Role } from '@/lib/types/database';
 
 interface ProjectMemberPageProps {
-  params: {
-    projectId: string;
-  };
+  params: Promise<{ projectId: string }>;
 }
 
 export default function ProjectMemberPage({ params }: ProjectMemberPageProps) {
-  const { projectId } = params;
+  const { projectId } = use(params);
 
   const { members, isLoading, refetch } = useProjectMembers(projectId);
   const [project, setProject] = useState<Project | null>(null);
