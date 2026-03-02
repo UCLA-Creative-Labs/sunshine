@@ -1,3 +1,16 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: unknown
+last_updated: "2026-03-02T20:34:21.498Z"
+progress:
+  total_phases: 2
+  completed_phases: 1
+  total_plans: 4
+  completed_plans: 3
+---
+
 # Project State
 
 ## Project Reference
@@ -5,16 +18,16 @@
 See: .planning/PROJECT.md (updated 2026-03-02)
 
 **Core value:** Internal role users can browse projects and manage project memberships without going through project leads
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Projects Committee
 
 ## Current Position
 
-Phase: 1 of 2 (Foundation)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-03-02 — Completed 01-02: Internal layout, sidebar, and access gate
+Phase: 2 of 2 (Projects Committee)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-03-02 — Completed 02-01: Internal projects list page
 
-Progress: [██████░░░░] 50%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -28,9 +41,10 @@ Progress: [██████░░░░] 50%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2/2 | ~7 min | ~4 min |
+| 02-projects-committee | 1/2 | ~3 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~5 min), 01-02 (~2 min)
+- Last 5 plans: 01-01 (~5 min), 01-02 (~2 min), 02-01 (~3 min)
 - Trend: fast
 
 *Updated after each plan completion*
@@ -51,6 +65,8 @@ Recent decisions affecting current work:
 - redirect('/portal') on unauthorized access (not an error page — familiar destination)
 - InternalSidebar uses identical NAV_STYLES as MembershipPortalSidebar for visual consistency
 - COMMITTEE_ITEMS const array in InternalSidebar — extend to add Finance/Marketing/Design in future
+- No search/filter on projects list — deferred per user request
+- Active row uses pathname.startsWith for prefix match (handles nested project routes)
 
 ### Pending Todos
 
@@ -63,5 +79,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 01-02-PLAN.md
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None

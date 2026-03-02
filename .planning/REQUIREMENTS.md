@@ -24,9 +24,9 @@
 
 ### Projects Committee — Project Browsing
 
-- [ ] **PROJ-01**: Projects committee view lists all projects (name, quarter/year)
-- [ ] **PROJ-02**: Selecting a project navigates to a member management view for that project
-- [ ] **PROJ-03**: Selected project is visually highlighted in the project list
+- [x] **PROJ-01**: Projects committee view lists all projects (name, quarter/year)
+- [x] **PROJ-02**: Selecting a project navigates to a member management view for that project
+- [x] **PROJ-03**: Selected project is visually highlighted in the project list
 
 ### Projects Committee — Member Management
 
@@ -70,9 +70,9 @@
 | LAYOUT-02 | Phase 1 | Complete |
 | LAYOUT-03 | Phase 1 | Complete |
 | LAYOUT-04 | Phase 1 | Complete |
-| PROJ-01 | Phase 2 | Pending |
-| PROJ-02 | Phase 2 | Pending |
-| PROJ-03 | Phase 2 | Pending |
+| PROJ-01 | Phase 2 | Complete |
+| PROJ-02 | Phase 2 | Complete |
+| PROJ-03 | Phase 2 | Complete |
 | MEM-01 | Phase 2 | Pending |
 | MEM-02 | Phase 2 | Pending |
 | MEM-03 | Phase 2 | Pending |
