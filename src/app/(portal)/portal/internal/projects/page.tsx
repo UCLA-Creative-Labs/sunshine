@@ -6,7 +6,8 @@ import { getAllProjects } from '@/lib/supabase/projectService';
 import { Project } from '@/types/project';
 
 function quarterSortKey(quarter: string, year: string): number {
-  const q = parseInt(quarter.replace(/\D/g, ''), 10) || 0;
+  const rank: Record<string, number> = { spring: 3, winter: 2, fall: 1 };
+  const q = rank[quarter.toLowerCase()] ?? 0;
   return parseInt(year, 10) * 10 + q;
 }
 
