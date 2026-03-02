@@ -16,7 +16,15 @@ interface ProjectMemberPageProps {
 export default function ProjectMemberPage({ params }: ProjectMemberPageProps) {
   const { projectId } = use(params);
 
-  const { members, isLoading, refetch } = useProjectMembers(projectId);
+  const { members: rawMembers, isLoading, refetch } = useProjectMembers(projectId);
+
+  // Sort: project leads first, then alphabetically
+  const members = [...rawMembers].sort((a, b) => {
+    const aIsLead = a.rbac_role?.name?.toLowerCase().includes('lead') ? 0 : 1;
+    const bIsLead = b.rbac_role?.name?.toLowerCase().includes('lead') ? 0 : 1;
+    if (aIsLead !== bIsLead) return aIsLead - bIsLead;
+    return (a.user.display_name || '').localeCompare(b.user.display_name || '');
+  });
   const [project, setProject] = useState<Project | null>(null);
   const [projectNotFound, setProjectNotFound] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>('');
@@ -81,7 +89,7 @@ export default function ProjectMemberPage({ params }: ProjectMemberPageProps) {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && rawMembers.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
