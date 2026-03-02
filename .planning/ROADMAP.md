@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md — Nav tab conditional visibility (permissions helper + async portal layout)
-- [ ] 01-02-PLAN.md — Internal layout shell (server gate + two-column layout + InternalSidebar + redirect)
+- [x] 01-02-PLAN.md — Internal layout shell (server gate + two-column layout + InternalSidebar + redirect)
 
 ### Phase 2: Projects Committee
 **Goal**: An internal user can browse all projects and perform full member management (view, add, change role, remove) on any project
@@ -43,12 +43,11 @@ Plans:
   3. Member management view shows all current members of the selected project with their external roles displayed
   4. Internal user can add a new member by searching by name or email and assigning an external role (lead or member)
   5. Internal user can change an existing member's role or remove them from the project (with confirmation)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Project list view with selection and highlight
-- [ ] 02-02: Member management view — display members + roles
-- [ ] 02-03: Add member (search + role assignment) + change role + remove member
+- [ ] 02-01-PLAN.md — Project list view with active-row highlight and navigation to member management
+- [ ] 02-02-PLAN.md — Member management page: display + add member modal + inline role change + inline remove
 
 ## Progress
 
@@ -58,4 +57,4 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-02 |
-| 2. Projects Committee | 0/3 | Not started | - |
+| 2. Projects Committee | 0/2 | Not started | - |
