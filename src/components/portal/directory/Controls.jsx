@@ -1,5 +1,5 @@
 // Controls Component
-const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange }) => {
+const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange, viewMode, onViewModeChange }) => {
   return (
     <div className="controls">
       <input
@@ -34,8 +34,16 @@ const Controls = ({ searchQuery, onSearchChange, filters, onFilterChange }) => {
       </div>
 
       <div className="view-toggle">
-        <button className="view-btn active" title="Grid View">⊞</button>
-        <button className="view-btn" title="List View">☰</button>
+        <button
+          className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+          title="Grid View"
+          onClick={() => onViewModeChange('grid')}
+        >⊞</button>
+        <button
+          className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+          title="List View"
+          onClick={() => onViewModeChange('list')}
+        >☰</button>
       </div>
     </div>
   );
