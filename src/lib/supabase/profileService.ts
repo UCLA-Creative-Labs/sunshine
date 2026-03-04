@@ -9,6 +9,11 @@ export interface Profile {
   created_at: string;
 }
 
+export async function getCurrentUserId(): Promise<string | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
+
 export const profileService = {
   async getCurrentProfile() {
     const { data: { user } } = await supabase.auth.getUser();

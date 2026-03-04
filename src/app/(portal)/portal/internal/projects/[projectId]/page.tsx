@@ -2,9 +2,9 @@
 
 import { use, useEffect, useState } from 'react';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
-import { updateMemberRole, removeMember } from '@/lib/services/projectMemberService';
+import { updateMemberRole, removeMember, getExternalRoles } from '@/lib/services/projectMemberService';
 import { getProjectById } from '@/lib/supabase/projectService';
-import { supabase } from '@/lib/supabase/client';
+import { getCurrentUserId } from '@/lib/supabase/profileService';
 import InviteMemberModal from '@/components/portal/InviteMemberModal';
 import { Project } from '@/types/project';
 import { Role } from '@/lib/types/database';
@@ -44,20 +44,11 @@ export default function ProjectMemberPage({ params }: ProjectMemberPageProps) {
       }
     });
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setCurrentUserId(data.user.id);
-      }
+    getCurrentUserId().then((id) => {
+      if (id) setCurrentUserId(id);
     });
 
-    supabase
-      .from('roles')
-      .select('id, name, context, description, created_at')
-      .eq('context', 'external')
-      .order('name')
-      .then(({ data }) => {
-        if (data) setRoles(data as Role[]);
-      });
+    getExternalRoles().then(setRoles);
   }, [projectId]);
 
   const handleRoleChange = async (memberId: number, roleId: number) => {

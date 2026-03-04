@@ -49,6 +49,20 @@ export async function getProjectMembers(
   return { data: membersWithRoles as ProjectMemberWithProfile[], error: null, success: true };
 }
 
+export async function getExternalRoles(): Promise<Role[]> {
+  const { data, error } = await supabase
+    .from('roles')
+    .select('id, name, context, description, created_at')
+    .eq('context', 'external')
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching external roles:', error);
+    return [];
+  }
+  return (data as Role[]) ?? [];
+}
+
 /**
  * Updates an existing project member's RBAC role.
  * @param memberId - The project_members.id (PK, number)
