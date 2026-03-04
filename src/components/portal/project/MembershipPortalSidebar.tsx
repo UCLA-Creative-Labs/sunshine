@@ -10,6 +10,7 @@ import {
   RxFileText,
   RxGear,
 } from "react-icons/rx";
+import { FaGithub } from "react-icons/fa";
 
 export type MembershipPortalSidebarItem = {
   id: string;
@@ -35,6 +36,7 @@ const BASE_ITEMS = [
   { id: "overview", label: "Overview", path: "overview", icon: RxHome },
   { id: "board", label: "Board", path: "board", icon: RxDashboard },
   { id: "list", label: "List", path: "list", icon: RxRows },
+  { id: "github", label: "GitHub", path: "github", icon: FaGithub },
   { id: "members", label: "Members", path: "members", icon: RxPerson },
   { id: "docs", label: "Docs", path: "docs", icon: RxFileText },
   { id: "settings", label: "Settings", path: "settings", icon: RxGear },

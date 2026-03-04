@@ -14,4 +14,7 @@ export interface Project {
     prototypeUrl?: string;
     demoDayUrl?: string;
     instaPostUrl?: string;
+    // GitHub integration fields
+    github_pat_encrypted?: string | null;
+    github_pat_updated_at?: string | null;
 }
