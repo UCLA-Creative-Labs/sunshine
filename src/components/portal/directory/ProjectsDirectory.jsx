@@ -11,7 +11,7 @@ import Header from './Header';
 import FloatingAddButton from './FloatingAddButton';
 import CreateProjectModal from './CreateProjectModal';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { supabase } from '@/lib/supabase/client';
+import { profileService } from '@/lib/supabase/profileService';
 
 // Projects Directory Component
 const ProjectsDirectory = () => {
@@ -46,13 +46,7 @@ const ProjectsDirectory = () => {
         setCanCreateProject(false);
         return;
       }
-      const { data } = await supabase
-        .from('project_members')
-        .select('roles!inner(name)')
-        .eq('user_id', userId);
-      const isProjectLead = (data || []).some(
-        (m) => m.roles?.name === 'project lead'
-      );
+      const isProjectLead = await profileService.hasProjectLeadRole(userId);
       setCanCreateProject(isProjectLead);
     }
     checkProjectLeadRole();
