@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Task } from '../types/database';
-import { CreateTaskInput, AssignTaskInput } from '../types/tasks';
+import {
+  AssignTaskInput,
+  CreateTaskAssignmentContext,
+  CreateTaskInput,
+} from '../types/tasks';
 import { createTask, assignUsersToTask } from '../services/taskService';
+import { createActivityLogEntry } from '../supabase/activityService';
 
 interface UseCreateTaskReturn {
   isCreating: boolean;
@@ -9,7 +14,7 @@ interface UseCreateTaskReturn {
   createTaskWithAssignees: (
     input: CreateTaskInput,
     createdBy: string,
-    assigneeIds: string[]
+    assignmentContext: CreateTaskAssignmentContext
   ) => Promise<Task | null>;
 }
 
@@ -23,7 +28,7 @@ export function useCreateTask(): UseCreateTaskReturn {
   const createTaskWithAssignees = async (
     input: CreateTaskInput,
     createdBy: string,
-    assigneeIds: string[]
+    assignmentContext: CreateTaskAssignmentContext
   ): Promise<Task | null> => {
     setIsCreating(true);
     setError(null);
@@ -39,11 +44,23 @@ export function useCreateTask(): UseCreateTaskReturn {
 
     const newTask = taskResult.data;
 
+    await createActivityLogEntry({
+      action: 'created_task',
+      projectId: input.project_id,
+      userId: createdBy,
+      taskId: newTask.id,
+      metadata: {
+        task_name: newTask.name,
+        status: newTask.status,
+        priority: newTask.priority,
+      },
+    });
+
     // assigns users 
-    if (assigneeIds.length > 0) {
+    if (assignmentContext.assigneeIds.length > 0) {
       const assignInput: AssignTaskInput = {
         task_id: newTask.id,
-        user_ids: assigneeIds,
+        user_ids: assignmentContext.assigneeIds,
         assigned_by: createdBy,
       };
 
@@ -51,6 +68,20 @@ export function useCreateTask(): UseCreateTaskReturn {
 
       if (!assignResult.success) {
         console.warn('Task created but assignment failed:', assignResult.error);
+      } else {
+        await createActivityLogEntry({
+          action: 'task_assigned',
+          projectId: input.project_id,
+          userId: createdBy,
+          taskId: newTask.id,
+          metadata: {
+            task_name: newTask.name,
+            assignee_count: assignmentContext.assigneeIds.length,
+            assignee_names: assignmentContext.assigneeDisplayNames,
+            assignee_summary: assignmentContext.assigneeDisplayNames.join(', '),
+            message: assignmentContext.assignmentNote || '',
+          },
+        });
       }
     }
 

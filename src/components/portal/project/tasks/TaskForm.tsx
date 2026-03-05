@@ -1,13 +1,20 @@
 "use client";
 
 import React, { useState } from 'react';
-import { CreateTaskInput, TASK_LABELS } from '@/lib/types/tasks';
+import {
+  CreateTaskAssignmentContext,
+  CreateTaskInput,
+  TASK_LABELS,
+} from '@/lib/types/tasks';
 import { TaskStatus, TaskPriority } from '@/lib/types/database';
 
 interface TaskFormProps {
   projectId: string;
   projectMembers: { id: string; display_name: string }[];
-  onSubmit: (input: CreateTaskInput, assigneeIds: string[]) => Promise<void>;
+  onSubmit: (
+    input: CreateTaskInput,
+    assignmentContext: CreateTaskAssignmentContext,
+  ) => Promise<void>;
   onCancel: () => void;
   isSubmitting: boolean;
 }
@@ -43,6 +50,7 @@ export function TaskForm({
   const [dueDate, setDueDate] = useState('');
   const [labelIndex, setLabelIndex] = useState(0);
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([]);
+  const [assignmentNote, setAssignmentNote] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = (): boolean => {
@@ -75,7 +83,15 @@ export function TaskForm({
       label_color: selectedLabel.color,
     };
 
-    await onSubmit(input, selectedAssignees);
+    const selectedAssigneeNames = projectMembers
+      .filter((member) => selectedAssignees.includes(member.id))
+      .map((member) => member.display_name);
+
+    await onSubmit(input, {
+      assigneeIds: selectedAssignees,
+      assigneeDisplayNames: selectedAssigneeNames,
+      assignmentNote: assignmentNote.trim() || undefined,
+    });
   };
 
   const toggleAssignee = (userId: string) => {
@@ -189,6 +205,16 @@ export function TaskForm({
           )}
         </div>
         {errors.assignees && <p className={errorClass}>{errors.assignees}</p>}
+      </div>
+
+      <div>
+        <label className={labelClass}>Assignment Note (Optional)</label>
+        <textarea
+          value={assignmentNote}
+          onChange={(e) => setAssignmentNote(e.target.value)}
+          className={`${inputClass} min-h-[72px] resize-none`}
+          placeholder="Add context for assignees (this appears in recent activity)"
+        />
       </div>
 
       <div className="flex justify-end gap-3 pt-4">

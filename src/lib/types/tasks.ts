@@ -26,6 +26,12 @@ export interface AssignTaskInput {
   assigned_by: string;
 }
 
+export interface CreateTaskAssignmentContext {
+  assigneeIds: string[];
+  assigneeDisplayNames: string[];
+  assignmentNote?: string;
+}
+
 /**
  * input type for updating an existing task
  */
