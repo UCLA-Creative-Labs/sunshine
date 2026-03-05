@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
 import './CreateProjectModal.css';
 
+// Generate default year in "YY-YY" format based on academic calendar
+// Academic year starts in Fall (September), so Jan-Aug = previous year's cycle
+const getDefaultYear = () => {
+    const now = new Date();
+    const calendarYear = now.getFullYear();
+    const month = now.getMonth(); // 0-indexed: 0=Jan, 8=Sep
+    const startYear = month >= 8 ? calendarYear : calendarYear - 1;
+    const startStr = startYear.toString().slice(-2);
+    const endStr = (startYear + 1).toString().slice(-2);
+    return `${startStr}-${endStr}`;
+};
+
 const CreateProjectModal = ({ onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         projectName: '',
         projectDescription: '',
-        year: new Date().getFullYear().toString(),
+        year: getDefaultYear(),
         quarter: 'Winter',
         logoUrl: '',
         prototypeUrl: '',
@@ -22,6 +34,22 @@ const CreateProjectModal = ({ onClose, onSubmit }) => {
             [name]: value
         }));
         setError('');
+    };
+
+    const handleFieldChange = (field, value) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        setError('');
+    };
+
+    const handleYearStep = (direction) => {
+        const currentYearStr = formData.year || '25-26';
+        let startYear = parseInt('20' + currentYearStr.split('-')[0]);
+        if (isNaN(startYear)) startYear = 2025;
+
+        const newStartYear = direction === 'next' ? startYear + 1 : startYear - 1;
+        const startStr = newStartYear.toString().slice(-2);
+        const endStr = (newStartYear + 1).toString().slice(-2);
+        handleFieldChange('year', `${startStr}-${endStr}`);
     };
 
     const handleSubmit = async (e) => {
@@ -96,36 +124,46 @@ const CreateProjectModal = ({ onClose, onSubmit }) => {
                         />
                     </div>
 
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label>
-                                Year <span className="required">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="year"
-                                className="form-input"
-                                placeholder="e.g., 2025"
-                                value={formData.year}
-                                onChange={handleChange}
-                            />
-                        </div>
-
+                    <div className="quarter-year-row">
                         <div className="form-group">
                             <label>
                                 Quarter <span className="required">*</span>
                             </label>
-                            <select
-                                name="quarter"
-                                className="form-input form-select"
-                                value={formData.quarter}
-                                onChange={handleChange}
-                            >
-                                <option value="Winter">Winter</option>
-                                <option value="Spring">Spring</option>
-                                <option value="Summer">Summer</option>
-                                <option value="Fall">Fall</option>
-                            </select>
+                            <div className="quarter-segmented">
+                                {['Fall', 'Winter', 'Spring'].map((q) => (
+                                    <button
+                                        key={q}
+                                        type="button"
+                                        onClick={() => handleFieldChange('quarter', q)}
+                                        className={`quarter-segment-btn ${formData.quarter === q ? 'active' : ''}`}
+                                    >
+                                        {q}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>
+                                Year <span className="required">*</span>
+                            </label>
+                            <div className="year-stepper">
+                                <button
+                                    type="button"
+                                    onClick={() => handleYearStep('prev')}
+                                    className="year-stepper-btn"
+                                >
+                                    ‹
+                                </button>
+                                <span className="year-stepper-value">{formData.year}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => handleYearStep('next')}
+                                    className="year-stepper-btn"
+                                >
+                                    ›
+                                </button>
+                            </div>
                         </div>
                     </div>
 

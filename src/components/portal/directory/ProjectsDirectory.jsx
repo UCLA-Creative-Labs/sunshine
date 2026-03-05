@@ -10,9 +10,13 @@ import Controls from './Controls';
 import Header from './Header';
 import FloatingAddButton from './FloatingAddButton';
 import CreateProjectModal from './CreateProjectModal';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { profileService } from '@/lib/supabase/profileService';
 
 // Projects Directory Component
 const ProjectsDirectory = () => {
+  const { userId } = useAuth();
+  const [canCreateProject, setCanCreateProject] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     status: 'All Status',
@@ -33,6 +37,20 @@ const ProjectsDirectory = () => {
   const [archivedProjects, setArchivedProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
+
+  // Check if the user has the "project lead" role in any project
+  useEffect(() => {
+    async function checkProjectLeadRole() {
+      if (!userId) {
+        setCanCreateProject(false);
+        return;
+      }
+      const isProjectLead = await profileService.hasProjectLeadRole(userId);
+      setCanCreateProject(isProjectLead);
+    }
+    checkProjectLeadRole();
+  }, [userId]);
 
   // Helper to generate consistent colors from names
   const getColor = (name) => {
@@ -138,23 +156,26 @@ const ProjectsDirectory = () => {
       );
     }
 
-    // 2. Status Filter (Active/Archived) -> This might conflict with the sectioning, 
-    // but if user selects "Active", we should only show Active projects.
-    // However, the logic below separates them anyway. 
-    // If "Active" is selected, we could clear the archived list or vice versa.
-    // Let's handle this after separation.
 
-    // 3. Category Filter
+    // 2. Category Filter
     if (filters.category !== 'All Categories') {
       // Assuming there isn't a category field yet, we might skip this or use a dummy field
       // If 'category' existed on project: filtered = filtered.filter(p => p.category === filters.category);
     }
 
-    // 4. Sort
+    // 3. Sort
+    const seasonOrder = { 'fall': 1, 'winter': 2, 'spring': 3, 'summer': 4 };
+    const compareQuarters = (a, b) => {
+      const [sA, yA] = a.quarter.split(' ');
+      const [sB, yB] = b.quarter.split(' ');
+      if (yA !== yB) return parseInt(yA) - parseInt(yB);
+      return (seasonOrder[sA] || 0) - (seasonOrder[sB] || 0);
+    };
+
     if (filters.sort === 'Sort: Newest') {
-      // Already loosely sorted by our Active/Archive logic, but let's be strict if needed
-      // For now relying on the quarter logic or just fetch order?
-      // Let's implement a basic sort if date exists, else ignore
+      filtered.sort((a, b) => -compareQuarters(a, b)); // Descending
+    } else if (filters.sort === 'Sort: Oldest') {
+      filtered.sort(compareQuarters); // Ascending
     } else if (filters.sort === 'Sort: A-Z') {
       filtered.sort((a, b) => a.name.localeCompare(b.name));
     } else if (filters.sort === 'Sort: Most Members') {
@@ -172,7 +193,6 @@ const ProjectsDirectory = () => {
     // Usually "Active" means "Current Quarter" regardless of search.
     // So we should find latestQuarter from the FULL `projects` list, to avoid active criteria changing when searching.
     const allQuarters = [...new Set(projects.map(p => p.quarter))];
-    const seasonOrder = { 'Winter': 1, 'Spring': 2, 'Summer': 3, 'Fall': 4 };
     const sortQuarters = (a, b) => {
       const [sA, yA] = a.split(' ');
       const [sB, yB] = b.split(' ');
@@ -212,6 +232,8 @@ const ProjectsDirectory = () => {
             onSearchChange={setSearchQuery}
             filters={filters}
             onFilterChange={handleFilterChange}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
 
           <StatsBar
@@ -221,28 +243,80 @@ const ProjectsDirectory = () => {
           />
 
           {/* Active Projects Section */}
-          <SectionHeader
-            title="Active Projects"
-            description="Currently ongoing projects"
-          />
-
-          <div className="projects-grid">
-            {activeProjects.map((project, index) => (
-              <ProjectCard key={index} project={project} onClick={setSelectedProject} />
-            ))}
-          </div>
+          {activeProjects.length > 0 && (
+            <>
+              <SectionHeader
+                title="Active Projects"
+                description="Currently ongoing projects"
+              />
+              {viewMode === 'grid' ? (
+                <div className="projects-grid">
+                  {activeProjects.map((project, index) => (
+                    <ProjectCard key={index} project={project} onClick={setSelectedProject} />
+                  ))}
+                </div>
+              ) : (
+                <div className="projects-list">
+                  {activeProjects.map((project, index) => (
+                    <div key={index} className="project-list-item" onClick={() => setSelectedProject(project)}>
+                      <div className="project-list-info">
+                        <h3>{project.name}</h3>
+                        <p>{project.description}</p>
+                      </div>
+                      <div className="project-list-meta">
+                        <div className="profile-photos">
+                          {project.leads.map((lead, i) => (
+                            <div key={i} className="profile-photo" style={{ backgroundColor: lead.color }}>{lead.initials}</div>
+                          ))}
+                        </div>
+                        <span className="member-count">{project.memberCount} members</span>
+                        <span className="project-date">{project.quarter}</span>
+                      </div>
+                      <span className="project-list-arrow">›</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
 
           {/* Archive Section */}
-          <SectionHeader
-            title="Project Archive"
-            description="Completed and past projects"
-          />
-
-          <div className="projects-grid">
-            {archivedProjects.map((project, index) => (
-              <ProjectCard key={index} project={project} onClick={setSelectedProject} />
-            ))}
-          </div>
+          {archivedProjects.length > 0 && (
+            <>
+              <SectionHeader
+                title="Project Archive"
+                description="Completed and past projects"
+              />
+              {viewMode === 'grid' ? (
+                <div className="projects-grid">
+                  {archivedProjects.map((project, index) => (
+                    <ProjectCard key={index} project={project} onClick={setSelectedProject} />
+                  ))}
+                </div>
+              ) : (
+                <div className="projects-list">
+                  {archivedProjects.map((project, index) => (
+                    <div key={index} className="project-list-item" onClick={() => setSelectedProject(project)}>
+                      <div className="project-list-info">
+                        <h3>{project.name}</h3>
+                        <p>{project.description}</p>
+                      </div>
+                      <div className="project-list-meta">
+                        <div className="profile-photos">
+                          {project.leads.map((lead, i) => (
+                            <div key={i} className="profile-photo" style={{ backgroundColor: lead.color }}>{lead.initials}</div>
+                          ))}
+                        </div>
+                        <span className="member-count">{project.memberCount} members</span>
+                        <span className="project-date">{project.quarter}</span>
+                      </div>
+                      <span className="project-list-arrow">›</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </>
       )}
 
@@ -253,9 +327,11 @@ const ProjectsDirectory = () => {
         />
       )}
 
-      <FloatingAddButton onClick={() => setIsCreateModalOpen(true)} />
+      {canCreateProject && (
+        <FloatingAddButton onClick={() => setIsCreateModalOpen(true)} />
+      )}
 
-      {isCreateModalOpen && (
+      {canCreateProject && isCreateModalOpen && (
         <CreateProjectModal
           onClose={() => setIsCreateModalOpen(false)}
           onSubmit={handleCreateProject}

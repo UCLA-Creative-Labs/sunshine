@@ -87,5 +87,21 @@ export const profileService = {
 
     if (error) throw error;
     return data;
+  },
+
+  async hasProjectLeadRole(userId: string): Promise<boolean> {
+    const { data, error } = await supabase
+      .from('project_members')
+      .select('roles!inner(name)')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+    return (data || []).some((m) => {
+      const roles = m.roles as { name: string } | { name: string }[];
+      if (Array.isArray(roles)) {
+        return roles.some((r) => r.name === 'project lead');
+      }
+      return roles?.name === 'project lead';
+    });
   }
 };
