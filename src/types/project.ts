@@ -14,4 +14,5 @@ export interface Project {
     prototypeUrl?: string;
     demoDayUrl?: string;
     instaPostUrl?: string;
+    slack_channel_id?: string | null;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { CreateAnnouncementInput } from '@/types/events';
+import { CreateAnnouncementInput, AnnouncementVisibility, BoardTeam } from '@/types/events';
 
 interface AnnouncementFormProps {
   projectId: string;
@@ -25,6 +25,21 @@ const PRIORITY_OPTIONS = [
   { value: 'urgent', label: 'Urgent' },
 ];
 
+const VISIBILITY_OPTIONS = [
+  { value: 'project', label: 'Project Only' },
+  { value: 'team', label: 'Specific Team' },
+  { value: 'board', label: 'Board Members' },
+  { value: 'club_wide', label: 'Entire Club' },
+];
+
+const TEAM_OPTIONS = [
+  { value: 'tech', label: 'Tech' },
+  { value: 'finance', label: 'Finance' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'design', label: 'Design' },
+  { value: 'project_managers', label: 'Project Managers' },
+];
+
 export function AnnouncementForm({
   projectId,
   onSubmit,
@@ -40,6 +55,8 @@ export function AnnouncementForm({
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
   const [expireDate, setExpireDate] = useState('');
+  const [visibility, setVisibility] = useState<AnnouncementVisibility>('project');
+  const [targetTeam, setTargetTeam] = useState<BoardTeam | ''>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = (): boolean => {
@@ -68,8 +85,8 @@ export function AnnouncementForm({
       publish_date: new Date().toISOString(),
       expire_date: expireDate ? new Date(expireDate).toISOString() : null,
       is_active: true,
-      visibility: 'project',
-      target_team: null,
+      visibility,
+      target_team: visibility === 'team' ? (targetTeam as BoardTeam) : null,
     };
 
     await onSubmit(input);
@@ -129,6 +146,37 @@ export function AnnouncementForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className={labelClass}>Visibility</label>
+          <select
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value as AnnouncementVisibility)}
+            className={inputClass}
+          >
+            {VISIBILITY_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+        {visibility === 'team' && (
+          <div>
+            <label className={labelClass}>Target Team</label>
+            <select
+              value={targetTeam}
+              onChange={(e) => setTargetTeam(e.target.value as BoardTeam)}
+              className={inputClass}
+              required
+            >
+              <option value="">Select a team</option>
+              {TEAM_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div>
