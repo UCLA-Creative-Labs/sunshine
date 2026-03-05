@@ -126,10 +126,78 @@
     padding-right: 40px;
 }
 
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+.quarter-year-row {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.quarter-segmented {
+    display: flex;
+    border-radius: 12px;
+    background: #f3f4f6;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
+
+.quarter-segment-btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 500;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quarter-segment-btn:hover {
+    color: #374151;
+}
+
+.quarter-segment-btn.active {
+    background: white;
+    color: #111827;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.year-stepper {
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    padding: 2px 4px;
+}
+
+.year-stepper-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1;
+    color: #9ca3af;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.year-stepper-btn:hover {
+    color: #111827;
+    background: #f3f4f6;
+}
+
+.year-stepper-value {
+    width: 56px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
 }
 
 .form-section-title {
@@ -201,7 +269,8 @@
 }
 
 @media (max-width: 600px) {
-    .form-row {
-        grid-template-columns: 1fr;
+    .quarter-year-row {
+        flex-direction: column;
+        align-items: stretch;
     }
 }

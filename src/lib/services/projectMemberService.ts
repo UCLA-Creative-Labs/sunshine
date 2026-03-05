@@ -48,3 +48,57 @@ export async function getProjectMembers(
 
   return { data: membersWithRoles as ProjectMemberWithProfile[], error: null, success: true };
 }
+
+export async function getExternalRoles(): Promise<Role[]> {
+  const { data, error } = await supabase
+    .from('roles')
+    .select('id, name, context, description, created_at')
+    .eq('context', 'external')
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching external roles:', error);
+    return [];
+  }
+  return (data as Role[]) ?? [];
+}
+
+/**
+ * Updates an existing project member's RBAC role.
+ * @param memberId - The project_members.id (PK, number)
+ * @param roleId   - The roles.id to assign
+ */
+export async function updateMemberRole(
+  memberId: number,
+  roleId: number
+): Promise<TaskOperationResult<void>> {
+  const { error } = await supabase
+    .from('project_members')
+    .update({ rbac_role_id: roleId })
+    .eq('id', memberId);
+
+  if (error) {
+    console.error('Error updating member role:', error);
+    return { data: null, error: error.message, success: false };
+  }
+  return { data: null, error: null, success: true };
+}
+
+/**
+ * Removes a member from a project by deleting their project_members row.
+ * @param memberId - The project_members.id (PK, number)
+ */
+export async function removeMember(
+  memberId: number
+): Promise<TaskOperationResult<void>> {
+  const { error } = await supabase
+    .from('project_members')
+    .delete()
+    .eq('id', memberId);
+
+  if (error) {
+    console.error('Error removing member:', error);
+    return { data: null, error: error.message, success: false };
+  }
+  return { data: null, error: null, success: true };
+}
