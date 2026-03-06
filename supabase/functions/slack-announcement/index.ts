@@ -73,8 +73,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'No channel mapping' }), { status: 200 });
     }
 
-    // Ping @channel for high or urgent priority announcements
-    const shouldPing = priority === 'high' || priority === 'urgent';
+    // Ping @channel for high priority announcements
+    const shouldPing = priority === 'high';
     const slackDescription = shouldPing ? `<!channel>\n${description}` : description;
 
     // Prepare Slack Message

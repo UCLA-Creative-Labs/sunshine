@@ -19,10 +19,8 @@ const ANNOUNCEMENT_TYPES = [
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: 'low', label: 'Low' },
   { value: 'normal', label: 'Normal' },
   { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' },
 ];
 
 const VISIBILITY_OPTIONS = [
