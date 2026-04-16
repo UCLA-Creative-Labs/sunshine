@@ -114,14 +114,24 @@ export async function processEvent(
       const item = issue ?? pr;
       if (item) {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+        const sender = (payload.sender as { login?: string } | undefined)?.login;
+        const repoFullName = (payload.repository as { full_name?: string } | undefined)?.full_name;
+        const taskName = (issue?.title ?? `Pull request #${pr?.number ?? ''}`).trim();
+
         const event: NotificationEvent = {
           action: notificationAction,
-          taskName: (issue?.title ?? '') || `#${pr?.number ?? ''}`,
+          taskName,
+          taskNumber: issue?.number ?? pr?.number,
           taskUrl: `${baseUrl}/portal/projects/${projectId}/board`,
           projectName: '',
+          repoFullName,
           issueUrl: item.html_url,
-          assignee: issue?.assignees?.[0]?.login,
+          description: issue?.body ?? pr?.body ?? null,
+          labels: issue?.labels?.map((l) => l.name).filter(Boolean),
+          assignees: issue?.assignees?.map((a) => a.login).filter(Boolean),
+          actor: sender,
         };
+
         try {
           await dispatchNotifications(supabase, projectId, event);
         } catch (err) {
