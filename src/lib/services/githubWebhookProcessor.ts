@@ -59,7 +59,7 @@ export async function processEvent(
   supabase: SupabaseClient,
   event: WebhookEvent,
 ): Promise<void> {
-  const { deliveryId, eventType, payload, existingId } = event;
+  const { deliveryId, eventType, payload } = event;
   const action = (payload.action as string | undefined) ?? 'unknown';
   const repoFullName = (payload.repository as { full_name?: string } | undefined)?.full_name;
 
@@ -69,11 +69,10 @@ export async function processEvent(
   const issue = payload.issue as GithubIssue | undefined;
   const pr = payload.pull_request as GithubPullRequest | undefined;
 
-  const { data: integration } = await supabase
+  const { data: integration, error: integrationErr } = await supabase
     .from('github_integrations')
     .upsert(
       {
-        ...(existingId ? { id: existingId } : {}),
         delivery_id: deliveryId,
         event_type: eventType,
         action,
@@ -90,8 +89,10 @@ export async function processEvent(
     .select('id')
     .single();
 
-  if (!integration) {
-    throw new Error(`Failed to upsert github_integrations row for delivery ${deliveryId}`);
+  if (integrationErr || !integration) {
+    throw new Error(
+      `github_integrations upsert failed for delivery ${deliveryId}: ${integrationErr?.message ?? 'no row returned'}`,
+    );
   }
 
   const integrationId = (integration as { id: number }).id;
