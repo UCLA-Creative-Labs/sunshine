@@ -1,4 +1,9 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import {
+  dispatchNotifications,
+  mapNotificationAction,
+  NotificationEvent,
+} from './notificationService';
 
 const PENDING_PUSH_WINDOW_MS = 30_000;
 
@@ -102,6 +107,28 @@ export async function processEvent(
       .from('github_integrations')
       .update({ processed: true, processed_at: new Date().toISOString() })
       .eq('id', integrationId);
+
+    // best-effort chat notification — never let failure here surface to github
+    const notificationAction = mapNotificationAction(eventType, action);
+    if (notificationAction) {
+      const item = issue ?? pr;
+      if (item) {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? '';
+        const event: NotificationEvent = {
+          action: notificationAction,
+          taskName: (issue?.title ?? '') || `#${pr?.number ?? ''}`,
+          taskUrl: `${baseUrl}/portal/projects/${projectId}/board`,
+          projectName: '',
+          issueUrl: item.html_url,
+          assignee: issue?.assignees?.[0]?.login,
+        };
+        try {
+          await dispatchNotifications(supabase, projectId, event);
+        } catch (err) {
+          console.error('notification dispatch failed:', err);
+        }
+      }
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     await supabase
