@@ -22,10 +22,8 @@ const ANNOUNCEMENT_TYPES = [
 ];
 
 const PRIORITY_OPTIONS = [
-  { value: 'low', label: 'Low' },
   { value: 'normal', label: 'Normal' },
   { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' },
 ];
 
 const BOARD_TEAMS: { value: BoardTeam; label: string }[] = [
@@ -33,6 +31,7 @@ const BOARD_TEAMS: { value: BoardTeam; label: string }[] = [
   { value: 'finance', label: 'Finance' },
   { value: 'marketing', label: 'Marketing' },
   { value: 'design', label: 'Design' },
+  { value: 'project_managers', label: 'Project Managers' },
 ];
 
 export function DashboardAnnouncementModal({
