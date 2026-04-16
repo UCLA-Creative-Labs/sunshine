@@ -285,7 +285,7 @@ async function createTaskFromIssue(
 ): Promise<void> {
   const labelInfo = extractLabelInfo(issue.labels);
 
-  const { data: task } = await supabase
+  const { data: task, error: upsertErr } = await supabase
     .from('tasks')
     .upsert(
       {
@@ -306,6 +306,9 @@ async function createTaskFromIssue(
     .select('id')
     .single();
 
+  if (upsertErr) {
+    throw new Error(`task upsert failed for issue #${issue.number}: ${upsertErr.message}`);
+  }
   if (!task) return;
 
   const taskId = (task as { id: number }).id;
