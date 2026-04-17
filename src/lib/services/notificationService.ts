@@ -55,13 +55,6 @@ function actionVerb(action: string): string {
   }
 }
 
-function fallbackText(event: NotificationEvent): string {
-  const verb = actionVerb(event.action);
-  const num = event.taskNumber ? ` #${event.taskNumber}` : '';
-  const who = event.actor ? ` by ${event.actor}` : '';
-  return `${verb}${num}${who}: ${event.taskName}`;
-}
-
 function colorFor(action: string): { hex: string; int: number } {
   if (action === 'issue_opened' || action === 'pr_opened') {
     return { hex: '#57ab5a', int: 0x57ab5a };
@@ -101,30 +94,14 @@ interface SlackBlock {
   elements?: unknown[];
 }
 
-function quoteBody(body: string): string {
-  return truncate(body, BODY_EXCERPT_MAX)
-    .split('\n')
-    .map((line) => `> ${line.length ? line : ' '}`)
-    .join('\n');
-}
-
 function buildSlackMessage(event: NotificationEvent) {
   const color = colorFor(event.action).hex;
   const verb = actionVerb(event.action);
 
-  const repoText = event.repoFullName ? escapeSlack(event.repoFullName) : '';
-  const repoLink =
-    event.repoUrl && repoText
-      ? `<${event.repoUrl}|${repoText}>`
-      : repoText;
   const actorText = event.actor ? escapeSlack(event.actor) : '';
   const actorLink =
     event.actorUrl && actorText ? `<${event.actorUrl}|${actorText}>` : actorText;
-
-  const headerSegments: string[] = [];
-  if (repoLink) headerSegments.push(`*[${repoLink}]*`);
-  headerSegments.push(actorLink ? `${verb} by ${actorLink}` : verb);
-  const headerLine = headerSegments.join(' ');
+  const topText = actorLink ? `${verb} by ${actorLink}` : verb;
 
   const numberPrefix = event.taskNumber ? `#${event.taskNumber} ` : '';
   const titleText = `${numberPrefix}${event.taskName}`;
@@ -133,16 +110,16 @@ function buildSlackMessage(event: NotificationEvent) {
     : `*${escapeSlack(titleText)}*`;
 
   const blocks: SlackBlock[] = [
-    {
-      type: 'section',
-      text: { type: 'mrkdwn', text: `${headerLine}\n${titleLine}` },
-    },
+    { type: 'section', text: { type: 'mrkdwn', text: titleLine } },
   ];
 
   if (event.description?.trim()) {
     blocks.push({
       type: 'section',
-      text: { type: 'mrkdwn', text: quoteBody(event.description.trim()) },
+      text: {
+        type: 'mrkdwn',
+        text: truncate(event.description.trim(), BODY_EXCERPT_MAX),
+      },
     });
   }
 
@@ -163,18 +140,24 @@ function buildSlackMessage(event: NotificationEvent) {
     });
   }
 
-  const linkParts: string[] = [];
-  if (event.issueUrl) linkParts.push(`<${event.issueUrl}|View on GitHub>`);
-  if (event.taskUrl) linkParts.push(`<${event.taskUrl}|Open in CL Portal>`);
-  if (linkParts.length) {
+  const footerParts: string[] = [];
+  if (event.repoFullName) {
+    const repoText = escapeSlack(event.repoFullName);
+    footerParts.push(
+      event.repoUrl ? `<${event.repoUrl}|${repoText}>` : repoText,
+    );
+  }
+  if (event.issueUrl) footerParts.push(`<${event.issueUrl}|View on GitHub>`);
+  if (event.taskUrl) footerParts.push(`<${event.taskUrl}|Open in CL Portal>`);
+  if (footerParts.length) {
     blocks.push({
       type: 'context',
-      elements: [{ type: 'mrkdwn', text: linkParts.join('  ·  ') }],
+      elements: [{ type: 'mrkdwn', text: footerParts.join('  ·  ') }],
     });
   }
 
   return {
-    text: fallbackText(event),
+    text: topText,
     attachments: [{ color, blocks }],
   };
 }
