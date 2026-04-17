@@ -2,6 +2,8 @@ import { SupabaseClient } from '@supabase/supabase-js';
 
 const NOTIFICATION_TIMEOUT_MS = 2500;
 const BODY_EXCERPT_MAX = 500;
+const GITHUB_ICON_URL =
+  'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
 
 export interface NotificationEvent {
   action: string;
@@ -10,11 +12,14 @@ export interface NotificationEvent {
   taskUrl: string;
   projectName: string;
   repoFullName?: string;
+  repoUrl?: string;
   issueUrl?: string;
   description?: string | null;
   labels?: string[];
   assignees?: string[];
   actor?: string;
+  actorUrl?: string;
+  actorAvatarUrl?: string;
 }
 
 export function mapNotificationAction(eventType: string, action: string): string | null {
@@ -31,34 +36,40 @@ export function mapNotificationAction(eventType: string, action: string): string
   return null;
 }
 
-function headlineFor(action: string, actor: string | undefined): string {
-  const who = actor ? ` by ${actor}` : '';
+function actionVerb(action: string): string {
   switch (action) {
     case 'issue_opened':
-      return `Issue opened${who}`;
+      return 'Issue opened';
     case 'issue_closed':
-      return `Issue closed${who}`;
+      return 'Issue closed';
     case 'issue_edited':
-      return `Issue edited${who}`;
+      return 'Issue edited';
     case 'issue_assigned':
-      return `Issue assignment changed${who}`;
+      return 'Issue assignment changed';
     case 'pr_opened':
-      return `Pull request opened${who}`;
+      return 'Pull request opened';
     case 'pr_closed':
-      return `Pull request closed${who}`;
+      return 'Pull request closed';
     default:
       return action;
   }
 }
 
+function fallbackText(event: NotificationEvent): string {
+  const verb = actionVerb(event.action);
+  const num = event.taskNumber ? ` #${event.taskNumber}` : '';
+  const who = event.actor ? ` by ${event.actor}` : '';
+  return `${verb}${num}${who}: ${event.taskName}`;
+}
+
 function colorFor(action: string): { hex: string; int: number } {
   if (action === 'issue_opened' || action === 'pr_opened') {
-    return { hex: '#2ea043', int: 0x2ea043 };
+    return { hex: '#57ab5a', int: 0x57ab5a };
   }
   if (action === 'issue_closed' || action === 'pr_closed') {
-    return { hex: '#8957e5', int: 0x8957e5 };
+    return { hex: '#a371f7', int: 0xa371f7 };
   }
-  return { hex: '#58a6ff', int: 0x58a6ff };
+  return { hex: '#79b8ff', int: 0x79b8ff };
 }
 
 function truncate(text: string, max: number): string {
@@ -90,62 +101,80 @@ interface SlackBlock {
   elements?: unknown[];
 }
 
+function quoteBody(body: string): string {
+  return truncate(body, BODY_EXCERPT_MAX)
+    .split('\n')
+    .map((line) => `> ${line.length ? line : ' '}`)
+    .join('\n');
+}
+
 function buildSlackMessage(event: NotificationEvent) {
-  const headline = headlineFor(event.action, event.actor);
   const color = colorFor(event.action).hex;
+  const verb = actionVerb(event.action);
+
+  const repoText = event.repoFullName ? escapeSlack(event.repoFullName) : '';
+  const repoLink =
+    event.repoUrl && repoText
+      ? `<${event.repoUrl}|${repoText}>`
+      : repoText;
+  const actorText = event.actor ? escapeSlack(event.actor) : '';
+  const actorLink =
+    event.actorUrl && actorText ? `<${event.actorUrl}|${actorText}>` : actorText;
+
+  const headerSegments: string[] = [];
+  if (repoLink) headerSegments.push(`*[${repoLink}]*`);
+  headerSegments.push(actorLink ? `${verb} by ${actorLink}` : verb);
+  const headerLine = headerSegments.join(' ');
 
   const numberPrefix = event.taskNumber ? `#${event.taskNumber} ` : '';
   const titleText = `${numberPrefix}${event.taskName}`;
-  const titleMrkdwn = event.issueUrl
+  const titleLine = event.issueUrl
     ? `*<${event.issueUrl}|${escapeSlack(titleText)}>*`
     : `*${escapeSlack(titleText)}*`;
 
   const blocks: SlackBlock[] = [
-    { type: 'section', text: { type: 'mrkdwn', text: titleMrkdwn } },
-  ];
-
-  if (event.description) {
-    blocks.push({
-      type: 'section',
-      text: { type: 'mrkdwn', text: truncate(event.description, BODY_EXCERPT_MAX) },
-    });
-  }
-
-  const contextParts: string[] = [];
-  if (event.repoFullName) contextParts.push(`\`${event.repoFullName}\``);
-  if (event.projectName) contextParts.push(`_${event.projectName}_`);
-  if (event.labels?.length) {
-    contextParts.push(`Labels: ${event.labels.map((l) => `\`${l}\``).join(' ')}`);
-  }
-  if (event.assignees?.length) {
-    contextParts.push(`Assigned: ${event.assignees.map((a) => `@${a}`).join(' ')}`);
-  }
-
-  if (contextParts.length) {
-    blocks.push({
-      type: 'context',
-      elements: [{ type: 'mrkdwn', text: contextParts.join(' · ') }],
-    });
-  }
-
-  const buttons: unknown[] = [
     {
-      type: 'button',
-      text: { type: 'plain_text', text: 'View in Portal' },
-      url: event.taskUrl,
+      type: 'section',
+      text: { type: 'mrkdwn', text: `${headerLine}\n${titleLine}` },
     },
   ];
-  if (event.issueUrl) {
-    buttons.push({
-      type: 'button',
-      text: { type: 'plain_text', text: 'View on GitHub' },
-      url: event.issueUrl,
+
+  if (event.description?.trim()) {
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: quoteBody(event.description.trim()) },
     });
   }
-  blocks.push({ type: 'actions', elements: buttons });
+
+  const metaParts: string[] = [];
+  if (event.labels?.length) {
+    metaParts.push(`🏷  ${event.labels.map((l) => `\`${l}\``).join(' · ')}`);
+  }
+  if (event.assignees?.length) {
+    metaParts.push(`👥  ${event.assignees.join(', ')}`);
+  }
+  if (event.projectName) {
+    metaParts.push(`📁  _${escapeSlack(event.projectName)}_`);
+  }
+  if (metaParts.length) {
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: metaParts.join('     ') }],
+    });
+  }
+
+  const linkParts: string[] = [];
+  if (event.issueUrl) linkParts.push(`<${event.issueUrl}|View on GitHub>`);
+  if (event.taskUrl) linkParts.push(`<${event.taskUrl}|Open in CL Portal>`);
+  if (linkParts.length) {
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: linkParts.join('  ·  ') }],
+    });
+  }
 
   return {
-    text: headline,
+    text: fallbackText(event),
     attachments: [{ color, blocks }],
   };
 }
@@ -162,38 +191,47 @@ interface DiscordField {
 }
 
 function buildDiscordMessage(event: NotificationEvent) {
-  const headline = headlineFor(event.action, event.actor);
   const color = colorFor(event.action).int;
+  const verb = actionVerb(event.action);
 
   const numberPrefix = event.taskNumber ? `#${event.taskNumber} ` : '';
   const titleText = `${numberPrefix}${event.taskName}`;
 
   const fields: DiscordField[] = [];
   if (event.labels?.length) {
-    fields.push({ name: 'Labels', value: event.labels.join(', '), inline: true });
+    fields.push({ name: 'Labels', value: event.labels.join(' · '), inline: true });
   }
   if (event.assignees?.length) {
     fields.push({
       name: 'Assignees',
-      value: event.assignees.map((a) => `@${a}`).join(', '),
+      value: event.assignees.join(', '),
       inline: true,
     });
   }
   if (event.projectName) {
     fields.push({ name: 'Project', value: event.projectName, inline: true });
   }
-  fields.push({ name: 'Portal', value: `[View Task](${event.taskUrl})`, inline: false });
+
+  const authorName = event.actor ? `${event.actor} · ${verb.toLowerCase()}` : verb;
 
   return {
     embeds: [
       {
-        author: { name: headline },
+        author: {
+          name: authorName,
+          url: event.actorUrl,
+          icon_url: event.actorAvatarUrl,
+        },
         title: titleText,
         url: event.issueUrl,
-        description: event.description ? truncate(event.description, BODY_EXCERPT_MAX) : undefined,
+        description: event.description?.trim()
+          ? truncate(event.description.trim(), BODY_EXCERPT_MAX)
+          : undefined,
         color,
         fields,
-        footer: event.repoFullName ? { text: event.repoFullName } : undefined,
+        footer: event.repoFullName
+          ? { text: event.repoFullName, icon_url: GITHUB_ICON_URL }
+          : undefined,
         timestamp: new Date().toISOString(),
       },
     ],

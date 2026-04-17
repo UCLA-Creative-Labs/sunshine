@@ -115,8 +115,12 @@ export async function processEvent(
       const item = issue ?? pr;
       if (item) {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? '';
-        const sender = (payload.sender as { login?: string } | undefined)?.login;
-        const repoFullName = (payload.repository as { full_name?: string } | undefined)?.full_name;
+        const senderObj = payload.sender as
+          | { login?: string; html_url?: string; avatar_url?: string }
+          | undefined;
+        const repoObj = payload.repository as
+          | { full_name?: string; html_url?: string }
+          | undefined;
         const taskName = (issue?.title ?? `Pull request #${pr?.number ?? ''}`).trim();
 
         const event: NotificationEvent = {
@@ -125,12 +129,15 @@ export async function processEvent(
           taskNumber: issue?.number ?? pr?.number,
           taskUrl: `${baseUrl}/portal/projects/${projectId}/board`,
           projectName: '',
-          repoFullName,
+          repoFullName: repoObj?.full_name,
+          repoUrl: repoObj?.html_url,
           issueUrl: item.html_url,
           description: issue?.body ?? pr?.body ?? null,
           labels: issue?.labels?.map((l) => l.name).filter(Boolean),
           assignees: issue?.assignees?.map((a) => a.login).filter(Boolean),
-          actor: sender,
+          actor: senderObj?.login,
+          actorUrl: senderObj?.html_url,
+          actorAvatarUrl: senderObj?.avatar_url,
         };
 
         try {
