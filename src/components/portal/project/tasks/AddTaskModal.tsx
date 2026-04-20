@@ -2,12 +2,18 @@
 
 import React from 'react';
 import { TaskForm } from './TaskForm';
-import { CreateTaskInput } from '@/lib/types/tasks';
+import {
+  CreateTaskAssignmentContext,
+  CreateTaskInput,
+} from '@/lib/types/tasks';
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (input: CreateTaskInput, assigneeIds: string[]) => Promise<void>;
+  onSubmit: (
+    input: CreateTaskInput,
+    assignmentContext: CreateTaskAssignmentContext,
+  ) => Promise<void>;
   projectId: string;
   projectMembers: { id: string; display_name: string }[];
   isSubmitting?: boolean;

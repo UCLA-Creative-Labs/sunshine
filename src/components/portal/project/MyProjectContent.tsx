@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import {
     FaGithub,
@@ -17,6 +17,11 @@ import {
     createAnnouncement,
 } from '@/lib/supabase/eventsService';
 import {
+    ActivityLogEntry,
+    createActivityLogEntry,
+    getProjectActivityLog,
+} from '@/lib/supabase/activityService';
+import {
     getProjectMembers,
     ProjectMemberWithProfile,
 } from '@/lib/services/projectMemberService';
@@ -27,10 +32,19 @@ import {
     CreateEventInput,
     CreateAnnouncementInput,
 } from '@/types/events';
+import { useTasks } from '@/lib/hooks/useTasks';
 import { AddEventModal } from './events/AddEventModal';
 import { AddAnnouncementModal } from './events/AddAnnouncementModal';
 import ProjectEventCard from '@/components/portal/ProjectEventCard';
 import { useUserRole } from '@/lib/hooks/useUserRole';
+import {
+    TASK_PRIORITY_STYLES,
+    TASK_STATUS_STYLES,
+    formatPriorityLabel,
+    formatRelativeTime,
+    getActivityComment,
+    getActivityMessage,
+} from '@/lib/utils/projectOverviewDisplay';
 
 const CARD_STYLES = {
     base: 'rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl',
@@ -87,14 +101,10 @@ function Section({
     );
 }
 
-function TaskLink({ children }: { children: React.ReactNode }) {
-    return <span className="font-semibold text-[#3F86FF]">{children}</span>;
-}
-
 interface ActivityItemProps {
     name: string;
     time: string;
-    action: React.ReactNode;
+    action: string;
     comment?: string;
 }
 
@@ -139,6 +149,11 @@ export default function MyProjectContent({
     currentUserId,
 }: MyProjectContentProps) {
     const { canPostEvents } = useUserRole(projectId, currentUserId);
+    const {
+        tasks: allTasks,
+        isLoading: isTasksLoading,
+        error: tasksError,
+    } = useTasks(projectId);
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -157,6 +172,10 @@ export default function MyProjectContent({
     const [announcements, setAnnouncements] = useState<ProjectAnnouncement[]>(
         [],
     );
+    const [recentActivities, setRecentActivities] = useState<ActivityLogEntry[]>(
+        [],
+    );
+    const [isActivityLoading, setIsActivityLoading] = useState(true);
     const [showEventModal, setShowEventModal] = useState(false);
     const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -189,9 +208,42 @@ export default function MyProjectContent({
         setAnnouncements(data);
     }, [projectId]);
 
+    const fetchRecentActivities = useCallback(async () => {
+        setIsActivityLoading(true);
+        try {
+            const data = await getProjectActivityLog(projectId, 8);
+            setRecentActivities(data);
+        } finally {
+            setIsActivityLoading(false);
+        }
+    }, [projectId]);
+
+    const myTasks = useMemo(
+        () =>
+            allTasks
+                .filter((task) =>
+                    task.assignments.some(
+                        (assignment) => assignment.user_id === currentUserId,
+                    ),
+                )
+                .sort((a, b) => {
+                    if (a.due_date && b.due_date) {
+                        return (
+                            new Date(a.due_date).getTime() -
+                            new Date(b.due_date).getTime()
+                        );
+                    }
+                    if (a.due_date) return -1;
+                    if (b.due_date) return 1;
+                    return a.sort_order - b.sort_order;
+                }),
+        [allTasks, currentUserId],
+    );
+
     useEffect(() => {
         fetchEvents();
         fetchAnnouncements();
+        fetchRecentActivities();
         getProjectMembers(projectId).then((result) => {
             if (result.success && result.data) {
                 setProjectLeads(
@@ -202,13 +254,34 @@ export default function MyProjectContent({
                 );
             }
         });
-    }, [fetchEvents, fetchAnnouncements, projectId]);
+    }, [
+        fetchAnnouncements,
+        fetchEvents,
+        fetchRecentActivities,
+        projectId,
+    ]);
 
     const handleCreateEvent = async (input: CreateEventInput) => {
         setIsSubmitting(true);
         try {
-            await createEvent(input);
-            await fetchEvents();
+            const result = await createEvent(input);
+            if (result.error) {
+                throw new Error(result.error);
+            }
+
+            if (result.data) {
+                await createActivityLogEntry({
+                    action: 'created_event',
+                    projectId,
+                    userId: currentUserId,
+                    metadata: {
+                        event_title: result.data.title,
+                        event_date: result.data.event_date,
+                    },
+                });
+            }
+
+            await Promise.all([fetchEvents(), fetchRecentActivities()]);
             setShowEventModal(false);
         } catch (err) {
             console.error('Failed to create event:', err);
@@ -220,8 +293,19 @@ export default function MyProjectContent({
     const handleCreateAnnouncement = async (input: CreateAnnouncementInput) => {
         setIsSubmitting(true);
         try {
-            await createAnnouncement(input);
-            await fetchAnnouncements();
+            const announcement = await createAnnouncement(input);
+            if (announcement) {
+                await createActivityLogEntry({
+                    action: 'created_announcement',
+                    projectId,
+                    userId: currentUserId,
+                    metadata: {
+                        announcement_title: announcement.title,
+                    },
+                });
+            }
+
+            await Promise.all([fetchAnnouncements(), fetchRecentActivities()]);
             setShowAnnouncementModal(false);
         } catch (err) {
             console.error('Failed to create announcement:', err);
@@ -476,7 +560,6 @@ export default function MyProjectContent({
                         </div>
                     </Section>
 
-                    {/* TODO: Replace with user's assigned tasks from database */}
                     <Section title="My Tasks" delay={160}>
                         <div className="overflow-x-auto">
                             <table className="min-w-full text-left text-xs md:text-sm text-black/80">
@@ -500,42 +583,111 @@ export default function MyProjectContent({
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td className="py-4 pr-6 align-middle">
-                                            <span className="text-black/60 mr-1">
-                                                #67
-                                            </span>
-                                            Follow CL on IG!
-                                        </td>
-                                        <td className="py-4 pr-6 align-middle">
-                                            <span className="rounded-full bg-[#FFE3E3] px-3 py-1 text-xs font-medium text-[#E1225C]">
-                                                High
-                                            </span>
-                                        </td>
-                                        <td className="py-4 pr-6 align-middle">
-                                            <span className="rounded-full bg-[#FFE6D5] px-3 py-1 text-xs font-medium text-[#D26A00]">
-                                                Bug
-                                            </span>
-                                        </td>
-                                        <td className="py-4 pr-6 align-middle">
-                                            <span className="rounded-full bg-[#E2F7E6] px-3 py-1 text-xs font-medium text-[#1F7A3D]">
-                                                In-Progress
-                                            </span>
-                                        </td>
-                                        <td className="py-4 align-middle">
-                                            <span
-                                                className={AVATAR_STYLES.small}
+                                    {isTasksLoading ? (
+                                        <tr>
+                                            <td
+                                                colSpan={5}
+                                                className="py-6 text-center text-black/50"
                                             >
-                                                <Image
-                                                    src="/images/default-avatar.svg"
-                                                    alt="Task assignee avatar"
-                                                    width={32}
-                                                    height={32}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            </span>
-                                        </td>
-                                    </tr>
+                                                Loading your tasks...
+                                            </td>
+                                        </tr>
+                                    ) : tasksError ? (
+                                        <tr>
+                                            <td
+                                                colSpan={5}
+                                                className="py-6 text-center text-red-500"
+                                            >
+                                                Failed to load your tasks.
+                                            </td>
+                                        </tr>
+                                    ) : myTasks.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan={5}
+                                                className="py-6 text-center text-black/50"
+                                            >
+                                                No tasks assigned to you yet.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        myTasks.map((task) => {
+                                            const statusMeta =
+                                                TASK_STATUS_STYLES[task.status];
+                                            const additionalAssignees =
+                                                task.assignments.length - 1;
+
+                                            return (
+                                                <tr key={task.id}>
+                                                    <td className="py-4 pr-6 align-middle">
+                                                        <span className="text-black/60 mr-1">
+                                                            #{task.id}
+                                                        </span>
+                                                        {task.name}
+                                                    </td>
+                                                    <td className="py-4 pr-6 align-middle">
+                                                        <span
+                                                            className={
+                                                                TASK_PRIORITY_STYLES[
+                                                                    task.priority
+                                                                ]
+                                                            }
+                                                        >
+                                                            {formatPriorityLabel(
+                                                                task.priority,
+                                                            )}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 pr-6 align-middle">
+                                                        <span
+                                                            className="rounded-full px-3 py-1 text-xs font-medium text-black/70"
+                                                            style={{
+                                                                backgroundColor:
+                                                                    task.label_color,
+                                                            }}
+                                                        >
+                                                            {task.label}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 pr-6 align-middle">
+                                                        <span
+                                                            className={
+                                                                statusMeta.className
+                                                            }
+                                                        >
+                                                            {statusMeta.label}
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-4 align-middle">
+                                                        <div className="inline-flex items-center gap-2">
+                                                            <span
+                                                                className={
+                                                                    AVATAR_STYLES.small
+                                                                }
+                                                            >
+                                                                <Image
+                                                                    src="/images/default-avatar.svg"
+                                                                    alt="Task assignee avatar"
+                                                                    width={32}
+                                                                    height={32}
+                                                                    className="h-full w-full object-cover"
+                                                                />
+                                                            </span>
+                                                            {additionalAssignees >
+                                                                0 && (
+                                                                <span className="text-xs text-black/60">
+                                                                    +
+                                                                    {
+                                                                        additionalAssignees
+                                                                    }
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -628,55 +780,31 @@ export default function MyProjectContent({
 
                 {/* Right column */}
                 <div className="space-y-14">
-                    {/* TODO: Replace with project.recentActivity from database */}
                     <Section title="Recent Activity" delay={240}>
                         <div className="space-y-7 text-xs md:text-sm text-black/80">
-                            <ActivityItem
-                                name="Sunny Vinay"
-                                time="9:05 AM"
-                                action={
-                                    <>
-                                        Created task{' '}
-                                        <TaskLink>
-                                            &quot;Design onboarding flow&quot;
-                                        </TaskLink>
-                                    </>
-                                }
-                            />
-                            <ActivityItem
-                                name="Shawn Lin"
-                                time="9:42 AM"
-                                action="Commented on sprint planning"
-                                comment="Can we move this story to the next sprint?"
-                            />
-                            <ActivityItem
-                                name="Stephanie Pham"
-                                time="10:15 AM"
-                                action={
-                                    <>
-                                        Updated status of{' '}
-                                        <TaskLink>
-                                            &quot;Landing page redesign&quot;
-                                        </TaskLink>{' '}
-                                        to In Progress
-                                    </>
-                                }
-                            />
-                            <ActivityItem
-                                name="Travis Nguyen"
-                                time="11:02 AM"
-                                action='Completed task "Hook up API to dashboard"'
-                            />
-                            <ActivityItem
-                                name="MJ Bagaoisan"
-                                time="11:45 AM"
-                                action="Reviewed pull request #42"
-                            />
-                            <ActivityItem
-                                name="LeBron James"
-                                time="12:10 PM"
-                                action="Assigned as project lead"
-                            />
+                            {isActivityLoading ? (
+                                <p className="text-sm text-black/50">
+                                    Loading recent activity...
+                                </p>
+                            ) : recentActivities.length === 0 ? (
+                                <p className="text-sm text-black/50">
+                                    No recent activity yet.
+                                </p>
+                            ) : (
+                                recentActivities.map((activity) => (
+                                    <ActivityItem
+                                        key={activity.id}
+                                        name={activity.actorDisplayName}
+                                        time={formatRelativeTime(
+                                            activity.created_at,
+                                        )}
+                                        action={getActivityMessage(activity)}
+                                        comment={getActivityComment(
+                                            activity.metadata,
+                                        ) ?? undefined}
+                                    />
+                                ))
+                            )}
                         </div>
                     </Section>
 

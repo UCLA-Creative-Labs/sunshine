@@ -9,7 +9,11 @@ import { useTaskActions } from '@/lib/hooks/useTaskActions';
 import { AddTaskModal } from './tasks/AddTaskModal';
 import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
-import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
+import {
+  CreateTaskAssignmentContext,
+  CreateTaskInput,
+  UpdateTaskInput,
+} from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 import { getProfileDisplayName } from '@/lib/utils/profileName';
 
@@ -137,7 +141,7 @@ interface StatusSectionProps {
   delay?: number;
   onEditTask: (task: TaskWithAssignments) => void;
   onMarkComplete: (task: TaskWithAssignments) => void;
-  onDeleteTask: (taskId: string) => void;
+  onDeleteTask: (task: TaskWithAssignments) => void;
   canEdit: boolean;
   dbTasks: TaskWithAssignments[];
 }
@@ -268,7 +272,10 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask,
                               const dbTask = dbTasks.find(t => t.id.toString() === task.id);
                               if (dbTask) onMarkComplete(dbTask);
                             }}
-                            onDelete={() => onDeleteTask(task.id)}
+                            onDelete={() => {
+                              const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                              if (dbTask) onDeleteTask(dbTask);
+                            }}
                             canEdit={canEdit}
                             isCompleted={task.status === 'done'}
                           />
@@ -299,7 +306,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions();
+  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions(projectId, currentUserId);
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -313,8 +320,11 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     }));
 
   // handle task creation
-  const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
-    const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
+  const handleCreateTask = async (
+    input: CreateTaskInput,
+    assignmentContext: CreateTaskAssignmentContext,
+  ) => {
+    const result = await createTaskWithAssignees(input, currentUserId, assignmentContext);
     if (result) {
       setIsModalOpen(false);
       refetch();
@@ -322,10 +332,12 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
   };
 
   // handle task deletion
-  const handleDeleteTask = async (taskId: string) => {
+  const handleDeleteTask = async (task: TaskWithAssignments) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
     
-    const success = await deleteTaskAction(taskId);
+    const success = await deleteTaskAction(String(task.id), {
+      taskName: task.name,
+    });
     if (success) {
       refetch();
     }
@@ -339,7 +351,10 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
   const handleEditSubmit = async (input: UpdateTaskInput) => {
     if (!editingTask) return;
     
-    const success = await updateTaskAction(String(editingTask.id), input);
+    const success = await updateTaskAction(String(editingTask.id), input, {
+      taskName: editingTask.name,
+      previousStatus: editingTask.status,
+    });
     if (success) {
       setEditingTask(null);
       refetch();
@@ -351,7 +366,10 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
       status: 'done',
     };
     
-    const success = await updateTaskAction(String(task.id), input);
+    const success = await updateTaskAction(String(task.id), input, {
+      taskName: task.name,
+      previousStatus: task.status,
+    });
     if (success) {
       refetch();
     }
