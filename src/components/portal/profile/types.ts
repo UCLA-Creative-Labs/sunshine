@@ -25,6 +25,7 @@ export interface Profile {
     level: number;
     points: number;
     joined_date: string;
+    github_username?: string | null;
 }
 
 export interface Achievement {

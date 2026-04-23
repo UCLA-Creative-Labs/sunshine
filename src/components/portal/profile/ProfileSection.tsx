@@ -10,6 +10,7 @@
 
 import React from 'react';
 import { Profile, Achievement } from './types';
+import GitHubLinkSection from './GitHubLinkSection';
 
 interface ProfileSectionProps {
     profile: Profile;
@@ -18,6 +19,8 @@ interface ProfileSectionProps {
     isEditingBio: boolean;
     achievements: Achievement[];
     roles?: any[];
+    githubUsername?: string | null;
+    onGithubUsernameChange?: (username: string | null) => void;
     onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onBioChange: (value: string) => void;
     onEditBioStart: () => void;
@@ -31,6 +34,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     isEditingBio,
     achievements,
     roles = [],
+    githubUsername,
+    onGithubUsernameChange,
     onImageChange,
     onBioChange,
     onEditBioStart,
@@ -68,7 +73,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                                         <div className="w-2.5 h-2.5 bg-black rounded-full"></div>
                                     </div>
                                     <svg width="16" height="8" viewBox="0 0 16 8" className="mt-1">
-                                        <path d="M2 6 Q8 2 14 6" stroke="black" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                                        <path d="M2 6 Q8 2 14 6" stroke="black" strokeWidth="2" fill="none" strokeLinecap="round" />
                                     </svg>
                                 </div>
                             </div>
@@ -161,6 +166,15 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                             </div>
                         )}
                     </div>
+
+                    {/* GitHub Account */}
+                    {onGithubUsernameChange && (
+                        <GitHubLinkSection
+                            userId={profile.id}
+                            githubUsername={githubUsername ?? null}
+                            onUsernameChange={onGithubUsernameChange}
+                        />
+                    )}
 
                     {/* Achievements */}
                     <div>

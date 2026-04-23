@@ -33,6 +33,7 @@ const ProfileContent = () => {
     const [bio, setBio] = useState('');
     const [isEditingBio, setIsEditingBio] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [githubUsername, setGithubUsername] = useState<string | null>(null);
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProject, setSelectedProject] = useState<any>(null);
 
@@ -41,7 +42,7 @@ const ProfileContent = () => {
         const fetchProfile = async () => {
             try {
                 const profileData = await profileService.getCurrentProfile();
-                
+
                 // Transform Supabase profile to match UI expectations
                 const transformedProfile: Profile = {
                     id: profileData.id,
@@ -53,14 +54,16 @@ const ProfileContent = () => {
                     level: 1,
                     points: 0,
                     joined_date: profileData.created_at,
+                    github_username: profileData.github_username ?? null,
                 };
-                
+                setGithubUsername(profileData.github_username ?? null);
+
                 setProfile(transformedProfile);
                 setBio(transformedProfile.bio || '');
-                
+
                 const userRoles = await profileService.getUserRoles(profileData.id);
                 setRoles(userRoles);
-                
+
                 // Fetch user projects
                 try {
                     const userProjects = await profileService.getUserProjects(profileData.id);
@@ -110,7 +113,7 @@ const ProfileContent = () => {
     // Calculate unlocked achievements based on level and points
     const getUnlockedAchievements = () => {
         if (!profile) return [];
-        
+
         return ACHIEVEMENT_CONFIG.filter(achievement => {
             const threshold = ACHIEVEMENT_THRESHOLDS[achievement.type];
             return profile.level >= threshold.level || profile.points >= threshold.points;
@@ -133,7 +136,7 @@ const ProfileContent = () => {
 
     const handleBioUpdate = async () => {
         if (!profile) return;
-        
+
         try {
             // TODO: Update bio in profiles table when bio field is added
             // await profileService.updateProfile(profile.id, { bio });
@@ -173,6 +176,8 @@ const ProfileContent = () => {
                     isEditingBio={isEditingBio}
                     achievements={unlockedAchievements}
                     roles={roles}
+                    githubUsername={githubUsername}
+                    onGithubUsernameChange={setGithubUsername}
                     onImageChange={handleProfileImageChange}
                     onBioChange={setBio}
                     onEditBioStart={() => setIsEditingBio(true)}
