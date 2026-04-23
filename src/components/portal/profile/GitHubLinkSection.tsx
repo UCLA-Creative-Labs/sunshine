@@ -91,9 +91,11 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
         setLoading(true);
         setError(null);
         try {
-            await profileService.clearGithubUsername(userId);
+            const res = await fetch('/api/github/disconnect', { method: 'POST' });
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.error ?? 'Failed to disconnect.');
             onUsernameChange(null);
-            setSuccessMsg(null);
+            setSuccessMsg('GitHub account disconnected.');
         } catch (err: any) {
             setError(err.message);
         } finally {
