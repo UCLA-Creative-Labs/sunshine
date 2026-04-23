@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Check if user already has a GitHub identity linked
     const githubIdentity = user.identities?.find(
         (i) => i.provider === 'github',
     );
@@ -35,9 +34,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const origin =
-        process.env.NEXT_PUBLIC_SITE_URL ??
-        request.nextUrl.origin;
+    const origin = request.nextUrl.origin;
 
     const { data, error } = await supabase.auth.linkIdentity({
         provider: 'github',
@@ -57,7 +54,6 @@ export async function POST(request: NextRequest) {
     }
 
     const url = data?.url;
-    console.log('linkIdentity returned URL:', url);
 
     if (!url) {
         return NextResponse.json(
