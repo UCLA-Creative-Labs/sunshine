@@ -303,7 +303,7 @@ export default function MembersDirectory() {
           </h1>
           <p className="mt-5 font-ui text-lg text-ink-600 max-w-2xl leading-relaxed">
             Internal board + everyone on an active project.{' '}
-            <span className="font-code text-[13px] text-ink-500">
+            <span className="font-code text-[13px] text-ink-400">
               {totalMembersUnique} unique · {INTERNAL.length} internal seats · {PROJECTS.length} active projects
             </span>
           </p>
@@ -375,7 +375,7 @@ export default function MembersDirectory() {
                         <p className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-400">
                           empty roster
                         </p>
-                        <p className="font-ui text-sm text-ink-500 mt-2">
+                        <p className="font-ui text-sm text-ink-400 mt-2">
                           Past members will land here once we start tracking them.
                         </p>
                       </div>
@@ -656,7 +656,7 @@ function ProjectBlock({ project }: { project: ProjectGroup }) {
             <h3 className="font-ui font-extrabold text-[20px] text-ink-900 leading-none m-0">
               {project.name}
             </h3>
-            <span className="font-code text-[11px] text-ink-500">· {project.quarter}</span>
+            <span className="font-code text-[11px] text-ink-400">· {project.quarter}</span>
           </div>
           <p className="font-code text-[11px] text-ink-600 mt-1.5 tracking-wide">
             {counts.lead} lead · {counts.pm} pm · {counts.member} member{counts.member === 1 ? '' : 's'}

@@ -132,7 +132,7 @@ const STATUS_META: Record<StatusId, {
 };
 
 const PRIORITY_STYLES: Record<Priority, { className: string; label: string }> = {
-  low: { className: "bg-ink-100 text-ink-500", label: "Low" },
+  low: { className: "bg-ink-100 text-ink-400", label: "Low" },
   medium: { className: "bg-ink-200 text-ink-900", label: "Medium" },
   high: { className: "bg-cl-pink-100 text-cl-pink-700", label: "High" },
   urgent: { className: "bg-cl-pink-700 text-white", label: "Urgent" },

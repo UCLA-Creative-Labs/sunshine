@@ -22,7 +22,7 @@ const ACTIVITY: ActivityRow[] = [
     body: (
       <>
         <b className="font-semibold text-ink-900">Travis Nguyen</b>
-        <span className="text-ink-700"> shipped Studybug — final demo posted</span>
+        <span className="text-ink-600"> shipped Studybug — final demo posted</span>
       </>
     ),
     timestamp: '2h ago',
@@ -34,7 +34,7 @@ const ACTIVITY: ActivityRow[] = [
     body: (
       <>
         <b className="font-semibold text-ink-900">3 new members</b>
-        <span className="text-ink-700"> joined this week</span>
+        <span className="text-ink-600"> joined this week</span>
       </>
     ),
     timestamp: '1d ago',
@@ -46,7 +46,7 @@ const ACTIVITY: ActivityRow[] = [
     body: (
       <>
         <b className="font-semibold text-ink-900">ThermoSense</b>
-        <span className="text-ink-700"> posted a sprint update</span>
+        <span className="text-ink-600"> posted a sprint update</span>
       </>
     ),
     timestamp: '1d ago',
@@ -58,7 +58,7 @@ const ACTIVITY: ActivityRow[] = [
     body: (
       <>
         <b className="font-semibold text-ink-900">Aarushi Gupta</b>
-        <span className="text-ink-700"> added 4 tasks to BruinBites</span>
+        <span className="text-ink-600"> added 4 tasks to BruinBites</span>
       </>
     ),
     timestamp: '2d ago',
@@ -70,7 +70,7 @@ const ACTIVITY: ActivityRow[] = [
     body: (
       <>
         <b className="font-semibold text-ink-900">Cohabit</b>
-        <span className="text-ink-700"> moved 2 tasks to Done</span>
+        <span className="text-ink-600"> moved 2 tasks to Done</span>
       </>
     ),
     timestamp: '3d ago',
@@ -722,7 +722,7 @@ function PortalFooter() {
             <path d="M20 20 L20 2 A18 18 0 0 1 36 25 Z" fill="#1A1A1A" />
           </svg>
           <span>© 2026 Creative Labs at UCLA</span>
-          <span className="font-accent italic text-ink-500 ml-2">made with care</span>
+          <span className="font-accent italic text-ink-400 ml-2">made with care</span>
         </div>
         <div className="flex gap-5 font-code text-[11px] text-ink-600">
           <Link href="#" className="hover:text-ink-900">

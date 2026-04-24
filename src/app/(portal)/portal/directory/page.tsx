@@ -241,7 +241,7 @@ export default function ProjectDirectory() {
           </h1>
           <p className="mt-5 font-ui text-lg text-ink-600 max-w-2xl leading-relaxed">
             Browse and discover ongoing and completed Creative Labs projects.{' '}
-            <span className="font-code text-[13px] text-ink-500">
+            <span className="font-code text-[13px] text-ink-400">
               {total} total · {totalActive} active · {totalArchived} archived
             </span>
           </p>
@@ -604,7 +604,7 @@ function ProjectListRow({ project: p }: { project: Project }) {
           <h3 className="font-ui font-extrabold text-[15px] text-ink-900 leading-none m-0 truncate">
             {p.name}
           </h3>
-          <span className="font-code text-[11px] text-ink-500">· {p.quarter}</span>
+          <span className="font-code text-[11px] text-ink-400">· {p.quarter}</span>
         </div>
         <p className="font-ui text-sm text-ink-600 mt-1 leading-[1.4] m-0 truncate">
           {p.description}

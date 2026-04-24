@@ -16,11 +16,7 @@ import {
   createEvent,
   createAnnouncement,
 } from '@/lib/supabase/eventsService';
-import {
-  createActivityLogEntry,
-  getProjectActivityLog,
-  ActivityLogEntry,
-} from '@/lib/supabase/activityService';
+import { createActivityLogEntry } from '@/lib/supabase/activityService';
 import {
   getProjectMembers,
   ProjectMemberWithProfile,
@@ -39,11 +35,6 @@ import ProjectEventCard from '@/components/portal/ProjectEventCard';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { Avatar, pickAvatarColor, type AvatarColor } from '@/components/portal/ui';
 import { TaskWithAssignments } from '@/lib/types/database';
-import {
-  formatRelativeTime,
-  getActivityComment,
-  getActivityMessage,
-} from '@/lib/utils/projectOverviewDisplay';
 
 type StatusId = 'todo' | 'in_progress' | 'in_review' | 'done';
 
@@ -96,7 +87,7 @@ const STATUS_ICON: Record<StatusId, { icon: React.ReactNode; tone: string }> = {
 };
 
 const PRIORITY_STYLES: Record<string, { className: string; label: string }> = {
-  low: { className: 'bg-ink-100 text-ink-500', label: 'Low' },
+  low: { className: 'bg-ink-100 text-ink-400', label: 'Low' },
   medium: { className: 'bg-ink-200 text-ink-900', label: 'Medium' },
   high: { className: 'bg-cl-pink-100 text-cl-pink-700', label: 'High' },
   urgent: { className: 'bg-cl-pink-700 text-white', label: 'Urgent' },
@@ -105,7 +96,9 @@ const PRIORITY_STYLES: Record<string, { className: string; label: string }> = {
 const MAX_TASKS = 5;
 const MAX_EVENTS = 4;
 const MAX_ANNOUNCEMENTS = 4;
-const MAX_ACTIVITIES = 6;
+
+const EMPTY_STATE_CLASS =
+  'rounded-2xl border-[1.5px] border-dashed border-ink-300 bg-transparent text-center';
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -188,7 +181,7 @@ function Section({
 }
 
 /* ----------------------------------------------------------------
- * Greeting strip — warm opening tone, time-of-day based
+ * Greeting — warm time-of-day opener
  * ---------------------------------------------------------------- */
 
 function greetingFor(hour: number): { hello: string; nudge: string } {
@@ -199,12 +192,13 @@ function greetingFor(hour: number): { hello: string; nudge: string } {
   return { hello: 'Late one tonight —', nudge: 'easy does it' };
 }
 
-interface GreetingProps {
+function Greeting({
+  openTaskCount,
+  overdueCount,
+}: {
   openTaskCount: number;
   overdueCount: number;
-}
-
-function Greeting({ openTaskCount, overdueCount }: GreetingProps) {
+}) {
   const [hour, setHour] = useState<number | null>(null);
   useEffect(() => {
     setHour(new Date().getHours());
@@ -216,7 +210,7 @@ function Greeting({ openTaskCount, overdueCount }: GreetingProps) {
     nudge = (
       <>
         <span className="text-cl-pink-700">{overdueCount} overdue</span>
-        <span className="text-ink-600"> —{' '}{g.nudge.toLowerCase()}</span>
+        <span className="text-ink-600"> — {g.nudge.toLowerCase()}</span>
       </>
     );
   } else if (openTaskCount === 0) {
@@ -258,7 +252,9 @@ interface TodoItem {
   createdAt: number;
 }
 
-function useLocalTodos(userId: string): [TodoItem[], (fn: (prev: TodoItem[]) => TodoItem[]) => void] {
+function useLocalTodos(
+  userId: string,
+): [TodoItem[], (fn: (prev: TodoItem[]) => TodoItem[]) => void] {
   const key = `cl:todos:${userId}`;
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const loadedRef = useRef(false);
@@ -283,7 +279,7 @@ function useLocalTodos(userId: string): [TodoItem[], (fn: (prev: TodoItem[]) => 
         try {
           localStorage.setItem(key, JSON.stringify(next));
         } catch {
-          /* quota or privacy mode — ignore */
+          /* quota / privacy — ignore */
         }
         return next;
       });
@@ -304,7 +300,12 @@ function MyTodoSection({ userId }: { userId: string }) {
     if (!text) return;
     setTodos((prev) => [
       ...prev,
-      { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, text, done: false, createdAt: Date.now() },
+      {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        text,
+        done: false,
+        createdAt: Date.now(),
+      },
     ]);
     setInput('');
   };
@@ -332,7 +333,7 @@ function MyTodoSection({ userId }: { userId: string }) {
         {sorted.map((todo) => (
           <div
             key={todo.id}
-            className="group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-cream-100"
+            className="group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-ink-50"
           >
             <button
               type="button"
@@ -403,7 +404,7 @@ function MyTodoSection({ userId }: { userId: string }) {
 }
 
 /* ----------------------------------------------------------------
- * My Task row — scannable, with hover chevron
+ * My Task row
  * ---------------------------------------------------------------- */
 
 type TaskAssignee = { id: string; name: string; color: AvatarColor };
@@ -428,7 +429,7 @@ function MyTaskRow({ task }: { task: TaskWithAssignments }) {
       className={`group flex items-center gap-3 rounded-xl border-[1.5px] px-4 py-2.5 transition-all duration-fast ${
         isOverdue
           ? 'border-cl-pink-100 bg-cl-pink-100/40 hover:bg-cl-pink-100/60 hover:shadow-sm'
-          : 'border-ink-200 bg-white hover:bg-cream-100 hover:shadow-sm'
+          : 'border-ink-200 bg-white hover:bg-ink-50 hover:shadow-sm'
       }`}
     >
       <span className={`flex-shrink-0 ${statusIcon.tone}`} aria-hidden>
@@ -479,34 +480,6 @@ function MyTaskRow({ task }: { task: TaskWithAssignments }) {
 }
 
 /* ----------------------------------------------------------------
- * Activity row
- * ---------------------------------------------------------------- */
-
-function ActivityRow({ activity }: { activity: ActivityLogEntry }) {
-  const name = activity.actorDisplayName || 'Someone';
-  const comment = getActivityComment(activity.metadata);
-  return (
-    <div className="flex items-start gap-3 border-b border-ink-200 py-3 last:border-b-0">
-      <div className="mt-0.5 flex-shrink-0">
-        <Avatar name={name} color={pickAvatarColor(name)} size="xs" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[13px] leading-[1.5] text-ink-900">
-          <span className="font-semibold">{name}</span>{' '}
-          <span className="text-ink-600">{getActivityMessage(activity)}</span>
-        </p>
-        {comment ? (
-          <p className="mt-1 truncate font-code text-[11px] text-ink-400">{comment}</p>
-        ) : null}
-      </div>
-      <span className="flex-shrink-0 font-code text-[10px] uppercase tracking-[0.06em] text-ink-400">
-        {formatRelativeTime(activity.created_at)}
-      </span>
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------------
  * Main
  * ---------------------------------------------------------------- */
 
@@ -535,8 +508,6 @@ export default function MyProjectContent({
 
   const [events, setEvents] = useState<ProjectEvent[]>([]);
   const [announcements, setAnnouncements] = useState<ProjectAnnouncement[]>([]);
-  const [activities, setActivities] = useState<ActivityLogEntry[]>([]);
-  const [isActivityLoading, setIsActivityLoading] = useState(true);
 
   const [showEventModal, setShowEventModal] = useState(false);
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
@@ -566,16 +537,6 @@ export default function MyProjectContent({
   const fetchAnnouncements = useCallback(async () => {
     const data = await getProjectAnnouncements(projectId);
     setAnnouncements(data);
-  }, [projectId]);
-
-  const fetchActivities = useCallback(async () => {
-    setIsActivityLoading(true);
-    try {
-      const data = await getProjectActivityLog(projectId, MAX_ACTIVITIES);
-      setActivities(data);
-    } finally {
-      setIsActivityLoading(false);
-    }
   }, [projectId]);
 
   const myTasks = useMemo(
@@ -608,7 +569,6 @@ export default function MyProjectContent({
   useEffect(() => {
     fetchEvents();
     fetchAnnouncements();
-    fetchActivities();
     getProjectMembers(projectId).then((result) => {
       if (result.success && result.data) {
         setMemberCount(result.data.length);
@@ -619,7 +579,7 @@ export default function MyProjectContent({
         );
       }
     });
-  }, [fetchAnnouncements, fetchEvents, fetchActivities, projectId]);
+  }, [fetchAnnouncements, fetchEvents, projectId]);
 
   const handleCreateEvent = async (input: CreateEventInput) => {
     setIsSubmitting(true);
@@ -637,7 +597,7 @@ export default function MyProjectContent({
           },
         });
       }
-      await Promise.all([fetchEvents(), fetchActivities()]);
+      await fetchEvents();
       setShowEventModal(false);
     } catch (err) {
       console.error('Failed to create event:', err);
@@ -658,7 +618,7 @@ export default function MyProjectContent({
           metadata: { announcement_title: announcement.title },
         });
       }
-      await Promise.all([fetchAnnouncements(), fetchActivities()]);
+      await fetchAnnouncements();
       setShowAnnouncementModal(false);
     } catch (err) {
       console.error('Failed to create announcement:', err);
@@ -720,7 +680,7 @@ export default function MyProjectContent({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Greeting — warm opener */}
+      {/* Greeting */}
       <Section delay={0}>
         <Greeting openTaskCount={myTasks.length} overdueCount={myOverdueCount} />
       </Section>
@@ -729,7 +689,6 @@ export default function MyProjectContent({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
         {/* Main column — personal work + project surface */}
         <div className="flex flex-col gap-8">
-          {/* My Tasks */}
           <Section delay={60}>
             <EyebrowHeader
               label="My Tasks"
@@ -750,11 +709,9 @@ export default function MyProjectContent({
                 failed to load tasks
               </p>
             ) : myTasks.length === 0 ? (
-              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-5 py-8 text-center">
-                <p className="font-accent italic text-[15px] text-ink-600">
-                  nothing assigned —{' '}
-                </p>
-                <p className="mt-1 text-[14px] text-ink-900">
+              <div className={`${EMPTY_STATE_CLASS} px-5 py-8`}>
+                <p className="font-accent italic text-[15px] text-ink-400">nothing assigned —</p>
+                <p className="mt-1 text-[14px] text-ink-600">
                   grab something from the{' '}
                   <a
                     href={`/portal/projects/${projectId}/board`}
@@ -772,7 +729,7 @@ export default function MyProjectContent({
                 {myTasks.length > MAX_TASKS && (
                   <a
                     href={`/portal/projects/${projectId}/list`}
-                    className="mt-1 flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-4 py-2.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-400 hover:bg-cream-100 hover:text-ink-900"
+                    className="mt-1 flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-4 py-2.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-400 hover:bg-ink-50 hover:text-ink-900"
                   >
                     <span>+{myTasks.length - MAX_TASKS} more</span>
                     <FaArrowRight className="h-2.5 w-2.5" />
@@ -782,7 +739,7 @@ export default function MyProjectContent({
             )}
           </Section>
 
-          {/* My Todo — personal, localStorage */}
+          {/* My Todo */}
           <Section delay={120}>
             <MyTodoSection userId={currentUserId} />
           </Section>
@@ -805,8 +762,8 @@ export default function MyProjectContent({
               }
             />
             {announcements.length === 0 ? (
-              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-5 py-6 text-center">
-                <p className="font-accent italic text-[14px] text-ink-500">quiet around here</p>
+              <div className={`${EMPTY_STATE_CLASS} px-5 py-6`}>
+                <p className="font-accent italic text-[14px] text-ink-400">quiet around here</p>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
@@ -823,7 +780,7 @@ export default function MyProjectContent({
                       className={`flex items-start gap-3 rounded-xl border-[1.5px] px-4 py-3 transition-colors ${
                         a.is_pinned
                           ? 'border-cl-pink-100 bg-cl-pink-100/30 hover:bg-cl-pink-100/50'
-                          : 'border-ink-200 bg-white hover:bg-cream-100'
+                          : 'border-ink-200 bg-white hover:bg-ink-50'
                       }`}
                     >
                       <span
@@ -919,8 +876,8 @@ export default function MyProjectContent({
               }
             />
             {events.length === 0 ? (
-              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-4 py-6 text-center">
-                <p className="font-accent italic text-[13px] text-ink-500">nothing scheduled</p>
+              <div className={`${EMPTY_STATE_CLASS} px-4 py-6`}>
+                <p className="font-accent italic text-[13px] text-ink-400">nothing scheduled</p>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
@@ -946,7 +903,7 @@ export default function MyProjectContent({
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-cream-100"
+                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-ink-50"
                   >
                     <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-ink-100 transition-colors group-hover:bg-ink-200">
                       <Icon className="h-3.5 w-3.5 text-ink-900" />
@@ -962,26 +919,6 @@ export default function MyProjectContent({
           )}
         </div>
       </div>
-
-      {/* Activity feed — full width at bottom */}
-      <Section delay={260}>
-        <EyebrowHeader label="Activity" />
-        {isActivityLoading ? (
-          <p className="font-accent italic text-[13px] text-ink-400">loading activity...</p>
-        ) : activities.length === 0 ? (
-          <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-5 py-6 text-center">
-            <p className="font-accent italic text-[14px] text-ink-500">
-              nothing yet — first edit sets the rhythm
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white px-5 py-2">
-            {activities.map((activity) => (
-              <ActivityRow key={activity.id} activity={activity} />
-            ))}
-          </div>
-        )}
-      </Section>
 
       <AddEventModal
         isOpen={showEventModal}

@@ -1,23 +1,65 @@
 'use client';
 
 import { use, useEffect, useRef, useState } from 'react';
+import { FaGithub, FaFigma } from 'react-icons/fa6';
+import { SiNotion } from 'react-icons/si';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { getProjectById, updateProjectSettings, uploadProjectLogo } from '@/lib/supabase/projectService';
+import {
+  getProjectById,
+  updateProjectSettings,
+  uploadProjectLogo,
+} from '@/lib/supabase/projectService';
 import { Project } from '@/types/project';
+import { Button, Input } from '@/components/portal/ui';
+
+type LinkKey = 'githubUrl' | 'figmaUrl' | 'notionUrl';
 
 interface SettingsField {
-  key: keyof Pick<Project, 'githubUrl' | 'figmaUrl' | 'notionUrl'>;
+  key: LinkKey;
   label: string;
   placeholder: string;
+  icon: React.ReactNode;
 }
 
 const LINK_FIELDS: SettingsField[] = [
-  { key: 'githubUrl', label: 'GitHub URL', placeholder: 'https://github.com/org/repo' },
-  { key: 'figmaUrl', label: 'Figma URL', placeholder: 'https://figma.com/file/...' },
-  { key: 'notionUrl', label: 'Notion URL', placeholder: 'https://notion.so/...' },
+  {
+    key: 'githubUrl',
+    label: 'GitHub',
+    placeholder: 'https://github.com/org/repo',
+    icon: <FaGithub className="h-3.5 w-3.5" />,
+  },
+  {
+    key: 'figmaUrl',
+    label: 'Figma',
+    placeholder: 'https://figma.com/file/...',
+    icon: <FaFigma className="h-3.5 w-3.5" />,
+  },
+  {
+    key: 'notionUrl',
+    label: 'Notion',
+    placeholder: 'https://notion.so/...',
+    icon: <SiNotion className="h-3.5 w-3.5" />,
+  },
 ];
 
-export default function SettingsPage({ params }: { params: Promise<{ projectId: string }> }) {
+function SectionHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+        {eyebrow}
+      </span>
+      <h2 className="font-display text-[20px] font-bold leading-tight text-ink-900">
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+export default function SettingsPage({
+  params,
+}: {
+  params: Promise<{ projectId: string }>;
+}) {
   const { projectId } = use(params);
   const { userId, isLoading: authLoading, error: authError } = useAuth();
 
@@ -82,6 +124,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
 
     if (updated) {
       setProject(updated);
+      setLogoFile(null);
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };
@@ -89,7 +132,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
   if (authLoading || projectLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-sm text-black/50">Loading...</p>
+        <p className="font-accent italic text-[14px] text-ink-400">loading…</p>
       </div>
     );
   }
@@ -97,46 +140,70 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
   if (authError || !userId) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-sm text-red-500">Please sign in to view this page</p>
+        <p className="text-sm text-cl-danger-700">Please sign in to view this page</p>
       </div>
     );
   }
 
+  const linkValueFor = (key: LinkKey): string =>
+    key === 'githubUrl' ? githubUrl : key === 'figmaUrl' ? figmaUrl : notionUrl;
+
+  const setLinkValueFor = (key: LinkKey, v: string) => {
+    if (key === 'githubUrl') setGithubUrl(v);
+    else if (key === 'figmaUrl') setFigmaUrl(v);
+    else setNotionUrl(v);
+  };
+
+  const logoChanged = logoPreview !== (project?.logoUrl ?? null);
+
   return (
     <>
-      <section className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-black">Settings</h1>
-        <p className="text-sm text-black/50">Manage your project details and integrations</p>
+      <section className="flex flex-col gap-1">
+        <span className="font-code text-[11px] uppercase tracking-[0.08em] text-ink-400">
+          project
+        </span>
+        <h1 className="font-display text-[32px] font-bold leading-tight tracking-[-0.01em] text-ink-900 md:text-[40px]">
+          Settings
+        </h1>
+        <p className="mt-1 text-[14px] text-ink-600">
+          Manage project details and external integrations
+        </p>
       </section>
 
-      <div className="mt-8 space-y-8 max-w-2xl">
-
-        {/* Logo */}
-        <div className="rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 space-y-4">
-          <h2 className="text-xl font-semibold text-black">Project Logo</h2>
-          <div className="flex items-center gap-6">
-            {logoPreview && (
-              <div className="h-20 w-20 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+      <div className="mt-8 flex max-w-2xl flex-col gap-6">
+        <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-6 md:p-8">
+          <SectionHeader eyebrow="branding" title="Project logo" />
+          <div className="mt-5 flex items-center gap-6">
+            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border-[1.5px] border-dashed border-ink-300 bg-cream-50">
+              {logoPreview ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={logoPreview}
                   alt="Project logo"
                   className="h-full w-full object-contain"
                 />
-              </div>
-            )}
-            <div className="space-y-2">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 rounded-lg border border-[#D4D7E5] text-sm font-medium text-black hover:bg-gray-50 transition-colors"
-              >
-                Upload image
-              </button>
-              {logoPreview && logoPreview !== (project?.logoUrl ?? null) && (
-                <p className="text-xs text-black/50">New logo selected — save to apply</p>
+              ) : (
+                <span className="font-accent italic text-[12px] text-ink-400">
+                  no logo
+                </span>
               )}
-              <p className="text-xs text-black/40">PNG, JPG, SVG up to 5 MB</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {logoPreview ? 'Replace logo' : 'Upload image'}
+              </Button>
+              {logoChanged && (
+                <p className="font-code text-[10px] uppercase tracking-[0.06em] text-cl-blue-700">
+                  new logo — save to apply
+                </p>
+              )}
+              <p className="font-code text-[10px] uppercase tracking-[0.06em] text-ink-400">
+                PNG, JPG, SVG up to 5 MB
+              </p>
             </div>
             <input
               ref={fileInputRef}
@@ -148,42 +215,39 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
           </div>
         </div>
 
-        {/* Links */}
-        <div className="rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 space-y-5">
-          <h2 className="text-xl font-semibold text-black">Project Links</h2>
-          {LINK_FIELDS.map(({ key, label, placeholder }) => {
-            const value = key === 'githubUrl' ? githubUrl : key === 'figmaUrl' ? figmaUrl : notionUrl;
-            const setter = key === 'githubUrl' ? setGithubUrl : key === 'figmaUrl' ? setFigmaUrl : setNotionUrl;
-            return (
-              <div key={key} className="space-y-1.5">
-                <label className="block text-sm font-medium text-black/70">{label}</label>
-                <input
+        <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-6 md:p-8">
+          <SectionHeader eyebrow="integrations" title="Project links" />
+          <div className="mt-5 flex flex-col gap-5">
+            {LINK_FIELDS.map(({ key, label, placeholder, icon }) => (
+              <div key={key} className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 font-ui text-[13px] font-bold text-ink-900">
+                  <span className="text-ink-600">{icon}</span>
+                  {label}
+                </label>
+                <Input
                   type="url"
-                  value={value}
-                  onChange={(e) => setter(e.target.value)}
+                  value={linkValueFor(key)}
+                  onChange={(e) => setLinkValueFor(key, e.target.value)}
                   placeholder={placeholder}
-                  className="w-full rounded-lg border border-[#D4D7E5] px-3 py-2 text-sm text-black placeholder:text-black/30 focus:outline-none focus:ring-2 focus:ring-[#3F86FF]/40"
                 />
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
 
-        {/* Save */}
         <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="px-5 py-2.5 rounded-lg bg-[#3F86FF] text-white text-sm font-semibold hover:bg-[#2d74ee] disabled:opacity-50 transition-colors"
-          >
+          <Button variant="primary" size="md" onClick={handleSave} disabled={saving}>
             {saving ? 'Saving…' : 'Save changes'}
-          </button>
+          </Button>
           {saveStatus === 'success' && (
-            <p className="text-sm text-green-600">Changes saved!</p>
+            <p className="font-code text-[11px] uppercase tracking-[0.06em] text-cl-lime-700">
+              ✓ saved
+            </p>
           )}
           {saveStatus === 'error' && (
-            <p className="text-sm text-red-500">Failed to save. Please try again.</p>
+            <p className="font-code text-[11px] uppercase tracking-[0.06em] text-cl-danger-700">
+              failed — try again
+            </p>
           )}
         </div>
       </div>
