@@ -14,6 +14,16 @@ export async function getCurrentUserId(): Promise<string | null> {
   return user?.id ?? null;
 }
 
+export async function getProfileById(userId: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  if (error) return null;
+  return data as Profile;
+}
+
 export const profileService = {
   async getCurrentProfile() {
     const { data: { user } } = await supabase.auth.getUser();
