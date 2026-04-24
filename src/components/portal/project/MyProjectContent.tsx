@@ -1,856 +1,1002 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import {
-    FaGithub,
-    FaPencil,
-    FaChevronLeft,
-    FaChevronRight,
+  FaGithub,
+  FaLink,
+  FaArrowRight,
+  FaXmark,
+  FaChevronRight,
 } from 'react-icons/fa6';
-import { SiFigma, SiNotion } from 'react-icons/si';
-import { getProjectById, updateProject } from '@/lib/supabase/projectService';
+import { SiFigma, SiNotion, SiInstagram } from 'react-icons/si';
+import { getProjectById } from '@/lib/supabase/projectService';
 import {
-    getProjectEvents,
-    getProjectAnnouncements,
-    createEvent,
-    createAnnouncement,
+  getProjectEvents,
+  getProjectAnnouncements,
+  createEvent,
+  createAnnouncement,
 } from '@/lib/supabase/eventsService';
 import {
-    ActivityLogEntry,
-    createActivityLogEntry,
-    getProjectActivityLog,
+  createActivityLogEntry,
+  getProjectActivityLog,
+  ActivityLogEntry,
 } from '@/lib/supabase/activityService';
 import {
-    getProjectMembers,
-    ProjectMemberWithProfile,
+  getProjectMembers,
+  ProjectMemberWithProfile,
 } from '@/lib/services/projectMemberService';
 import { Project } from '@/types/project';
 import {
-    ProjectEvent,
-    ProjectAnnouncement,
-    CreateEventInput,
-    CreateAnnouncementInput,
+  ProjectEvent,
+  ProjectAnnouncement,
+  CreateEventInput,
+  CreateAnnouncementInput,
 } from '@/types/events';
 import { useTasks } from '@/lib/hooks/useTasks';
 import { AddEventModal } from './events/AddEventModal';
 import { AddAnnouncementModal } from './events/AddAnnouncementModal';
 import ProjectEventCard from '@/components/portal/ProjectEventCard';
 import { useUserRole } from '@/lib/hooks/useUserRole';
+import { Avatar, pickAvatarColor, type AvatarColor } from '@/components/portal/ui';
+import { TaskWithAssignments } from '@/lib/types/database';
 import {
-    TASK_PRIORITY_STYLES,
-    TASK_STATUS_STYLES,
-    formatPriorityLabel,
-    formatRelativeTime,
-    getActivityComment,
-    getActivityMessage,
+  formatRelativeTime,
+  getActivityComment,
+  getActivityMessage,
 } from '@/lib/utils/projectOverviewDisplay';
 
-const CARD_STYLES = {
-    base: 'rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl',
-    titleDefault: 'mb-3 text-2xl font-semibold tracking-tight text-black',
-} as const;
+type StatusId = 'todo' | 'in_progress' | 'in_review' | 'done';
 
-const AVATAR_STYLES = {
-    large: 'flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#E5E7EB]',
-    medium: 'h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-[#E5E7EB]',
-    small: 'inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#E5E7EB]',
-} as const;
+const STATUS_ICON: Record<StatusId, { icon: React.ReactNode; tone: string }> = {
+  todo: {
+    tone: 'text-cl-blue-700',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden>
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
+  in_progress: {
+    tone: 'text-cl-pink-700',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden>
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6 1.5a4.5 4.5 0 0 1 0 9z" fill="currentColor" />
+      </svg>
+    ),
+  },
+  in_review: {
+    tone: 'text-cl-lime-700',
+    icon: (
+      <svg width="16" height="14" viewBox="0 0 14 12" fill="none" aria-hidden>
+        <path
+          d="M7 2C3.5 2 1.3 5 1 6c.3 1 2.5 4 6 4s5.7-3 6-4c-.3-1-2.5-4-6-4z"
+          stroke="currentColor"
+          strokeWidth="1.3"
+        />
+        <circle cx="7" cy="6" r="1.8" fill="currentColor" />
+      </svg>
+    ),
+  },
+  done: {
+    tone: 'text-cl-mint-700',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden>
+        <circle cx="6" cy="6" r="5.2" fill="currentColor" />
+        <path
+          d="M3.5 6.2l2 2 3-4"
+          stroke="#fff"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+};
+
+const PRIORITY_STYLES: Record<string, { className: string; label: string }> = {
+  low: { className: 'bg-ink-100 text-ink-500', label: 'Low' },
+  medium: { className: 'bg-ink-200 text-ink-900', label: 'Medium' },
+  high: { className: 'bg-cl-pink-100 text-cl-pink-700', label: 'High' },
+  urgent: { className: 'bg-cl-pink-700 text-white', label: 'Urgent' },
+};
+
+const MAX_TASKS = 5;
+const MAX_EVENTS = 4;
+const MAX_ANNOUNCEMENTS = 4;
+const MAX_ACTIVITIES = 6;
 
 function useMountAnimation(delay: number) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        const timeout = setTimeout(() => setMounted(true), delay);
-        return () => clearTimeout(timeout);
-    }, [delay]);
-
-    return mounted;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const timeout = setTimeout(() => setMounted(true), delay);
+    return () => clearTimeout(timeout);
+  }, [delay]);
+  return mounted;
 }
 
-interface SectionProps {
-    title: string;
-    children: React.ReactNode;
-    className?: string;
-    titleClassName?: string;
-    delay?: number;
+function startOfToday(): number {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function daysUntil(dateString: string | null): number | null {
+  if (!dateString) return null;
+  const target = new Date(dateString);
+  target.setHours(0, 0, 0, 0);
+  const diff = target.getTime() - startOfToday();
+  return Math.round(diff / (1000 * 60 * 60 * 24));
+}
+
+function dueDateLabel(days: number | null): string {
+  if (days === null) return 'no due date';
+  if (days < 0) return `${Math.abs(days)}d overdue`;
+  if (days === 0) return 'today';
+  if (days === 1) return 'tomorrow';
+  if (days <= 7) return `in ${days}d`;
+  return new Date(Date.now() + days * 86400000).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+interface EyebrowHeaderProps {
+  label: string;
+  sub?: string;
+  action?: React.ReactNode;
+}
+
+function EyebrowHeader({ label, sub, action }: EyebrowHeaderProps) {
+  return (
+    <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="flex items-baseline gap-2">
+        <span className="font-display text-[13px] font-bold uppercase tracking-[0.08em] text-ink-900">
+          {label}
+        </span>
+        {sub ? (
+          <span className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+            {sub}
+          </span>
+        ) : null}
+      </div>
+      {action ?? null}
+    </div>
+  );
 }
 
 function Section({
-    title,
-    children,
-    className = '',
-    titleClassName,
-    delay = 0,
-}: SectionProps) {
-    const mounted = useMountAnimation(delay);
-    const enterClasses = mounted
-        ? 'opacity-100 translate-y-0'
-        : 'opacity-0 translate-y-3';
+  children,
+  delay = 0,
+  className = '',
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const mounted = useMountAnimation(delay);
+  const enter = mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2';
+  return (
+    <section
+      className={`transform transition-all duration-300 ease-out ${enter} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </section>
+  );
+}
 
-    return (
-        <section
-            className={`${className} transform transition-all duration-300 ease-out ${enterClasses}`}
-            style={{ transitionDelay: `${delay}ms` }}
-        >
-            <h2 className={titleClassName ?? CARD_STYLES.titleDefault}>
-                {title}
-            </h2>
-            <div className={CARD_STYLES.base}>{children}</div>
-        </section>
+/* ----------------------------------------------------------------
+ * Greeting strip — warm opening tone, time-of-day based
+ * ---------------------------------------------------------------- */
+
+function greetingFor(hour: number): { hello: string; nudge: string } {
+  if (hour < 5) return { hello: 'Burning the midnight oil —', nudge: "here's where things stand" };
+  if (hour < 12) return { hello: 'Good morning —', nudge: "here's what's waiting for you" };
+  if (hour < 17) return { hello: 'Good afternoon —', nudge: 'keeping the rhythm' };
+  if (hour < 21) return { hello: 'Good evening —', nudge: 'wrapping the day' };
+  return { hello: 'Late one tonight —', nudge: 'easy does it' };
+}
+
+interface GreetingProps {
+  openTaskCount: number;
+  overdueCount: number;
+}
+
+function Greeting({ openTaskCount, overdueCount }: GreetingProps) {
+  const [hour, setHour] = useState<number | null>(null);
+  useEffect(() => {
+    setHour(new Date().getHours());
+  }, []);
+  const g = greetingFor(hour ?? 10);
+
+  let nudge: React.ReactNode;
+  if (overdueCount > 0) {
+    nudge = (
+      <>
+        <span className="text-cl-pink-700">{overdueCount} overdue</span>
+        <span className="text-ink-600"> —{' '}{g.nudge.toLowerCase()}</span>
+      </>
     );
+  } else if (openTaskCount === 0) {
+    nudge = <span className="text-ink-600">inbox zero, nicely done</span>;
+  } else if (openTaskCount === 1) {
+    nudge = (
+      <>
+        <span className="text-ink-900">1 task</span>
+        <span className="text-ink-600"> on your plate</span>
+      </>
+    );
+  } else {
+    nudge = (
+      <>
+        <span className="text-ink-900">{openTaskCount} tasks</span>
+        <span className="text-ink-600"> on your plate</span>
+      </>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <p className="font-accent italic text-[15px] text-ink-400">{g.hello}</p>
+      <h2 className="font-display text-[28px] font-bold leading-[1.1] tracking-[-0.01em] text-ink-900 md:text-[32px]">
+        {nudge}
+      </h2>
+    </div>
+  );
 }
 
-interface ActivityItemProps {
-    name: string;
-    time: string;
-    action: string;
-    comment?: string;
+/* ----------------------------------------------------------------
+ * My Todo — localStorage-backed personal checklist
+ * ---------------------------------------------------------------- */
+
+interface TodoItem {
+  id: string;
+  text: string;
+  done: boolean;
+  createdAt: number;
 }
 
-function ActivityItem({ name, time, action, comment }: ActivityItemProps) {
-    return (
-        <div className="flex gap-3">
-            <div className={AVATAR_STYLES.medium}>
-                <Image
-                    src="/images/default-avatar.svg"
-                    alt={`${name} avatar`}
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                />
-            </div>
-            <div className="flex-1">
-                <div className="mb-1 flex items-center justify-between">
-                    <p className="font-semibold">{name}</p>
-                    <p className="text-[10px] md:text-[11px] text-black/50">
-                        {time}
-                    </p>
-                </div>
-                <p>{action}</p>
-                {comment && (
-                    <div className="mt-2 inline-block rounded-2xl bg-[#EAF4FF] px-4 py-3 text-[11px] md:text-xs text-black/80">
-                        {comment}
-                    </div>
-                )}
-            </div>
+function useLocalTodos(userId: string): [TodoItem[], (fn: (prev: TodoItem[]) => TodoItem[]) => void] {
+  const key = `cl:todos:${userId}`;
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const loadedRef = useRef(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) setTodos(parsed);
+      }
+    } catch {
+      /* ignore */
+    }
+    loadedRef.current = true;
+  }, [key]);
+
+  const update = useCallback(
+    (fn: (prev: TodoItem[]) => TodoItem[]) => {
+      setTodos((prev) => {
+        const next = fn(prev);
+        try {
+          localStorage.setItem(key, JSON.stringify(next));
+        } catch {
+          /* quota or privacy mode — ignore */
+        }
+        return next;
+      });
+    },
+    [key],
+  );
+
+  return [todos, update];
+}
+
+function MyTodoSection({ userId }: { userId: string }) {
+  const [todos, setTodos] = useLocalTodos(userId);
+  const [input, setInput] = useState('');
+  const openCount = todos.filter((t) => !t.done).length;
+
+  const addTodo = () => {
+    const text = input.trim();
+    if (!text) return;
+    setTodos((prev) => [
+      ...prev,
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, text, done: false, createdAt: Date.now() },
+    ]);
+    setInput('');
+  };
+
+  const toggleTodo = (id: string) => {
+    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)));
+  };
+
+  const deleteTodo = (id: string) => {
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const sorted = [...todos].sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return a.createdAt - b.createdAt;
+  });
+
+  return (
+    <div>
+      <EyebrowHeader
+        label="My Todo"
+        sub={openCount > 0 ? `${openCount} open` : todos.length > 0 ? 'all clear' : undefined}
+      />
+      <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-1.5">
+        {sorted.map((todo) => (
+          <div
+            key={todo.id}
+            className="group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-cream-100"
+          >
+            <button
+              type="button"
+              onClick={() => toggleTodo(todo.id)}
+              aria-label={todo.done ? 'Mark as open' : 'Mark as done'}
+              className={`flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition-all ${
+                todo.done
+                  ? 'border-cl-pink-700 bg-cl-pink-700'
+                  : 'border-ink-300 bg-white hover:border-cl-pink-700'
+              }`}
+            >
+              {todo.done ? (
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden>
+                  <path
+                    d="M2.5 6.5l2.5 2.5 4.5-5.5"
+                    stroke="#fff"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : null}
+            </button>
+            <span
+              className={`min-w-0 flex-1 truncate text-[14px] leading-[1.4] transition-colors ${
+                todo.done ? 'text-ink-400 line-through' : 'text-ink-900'
+              }`}
+            >
+              {todo.text}
+            </span>
+            <button
+              type="button"
+              onClick={() => deleteTodo(todo.id)}
+              aria-label="Delete todo"
+              className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md opacity-0 transition-opacity group-hover:opacity-100 hover:bg-ink-100"
+            >
+              <FaXmark className="h-3 w-3 text-ink-400" />
+            </button>
+          </div>
+        ))}
+
+        <div className="flex items-center gap-3 rounded-lg px-2.5 py-2">
+          <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-[5px] border-[1.5px] border-dashed border-ink-300 text-ink-400">
+            <span className="text-[11px] leading-none">+</span>
+          </span>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                addTodo();
+              }
+            }}
+            placeholder={todos.length === 0 ? 'Start with your first todo...' : 'Add a todo...'}
+            className="min-w-0 flex-1 bg-transparent text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none"
+          />
+          {input ? (
+            <span className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+              ↵ save
+            </span>
+          ) : null}
         </div>
-    );
+      </div>
+    </div>
+  );
 }
+
+/* ----------------------------------------------------------------
+ * My Task row — scannable, with hover chevron
+ * ---------------------------------------------------------------- */
+
+type TaskAssignee = { id: string; name: string; color: AvatarColor };
+
+function getAssignees(task: TaskWithAssignments): TaskAssignee[] {
+  return task.assignments.map((a) => {
+    const name = a.assignee.display_name || a.assignee.email?.split('@')[0] || 'Unknown';
+    return { id: a.assignee.id, name, color: pickAvatarColor(name) };
+  });
+}
+
+function MyTaskRow({ task }: { task: TaskWithAssignments }) {
+  const statusIcon = STATUS_ICON[task.status as StatusId];
+  const priority = PRIORITY_STYLES[task.priority] ?? PRIORITY_STYLES.medium;
+  const assignees = getAssignees(task);
+  const days = daysUntil(task.due_date);
+  const isOverdue = days !== null && days < 0 && task.status !== 'done';
+  const isDueSoon = days !== null && days >= 0 && days <= 1 && task.status !== 'done';
+
+  return (
+    <div
+      className={`group flex items-center gap-3 rounded-xl border-[1.5px] px-4 py-2.5 transition-all duration-fast ${
+        isOverdue
+          ? 'border-cl-pink-100 bg-cl-pink-100/40 hover:bg-cl-pink-100/60 hover:shadow-sm'
+          : 'border-ink-200 bg-white hover:bg-cream-100 hover:shadow-sm'
+      }`}
+    >
+      <span className={`flex-shrink-0 ${statusIcon.tone}`} aria-hidden>
+        {statusIcon.icon}
+      </span>
+      <span className="min-w-0 flex-1 truncate text-[14px] font-medium text-ink-900">
+        {task.name}
+      </span>
+      <span
+        className="hidden md:inline-flex rounded-md px-2 py-0.5 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900 max-w-[100px] truncate"
+        style={{ backgroundColor: task.label_color }}
+      >
+        {task.label}
+      </span>
+      <span
+        className={`hidden md:inline-block min-w-[80px] text-right font-code text-[11px] uppercase tracking-[0.04em] ${
+          isOverdue
+            ? 'text-cl-pink-700 font-semibold'
+            : isDueSoon
+              ? 'text-cl-pink-700'
+              : 'text-ink-400'
+        }`}
+      >
+        {dueDateLabel(days)}
+      </span>
+      <span
+        className={`hidden lg:inline-flex items-center justify-center rounded-full px-2 py-0.5 font-code text-[10px] uppercase tracking-[0.06em] ${priority.className}`}
+      >
+        {priority.label}
+      </span>
+      {assignees.length > 0 ? (
+        <div className="flex -space-x-1.5">
+          {assignees.slice(0, 2).map((a) => (
+            <div key={a.id} className="ring-2 ring-white rounded-full" title={a.name}>
+              <Avatar name={a.name} color={a.color} size="xs" />
+            </div>
+          ))}
+          {assignees.length > 2 && (
+            <div className="ring-2 ring-white rounded-full flex h-7 w-7 items-center justify-center bg-ink-100 font-code text-[10px] font-semibold text-ink-600">
+              +{assignees.length - 2}
+            </div>
+          )}
+        </div>
+      ) : null}
+      <FaChevronRight className="h-3 w-3 flex-shrink-0 text-ink-300 transition-all duration-fast group-hover:translate-x-0.5 group-hover:text-ink-600" />
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------
+ * Activity row
+ * ---------------------------------------------------------------- */
+
+function ActivityRow({ activity }: { activity: ActivityLogEntry }) {
+  const name = activity.actorDisplayName || 'Someone';
+  const comment = getActivityComment(activity.metadata);
+  return (
+    <div className="flex items-start gap-3 border-b border-ink-200 py-3 last:border-b-0">
+      <div className="mt-0.5 flex-shrink-0">
+        <Avatar name={name} color={pickAvatarColor(name)} size="xs" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] leading-[1.5] text-ink-900">
+          <span className="font-semibold">{name}</span>{' '}
+          <span className="text-ink-600">{getActivityMessage(activity)}</span>
+        </p>
+        {comment ? (
+          <p className="mt-1 truncate font-code text-[11px] text-ink-400">{comment}</p>
+        ) : null}
+      </div>
+      <span className="flex-shrink-0 font-code text-[10px] uppercase tracking-[0.06em] text-ink-400">
+        {formatRelativeTime(activity.created_at)}
+      </span>
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------
+ * Main
+ * ---------------------------------------------------------------- */
 
 interface MyProjectContentProps {
-    projectId: string;
-    currentUserId: string;
+  projectId: string;
+  currentUserId: string;
 }
 
-// TODO: Fetch project data from database (description, leads, tasks, activity)
 export default function MyProjectContent({
-    projectId,
-    currentUserId,
+  projectId,
+  currentUserId,
 }: MyProjectContentProps) {
-    const { canPostEvents } = useUserRole(projectId, currentUserId);
-    const {
-        tasks: allTasks,
-        isLoading: isTasksLoading,
-        error: tasksError,
-    } = useTasks(projectId);
-    const [project, setProject] = useState<Project | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const { canPostEvents } = useUserRole(projectId, currentUserId);
+  const {
+    tasks: allTasks,
+    isLoading: isTasksLoading,
+    error: tasksError,
+  } = useTasks(projectId);
 
-    // Edit mode state
-    const [isEditing, setIsEditing] = useState(false);
-    const [editForm, setEditForm] = useState<Partial<Project>>({});
-    const [isSaving, setIsSaving] = useState(false);
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const [projectLeads, setProjectLeads] = useState<
-        ProjectMemberWithProfile[]
-    >([]);
+  const [projectLeads, setProjectLeads] = useState<ProjectMemberWithProfile[]>([]);
+  const [memberCount, setMemberCount] = useState(0);
 
-    // Events and announcements state
-    const [events, setEvents] = useState<ProjectEvent[]>([]);
-    const [announcements, setAnnouncements] = useState<ProjectAnnouncement[]>(
-        [],
-    );
-    const [recentActivities, setRecentActivities] = useState<ActivityLogEntry[]>(
-        [],
-    );
-    const [isActivityLoading, setIsActivityLoading] = useState(true);
-    const [showEventModal, setShowEventModal] = useState(false);
-    const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [events, setEvents] = useState<ProjectEvent[]>([]);
+  const [announcements, setAnnouncements] = useState<ProjectAnnouncement[]>([]);
+  const [activities, setActivities] = useState<ActivityLogEntry[]>([]);
+  const [isActivityLoading, setIsActivityLoading] = useState(true);
 
-    useEffect(() => {
-        async function fetchProject() {
-            try {
-                setLoading(true);
-                const data = await getProjectById(projectId);
-                setProject(data);
-            } catch (err) {
-                setError('Failed to load project data');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchProject();
-    }, [projectId]);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const fetchEvents = useCallback(async () => {
-        const data = await getProjectEvents(projectId, {
-            includeCompleted: false,
+  useEffect(() => {
+    async function fetchProject() {
+      try {
+        setLoading(true);
+        const data = await getProjectById(projectId);
+        setProject(data);
+      } catch (err) {
+        setError('Failed to load project data');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProject();
+  }, [projectId]);
+
+  const fetchEvents = useCallback(async () => {
+    const data = await getProjectEvents(projectId, { includeCompleted: false });
+    setEvents(data);
+  }, [projectId]);
+
+  const fetchAnnouncements = useCallback(async () => {
+    const data = await getProjectAnnouncements(projectId);
+    setAnnouncements(data);
+  }, [projectId]);
+
+  const fetchActivities = useCallback(async () => {
+    setIsActivityLoading(true);
+    try {
+      const data = await getProjectActivityLog(projectId, MAX_ACTIVITIES);
+      setActivities(data);
+    } finally {
+      setIsActivityLoading(false);
+    }
+  }, [projectId]);
+
+  const myTasks = useMemo(
+    () =>
+      allTasks
+        .filter((task) =>
+          task.assignments.some((assignment) => assignment.user_id === currentUserId),
+        )
+        .filter((task) => task.status !== 'done')
+        .sort((a, b) => {
+          if (a.due_date && b.due_date) {
+            return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+          }
+          if (a.due_date) return -1;
+          if (b.due_date) return 1;
+          return a.sort_order - b.sort_order;
+        }),
+    [allTasks, currentUserId],
+  );
+
+  const myOverdueCount = useMemo(
+    () =>
+      myTasks.filter((t) => {
+        const d = daysUntil(t.due_date);
+        return d !== null && d < 0;
+      }).length,
+    [myTasks],
+  );
+
+  useEffect(() => {
+    fetchEvents();
+    fetchAnnouncements();
+    fetchActivities();
+    getProjectMembers(projectId).then((result) => {
+      if (result.success && result.data) {
+        setMemberCount(result.data.length);
+        setProjectLeads(
+          result.data.filter(
+            (m) => m.rbac_role?.name?.toLowerCase() === 'project lead',
+          ),
+        );
+      }
+    });
+  }, [fetchAnnouncements, fetchEvents, fetchActivities, projectId]);
+
+  const handleCreateEvent = async (input: CreateEventInput) => {
+    setIsSubmitting(true);
+    try {
+      const result = await createEvent(input);
+      if (result.error) throw new Error(result.error);
+      if (result.data) {
+        await createActivityLogEntry({
+          action: 'created_event',
+          projectId,
+          userId: currentUserId,
+          metadata: {
+            event_title: result.data.title,
+            event_date: result.data.event_date,
+          },
         });
-        setEvents(data);
-    }, [projectId]);
+      }
+      await Promise.all([fetchEvents(), fetchActivities()]);
+      setShowEventModal(false);
+    } catch (err) {
+      console.error('Failed to create event:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    const fetchAnnouncements = useCallback(async () => {
-        const data = await getProjectAnnouncements(projectId);
-        setAnnouncements(data);
-    }, [projectId]);
-
-    const fetchRecentActivities = useCallback(async () => {
-        setIsActivityLoading(true);
-        try {
-            const data = await getProjectActivityLog(projectId, 8);
-            setRecentActivities(data);
-        } finally {
-            setIsActivityLoading(false);
-        }
-    }, [projectId]);
-
-    const myTasks = useMemo(
-        () =>
-            allTasks
-                .filter((task) =>
-                    task.assignments.some(
-                        (assignment) => assignment.user_id === currentUserId,
-                    ),
-                )
-                .sort((a, b) => {
-                    if (a.due_date && b.due_date) {
-                        return (
-                            new Date(a.due_date).getTime() -
-                            new Date(b.due_date).getTime()
-                        );
-                    }
-                    if (a.due_date) return -1;
-                    if (b.due_date) return 1;
-                    return a.sort_order - b.sort_order;
-                }),
-        [allTasks, currentUserId],
-    );
-
-    useEffect(() => {
-        fetchEvents();
-        fetchAnnouncements();
-        fetchRecentActivities();
-        getProjectMembers(projectId).then((result) => {
-            if (result.success && result.data) {
-                setProjectLeads(
-                    result.data.filter(
-                        (m) =>
-                            m.rbac_role?.name?.toLowerCase() === 'project lead',
-                    ),
-                );
-            }
+  const handleCreateAnnouncement = async (input: CreateAnnouncementInput) => {
+    setIsSubmitting(true);
+    try {
+      const announcement = await createAnnouncement(input);
+      if (announcement) {
+        await createActivityLogEntry({
+          action: 'created_announcement',
+          projectId,
+          userId: currentUserId,
+          metadata: { announcement_title: announcement.title },
         });
-    }, [
-        fetchAnnouncements,
-        fetchEvents,
-        fetchRecentActivities,
-        projectId,
-    ]);
-
-    const handleCreateEvent = async (input: CreateEventInput) => {
-        setIsSubmitting(true);
-        try {
-            const result = await createEvent(input);
-            if (result.error) {
-                throw new Error(result.error);
-            }
-
-            if (result.data) {
-                await createActivityLogEntry({
-                    action: 'created_event',
-                    projectId,
-                    userId: currentUserId,
-                    metadata: {
-                        event_title: result.data.title,
-                        event_date: result.data.event_date,
-                    },
-                });
-            }
-
-            await Promise.all([fetchEvents(), fetchRecentActivities()]);
-            setShowEventModal(false);
-        } catch (err) {
-            console.error('Failed to create event:', err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleCreateAnnouncement = async (input: CreateAnnouncementInput) => {
-        setIsSubmitting(true);
-        try {
-            const announcement = await createAnnouncement(input);
-            if (announcement) {
-                await createActivityLogEntry({
-                    action: 'created_announcement',
-                    projectId,
-                    userId: currentUserId,
-                    metadata: {
-                        announcement_title: announcement.title,
-                    },
-                });
-            }
-
-            await Promise.all([fetchAnnouncements(), fetchRecentActivities()]);
-            setShowAnnouncementModal(false);
-        } catch (err) {
-            console.error('Failed to create announcement:', err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <p className="text-black/60">Loading project...</p>
-            </div>
-        );
+      }
+      await Promise.all([fetchAnnouncements(), fetchActivities()]);
+      setShowAnnouncementModal(false);
+    } catch (err) {
+      console.error('Failed to create announcement:', err);
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    if (error) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <p className="text-red-500">{error}</p>
-            </div>
-        );
-    }
-
-    if (!project) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <p className="text-black/60">No project found for this user.</p>
-            </div>
-        );
-    }
-
-    const handleEditClick = () => {
-        if (project) {
-            setEditForm({
-                projectName: project.projectName,
-                projectDescription: project.projectDescription,
-                year: project.year,
-                quarter: project.quarter,
-            });
-            setIsEditing(true);
-        }
-    };
-
-    const handleCancelClick = () => {
-        setIsEditing(false);
-        setEditForm({});
-    };
-
-    const handleSaveClick = async () => {
-        if (!project) return;
-
-        try {
-            setIsSaving(true);
-            const updatedProject = await updateProject(project.id, editForm);
-            if (updatedProject) {
-                setProject(updatedProject);
-                setIsEditing(false);
-            }
-        } catch (err) {
-            console.error('Failed to save project:', err);
-            setError('Failed to save changes');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleInputChange = (field: keyof Project, value: string) => {
-        setEditForm((prev) => ({ ...prev, [field]: value }));
-    };
-
-    const handleYearStep = (direction: 'next' | 'prev') => {
-        const currentYearStr = editForm.year || '23-24';
-        // Parse start year from "YY-YY" format
-        let startYear = parseInt('20' + currentYearStr.split('-')[0]);
-
-        if (isNaN(startYear)) startYear = 2023; // Default fallback
-
-        const newStartYear =
-            direction === 'next' ? startYear + 1 : startYear - 1;
-
-        // Format back to "YY-YY"
-        const startStr = newStartYear.toString().slice(-2);
-        const endStr = (newStartYear + 1).toString().slice(-2);
-        const newYearStr = `${startStr}-${endStr}`;
-
-        handleInputChange('year', newYearStr);
-    };
-
+  if (loading) {
     return (
-        <>
-            {/* Project Name from database */}
-            <section className="space-y-4 mb-10">
-                <div className="flex items-start justify-between gap-4">
-                    {isEditing ? (
-                        <div className="flex-1 space-y-4">
-                            <input
-                                type="text"
-                                value={editForm.projectName || ''}
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        'projectName',
-                                        e.target.value,
-                                    )
-                                }
-                                className="w-full rounded-xl border border-gray-200 px-4 py-2 text-3xl md:text-4xl font-semibold tracking-tight focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-300 transition-all"
-                                placeholder="Project Name"
-                                aria-label="Project Name"
-                            />
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                {/* Quarter Segmented Control */}
-                                <div className="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
-                                    {['Fall', 'Winter', 'Spring'].map((q) => (
-                                        <button
-                                            key={q}
-                                            onClick={() =>
-                                                handleInputChange('quarter', q)
-                                            }
-                                            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                                                editForm.quarter === q
-                                                    ? 'bg-white text-black shadow-sm'
-                                                    : 'text-gray-500 hover:text-black'
-                                            }`}
-                                        >
-                                            {q}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                {/* Year Stepper */}
-                                <div className="flex items-center rounded-xl border border-gray-200 bg-white px-2 py-1">
-                                    <button
-                                        onClick={() => handleYearStep('prev')}
-                                        className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
-                                    >
-                                        <FaChevronLeft className="w-3 h-3" />
-                                    </button>
-                                    <span className="w-20 text-center font-medium text-sm">
-                                        {editForm.year || '23-24'}
-                                    </span>
-                                    <button
-                                        onClick={() => handleYearStep('next')}
-                                        className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
-                                    >
-                                        <FaChevronRight className="w-3 h-3" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="space-y-1">
-                            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-                                {project.projectName || 'My Project'}
-                            </h1>
-                            <p className="text-black/60">
-                                {project.quarter} {project.year}
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Edit Actions */}
-                    <div className="flex-shrink-0">
-                        {isEditing ? (
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={handleCancelClick}
-                                    disabled={isSaving}
-                                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSaveClick}
-                                    disabled={isSaving}
-                                    className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:opacity-50"
-                                >
-                                    {isSaving ? 'Saving...' : 'Save'}
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={handleEditClick}
-                                className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                            >
-                                <FaPencil className="h-3 w-3" />
-                                Edit
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </section>
-
-            <div className="grid gap-10 lg:gap-14 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
-                {/* Left column */}
-                <div className="space-y-14">
-                    {/* Project Description from database */}
-                    <Section title="Project Description" delay={0}>
-                        {isEditing ? (
-                            <textarea
-                                value={editForm.projectDescription || ''}
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        'projectDescription',
-                                        e.target.value,
-                                    )
-                                }
-                                className="w-full min-h-[150px] rounded-xl border border-gray-200 px-4 py-3 text-sm md:text-base focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-gray-300 transition-all resize-y"
-                                placeholder="Project Description"
-                                aria-label="Project Description"
-                            />
-                        ) : (
-                            <p className="text-sm md:text-base text-black/80 whitespace-pre-wrap">
-                                {project.projectDescription ||
-                                    'No description available.'}
-                            </p>
-                        )}
-                    </Section>
-
-                    {/* Project Leads from project_members */}
-                    <Section title="Project Leads" delay={80}>
-                        <div className="flex flex-wrap gap-4">
-                            {projectLeads.length > 0 ? (
-                                projectLeads.map((member) => (
-                                    <div
-                                        key={member.user_id}
-                                        className="flex items-center gap-4"
-                                    >
-                                        <div className={AVATAR_STYLES.large}>
-                                            <Image
-                                                src="/images/default-avatar.svg"
-                                                alt={`${member.user.display_name} avatar`}
-                                                width={56}
-                                                height={56}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-sm font-semibold text-[#E1225C]">
-                                                {member.user.display_name}
-                                            </p>
-                                            <p className="text-xs text-black/70">
-                                                Project Lead
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-sm text-black/60">
-                                    No project leads assigned.
-                                </p>
-                            )}
-                        </div>
-                    </Section>
-
-                    <Section title="My Tasks" delay={160}>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-left text-xs md:text-sm text-black/80">
-                                <thead>
-                                    <tr className="border-b border-[#E2E4F0]">
-                                        <th className="pb-3 pr-6 font-semibold">
-                                            Name
-                                        </th>
-                                        <th className="pb-3 pr-6 font-semibold">
-                                            Priority
-                                        </th>
-                                        <th className="pb-3 pr-6 font-semibold">
-                                            Topic
-                                        </th>
-                                        <th className="pb-3 pr-6 font-semibold">
-                                            Status
-                                        </th>
-                                        <th className="pb-3 font-semibold">
-                                            Assignee
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {isTasksLoading ? (
-                                        <tr>
-                                            <td
-                                                colSpan={5}
-                                                className="py-6 text-center text-black/50"
-                                            >
-                                                Loading your tasks...
-                                            </td>
-                                        </tr>
-                                    ) : tasksError ? (
-                                        <tr>
-                                            <td
-                                                colSpan={5}
-                                                className="py-6 text-center text-red-500"
-                                            >
-                                                Failed to load your tasks.
-                                            </td>
-                                        </tr>
-                                    ) : myTasks.length === 0 ? (
-                                        <tr>
-                                            <td
-                                                colSpan={5}
-                                                className="py-6 text-center text-black/50"
-                                            >
-                                                No tasks assigned to you yet.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        myTasks.map((task) => {
-                                            const statusMeta =
-                                                TASK_STATUS_STYLES[task.status];
-                                            const additionalAssignees =
-                                                task.assignments.length - 1;
-
-                                            return (
-                                                <tr key={task.id}>
-                                                    <td className="py-4 pr-6 align-middle">
-                                                        <span className="text-black/60 mr-1">
-                                                            #{task.id}
-                                                        </span>
-                                                        {task.name}
-                                                    </td>
-                                                    <td className="py-4 pr-6 align-middle">
-                                                        <span
-                                                            className={
-                                                                TASK_PRIORITY_STYLES[
-                                                                    task.priority
-                                                                ]
-                                                            }
-                                                        >
-                                                            {formatPriorityLabel(
-                                                                task.priority,
-                                                            )}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 pr-6 align-middle">
-                                                        <span
-                                                            className="rounded-full px-3 py-1 text-xs font-medium text-black/70"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    task.label_color,
-                                                            }}
-                                                        >
-                                                            {task.label}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 pr-6 align-middle">
-                                                        <span
-                                                            className={
-                                                                statusMeta.className
-                                                            }
-                                                        >
-                                                            {statusMeta.label}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 align-middle">
-                                                        <div className="inline-flex items-center gap-2">
-                                                            <span
-                                                                className={
-                                                                    AVATAR_STYLES.small
-                                                                }
-                                                            >
-                                                                <Image
-                                                                    src="/images/default-avatar.svg"
-                                                                    alt="Task assignee avatar"
-                                                                    width={32}
-                                                                    height={32}
-                                                                    className="h-full w-full object-cover"
-                                                                />
-                                                            </span>
-                                                            {additionalAssignees >
-                                                                0 && (
-                                                                <span className="text-xs text-black/60">
-                                                                    +
-                                                                    {
-                                                                        additionalAssignees
-                                                                    }
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </Section>
-
-                    {/* Upcoming Events */}
-                    <section className="space-y-4 transform transition-all duration-300 ease-out">
-                        <div className="flex items-center justify-between">
-                            <h2 className={CARD_STYLES.titleDefault}>
-                                Upcoming Events
-                            </h2>
-                            {canPostEvents && (
-                                <button
-                                    onClick={() => setShowEventModal(true)}
-                                    className="flex items-center gap-1.5 rounded-lg bg-[#3F86FF] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#346edd] transition-colors"
-                                >
-                                    <span className="text-base leading-none">
-                                        +
-                                    </span>
-                                    <span>Add Event</span>
-                                </button>
-                            )}
-                        </div>
-                        <div className={CARD_STYLES.base}>
-                            {events.length === 0 ? (
-                                <p className="text-sm text-black/50">
-                                    No upcoming events
-                                </p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {events.map((event) => (
-                                        <ProjectEventCard
-                                            key={event.id}
-                                            event={event}
-                                            compact
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </section>
-
-                    {/* Announcements */}
-                    <section className="space-y-4 transform transition-all duration-300 ease-out">
-                        <div className="flex items-center justify-between">
-                            <h2 className={CARD_STYLES.titleDefault}>
-                                Announcements
-                            </h2>
-                            {canPostEvents && (
-                                <button
-                                    onClick={() =>
-                                        setShowAnnouncementModal(true)
-                                    }
-                                    className="flex items-center gap-1.5 rounded-lg bg-[#3F86FF] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#346edd] transition-colors"
-                                >
-                                    <span className="text-base leading-none">
-                                        +
-                                    </span>
-                                    <span>Add Announcement</span>
-                                </button>
-                            )}
-                        </div>
-                        <div className={CARD_STYLES.base}>
-                            {announcements.length === 0 ? (
-                                <p className="text-sm text-black/50">
-                                    No announcements
-                                </p>
-                            ) : (
-                                <div className="space-y-4">
-                                    {announcements.map((announcement) => (
-                                        <div
-                                            key={announcement.id}
-                                            className="border-l-4 border-[#3F86FF] bg-blue-50 p-3 rounded-lg"
-                                        >
-                                            <h4 className="font-bold text-sm text-gray-900">
-                                                {announcement.title}
-                                            </h4>
-                                            {announcement.description && (
-                                                <p className="text-xs text-gray-600 mt-1">
-                                                    {announcement.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </section>
-                </div>
-
-                {/* Right column */}
-                <div className="space-y-14">
-                    <Section title="Recent Activity" delay={240}>
-                        <div className="space-y-7 text-xs md:text-sm text-black/80">
-                            {isActivityLoading ? (
-                                <p className="text-sm text-black/50">
-                                    Loading recent activity...
-                                </p>
-                            ) : recentActivities.length === 0 ? (
-                                <p className="text-sm text-black/50">
-                                    No recent activity yet.
-                                </p>
-                            ) : (
-                                recentActivities.map((activity) => (
-                                    <ActivityItem
-                                        key={activity.id}
-                                        name={activity.actorDisplayName}
-                                        time={formatRelativeTime(
-                                            activity.created_at,
-                                        )}
-                                        action={getActivityMessage(activity)}
-                                        comment={getActivityComment(
-                                            activity.metadata,
-                                        ) ?? undefined}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </Section>
-
-                    <Section title="Quick Links" delay={320}>
-                        <div className="flex items-center justify-center gap-6 text-sm text-black/80">
-                            <a
-                                href="#"
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-                                aria-label="GitHub"
-                            >
-                                <FaGithub className="h-5 w-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-                                aria-label="Figma"
-                            >
-                                <SiFigma className="h-5 w-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-                                aria-label="Notion"
-                            >
-                                <SiNotion className="h-5 w-5" />
-                            </a>
-                        </div>
-                    </Section>
-                </div>
-            </div>
-
-            <AddEventModal
-                isOpen={showEventModal}
-                onClose={() => setShowEventModal(false)}
-                onSubmit={handleCreateEvent}
-                projectId={projectId}
-                isSubmitting={isSubmitting}
-            />
-
-            <AddAnnouncementModal
-                isOpen={showAnnouncementModal}
-                onClose={() => setShowAnnouncementModal(false)}
-                onSubmit={handleCreateAnnouncement}
-                projectId={projectId}
-                isSubmitting={isSubmitting}
-            />
-        </>
+      <div className="flex items-center justify-center py-20">
+        <p className="font-code text-[11px] uppercase tracking-[0.08em] text-ink-400">
+          loading project...
+        </p>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="font-code text-[11px] uppercase tracking-[0.08em] text-cl-pink-700">
+          {error}
+        </p>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="font-code text-[11px] uppercase tracking-[0.08em] text-ink-400">
+          no project found.
+        </p>
+      </div>
+    );
+  }
+
+  type LinkEntry = {
+    key: string;
+    label: string;
+    url: string;
+    Icon: React.ComponentType<{ className?: string }>;
+  };
+  const projectLinks: LinkEntry[] = [
+    project.githubUrl ? { key: 'github', label: 'GitHub', url: project.githubUrl, Icon: FaGithub } : null,
+    project.figmaUrl ? { key: 'figma', label: 'Figma', url: project.figmaUrl, Icon: SiFigma } : null,
+    project.notionUrl ? { key: 'notion', label: 'Notion', url: project.notionUrl, Icon: SiNotion } : null,
+    project.prototypeUrl
+      ? { key: 'prototype', label: 'Prototype', url: project.prototypeUrl, Icon: FaLink }
+      : null,
+    project.demoDayUrl
+      ? { key: 'demo', label: 'Demo Day', url: project.demoDayUrl, Icon: FaLink }
+      : null,
+    project.instaPostUrl
+      ? { key: 'insta', label: 'Instagram', url: project.instaPostUrl, Icon: SiInstagram }
+      : null,
+  ].filter(Boolean) as LinkEntry[];
+
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Greeting — warm opener */}
+      <Section delay={0}>
+        <Greeting openTaskCount={myTasks.length} overdueCount={myOverdueCount} />
+      </Section>
+
+      {/* 2-col */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+        {/* Main column — personal work + project surface */}
+        <div className="flex flex-col gap-8">
+          {/* My Tasks */}
+          <Section delay={60}>
+            <EyebrowHeader
+              label="My Tasks"
+              action={
+                <a
+                  href={`/portal/projects/${projectId}/list`}
+                  className="flex items-center gap-1 font-code text-[11px] uppercase tracking-[0.06em] text-ink-400 transition-colors hover:text-ink-900"
+                >
+                  <span>view all</span>
+                  <FaArrowRight className="h-2.5 w-2.5" />
+                </a>
+              }
+            />
+            {isTasksLoading ? (
+              <p className="font-accent italic text-[13px] text-ink-400">loading your tasks...</p>
+            ) : tasksError ? (
+              <p className="font-code text-[11px] uppercase tracking-[0.08em] text-cl-pink-700">
+                failed to load tasks
+              </p>
+            ) : myTasks.length === 0 ? (
+              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-5 py-8 text-center">
+                <p className="font-accent italic text-[15px] text-ink-600">
+                  nothing assigned —{' '}
+                </p>
+                <p className="mt-1 text-[14px] text-ink-900">
+                  grab something from the{' '}
+                  <a
+                    href={`/portal/projects/${projectId}/board`}
+                    className="font-semibold text-cl-blue-700 hover:text-cl-blue-800"
+                  >
+                    board
+                  </a>
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {myTasks.slice(0, MAX_TASKS).map((task) => (
+                  <MyTaskRow key={task.id} task={task} />
+                ))}
+                {myTasks.length > MAX_TASKS && (
+                  <a
+                    href={`/portal/projects/${projectId}/list`}
+                    className="mt-1 flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-4 py-2.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-400 hover:bg-cream-100 hover:text-ink-900"
+                  >
+                    <span>+{myTasks.length - MAX_TASKS} more</span>
+                    <FaArrowRight className="h-2.5 w-2.5" />
+                  </a>
+                )}
+              </div>
+            )}
+          </Section>
+
+          {/* My Todo — personal, localStorage */}
+          <Section delay={120}>
+            <MyTodoSection userId={currentUserId} />
+          </Section>
+
+          {/* Announcements */}
+          <Section delay={180}>
+            <EyebrowHeader
+              label="Announcements"
+              action={
+                canPostEvents ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAnnouncementModal(true)}
+                    className="flex items-center gap-1.5 rounded-md border-[1.5px] border-ink-200 bg-white px-3 py-1.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900"
+                  >
+                    <span className="text-sm leading-none">+</span>
+                    <span>add</span>
+                  </button>
+                ) : null
+              }
+            />
+            {announcements.length === 0 ? (
+              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-5 py-6 text-center">
+                <p className="font-accent italic text-[14px] text-ink-500">quiet around here</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {announcements.slice(0, MAX_ANNOUNCEMENTS).map((a) => {
+                  const publishDate = a.publish_date
+                    ? new Date(a.publish_date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                    : null;
+                  return (
+                    <div
+                      key={a.id}
+                      className={`flex items-start gap-3 rounded-xl border-[1.5px] px-4 py-3 transition-colors ${
+                        a.is_pinned
+                          ? 'border-cl-pink-100 bg-cl-pink-100/30 hover:bg-cl-pink-100/50'
+                          : 'border-ink-200 bg-white hover:bg-cream-100'
+                      }`}
+                    >
+                      <span
+                        aria-hidden
+                        className={`mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full ${
+                          a.is_pinned ? 'bg-cl-pink-700' : 'bg-cl-blue-700'
+                        }`}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <h4 className="truncate text-[14px] font-semibold text-ink-900">
+                            {a.title}
+                          </h4>
+                          {publishDate ? (
+                            <span className="flex-shrink-0 font-code text-[10px] uppercase tracking-[0.06em] text-ink-400">
+                              {publishDate}
+                            </span>
+                          ) : null}
+                        </div>
+                        {a.description ? (
+                          <p className="mt-0.5 line-clamp-2 text-[13px] leading-[1.5] text-ink-600">
+                            {a.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
+                {announcements.length > MAX_ANNOUNCEMENTS && (
+                  <p className="mt-1 text-center font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+                    +{announcements.length - MAX_ANNOUNCEMENTS} older
+                  </p>
+                )}
+              </div>
+            )}
+          </Section>
+        </div>
+
+        {/* Sidebar — project context */}
+        <div className="flex flex-col gap-8">
+          <Section delay={80}>
+            <EyebrowHeader label="Team" />
+            <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-4">
+              <div className="mb-3 flex flex-col gap-3">
+                {projectLeads.length > 0 ? (
+                  projectLeads.slice(0, 4).map((member) => (
+                    <div key={member.user_id} className="flex items-center gap-3">
+                      <Avatar
+                        name={member.user.display_name || 'Unknown'}
+                        color={pickAvatarColor(member.user.display_name || 'Unknown')}
+                        size="sm"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-semibold text-ink-900">
+                          {member.user.display_name || 'Unknown'}
+                        </p>
+                        <p className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+                          Project Lead
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="font-accent italic text-[13px] text-ink-400">
+                    no leads assigned
+                  </p>
+                )}
+              </div>
+              <a
+                href={`/portal/projects/${projectId}/members`}
+                className="flex items-center justify-between border-t-[1.5px] border-ink-200 pt-3 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:text-ink-900"
+              >
+                <span>all {memberCount} members</span>
+                <FaArrowRight className="h-2.5 w-2.5" />
+              </a>
+            </div>
+          </Section>
+
+          <Section delay={140}>
+            <EyebrowHeader
+              label="Upcoming Events"
+              action={
+                canPostEvents ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowEventModal(true)}
+                    className="flex items-center gap-1.5 rounded-md border-[1.5px] border-ink-200 bg-white px-3 py-1.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900"
+                  >
+                    <span className="text-sm leading-none">+</span>
+                    <span>add</span>
+                  </button>
+                ) : null
+              }
+            />
+            {events.length === 0 ? (
+              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-4 py-6 text-center">
+                <p className="font-accent italic text-[13px] text-ink-500">nothing scheduled</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {events.slice(0, MAX_EVENTS).map((event) => (
+                  <ProjectEventCard key={event.id} event={event} compact />
+                ))}
+                {events.length > MAX_EVENTS && (
+                  <p className="mt-1 text-center font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+                    +{events.length - MAX_EVENTS} more
+                  </p>
+                )}
+              </div>
+            )}
+          </Section>
+
+          {projectLinks.length > 0 && (
+            <Section delay={200}>
+              <EyebrowHeader label="Links" />
+              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-2">
+                {projectLinks.map(({ key, label, url, Icon }) => (
+                  <a
+                    key={key}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-cream-100"
+                  >
+                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-ink-100 transition-colors group-hover:bg-ink-200">
+                      <Icon className="h-3.5 w-3.5 text-ink-900" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink-900">
+                      {label}
+                    </span>
+                    <FaArrowRight className="h-2.5 w-2.5 flex-shrink-0 text-ink-300 transition-all group-hover:translate-x-0.5 group-hover:text-ink-600" />
+                  </a>
+                ))}
+              </div>
+            </Section>
+          )}
+        </div>
+      </div>
+
+      {/* Activity feed — full width at bottom */}
+      <Section delay={260}>
+        <EyebrowHeader label="Activity" />
+        {isActivityLoading ? (
+          <p className="font-accent italic text-[13px] text-ink-400">loading activity...</p>
+        ) : activities.length === 0 ? (
+          <div className="rounded-2xl border-[1.5px] border-ink-200 bg-cream-100/50 px-5 py-6 text-center">
+            <p className="font-accent italic text-[14px] text-ink-500">
+              nothing yet — first edit sets the rhythm
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white px-5 py-2">
+            {activities.map((activity) => (
+              <ActivityRow key={activity.id} activity={activity} />
+            ))}
+          </div>
+        )}
+      </Section>
+
+      <AddEventModal
+        isOpen={showEventModal}
+        onClose={() => setShowEventModal(false)}
+        onSubmit={handleCreateEvent}
+        projectId={projectId}
+        isSubmitting={isSubmitting}
+      />
+      <AddAnnouncementModal
+        isOpen={showAnnouncementModal}
+        onClose={() => setShowAnnouncementModal(false)}
+        onSubmit={handleCreateAnnouncement}
+        projectId={projectId}
+        isSubmitting={isSubmitting}
+      />
+    </div>
+  );
 }
