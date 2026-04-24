@@ -245,7 +245,7 @@ export default function MembersDirectory() {
 
         {!loading && totallyEmpty && (
           <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
-            <div className="w-[72px] h-[72px] rounded-full bg-cream-100 border border-ink-200 flex items-center justify-center">
+            <div className="w-[72px] h-[72px] rounded-full bg-ink-100 border border-ink-200 flex items-center justify-center">
               <svg
                 width="28" height="28" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -440,7 +440,7 @@ function InternalCard({ row }: { row: InternalRow }) {
   return (
     <Link
       href={`#${member.id}`}
-      className="group bg-surface-card border border-ink-100 rounded-[12px] p-4 flex items-center gap-3.5 hover:border-ink-300 hover:-translate-y-[2px] hover:shadow-md transition-all duration-300"
+      className="group bg-surface-card border border-ink-100 rounded-[12px] p-4 flex items-center gap-3.5 hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
     >
       <Avatar name={member.name} initials={member.initials} color={member.avatarColor} size="md" />
       <div className="flex-1 min-w-0">
@@ -518,7 +518,7 @@ function ProjectMemberCard({ row }: { row: ProjectMemberRow }) {
   return (
     <Link
       href={`#${member.id}`}
-      className="group flex items-center gap-3 bg-cream-50 border border-ink-100 rounded-[10px] px-3.5 py-3 hover:border-ink-300 hover:-translate-y-[1px] hover:shadow-sm transition-all duration-200"
+      className="group flex items-center gap-3 bg-cream-50 border border-ink-100 rounded-[10px] px-3.5 py-3 hover:border-ink-300 hover:-translate-y-[1px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
     >
       <Avatar name={member.name} initials={member.initials} color={member.avatarColor} size="sm" />
       <div className="flex-1 min-w-0">

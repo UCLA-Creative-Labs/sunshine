@@ -30,7 +30,7 @@ function MiniProjectCard({
         <button
             type="button"
             onClick={() => onClick(project)}
-            className="group flex flex-col gap-3 rounded-2xl border-[1.5px] border-ink-200 bg-white p-5 text-left transition-colors hover:border-ink-400"
+            className="group flex flex-col gap-3 rounded-2xl border-[1.5px] border-ink-200 bg-white p-5 text-left shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-card-hover"
         >
             <div className="flex items-start justify-between gap-3">
                 <h3 className="truncate font-display text-[16px] font-bold leading-tight text-ink-900">

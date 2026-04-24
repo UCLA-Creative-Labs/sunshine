@@ -43,3 +43,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* View Transitions API — cross-document + same-document navigation fade.
+   Chromium + Safari 18+ supported; Firefox gracefully no-ops. Skipped
+   automatically under prefers-reduced-motion by the backstop above. */
+@view-transition {
+  navigation: auto;
+}
+
+@keyframes cl-vt-fade-out { to { opacity: 0; } }
+@keyframes cl-vt-fade-in  { from { opacity: 0; } }
+
+::view-transition-old(root) { animation: 150ms ease-out both cl-vt-fade-out; }
+::view-transition-new(root) { animation: 150ms ease-in  both cl-vt-fade-in; }

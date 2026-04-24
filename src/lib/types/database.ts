@@ -45,6 +45,8 @@ export interface Profiles {
   first_name: string | null;
   last_name: string | null;
   display_name?: string | null;
+  major?: string | null;
+  grad_year?: number | null;
 }
 
 export interface ProjectMember {

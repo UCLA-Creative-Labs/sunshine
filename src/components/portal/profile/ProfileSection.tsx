@@ -250,7 +250,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                                 {achievements.map((a) => (
                                     <span
                                         key={a.id}
-                                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-ink-200 bg-cream-100 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900"
+                                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-ink-200 bg-ink-100 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900"
                                         title={a.type}
                                     >
                                         {a.type.slice(0, 1)}

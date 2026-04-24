@@ -27,7 +27,7 @@ const variants: Record<ButtonVariant, string> = {
   danger:
     'bg-white text-cl-danger-700 border border-cl-danger-700 hover:bg-cl-danger-700 hover:text-white focus-visible:ring-cl-danger-500/20',
   icon:
-    'bg-white text-ink-900 border border-ink-200 hover:bg-cream-100 hover:border-ink-900 focus-visible:ring-cl-blue-100',
+    'bg-white text-ink-900 border border-ink-200 hover:bg-ink-50 hover:border-ink-900 focus-visible:ring-cl-blue-100',
 }
 
 const sizes: Record<ButtonSize, string> = {

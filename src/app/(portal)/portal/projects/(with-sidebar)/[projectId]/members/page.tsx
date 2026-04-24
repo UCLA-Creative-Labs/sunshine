@@ -41,17 +41,23 @@ function formatJoined(dateString: string): string {
 function MemberCard({ member }: { member: ProjectMemberWithProfile }) {
   const name = member.user.display_name ?? 'Unknown';
   const email = member.user.email;
+  const major = member.user.major ?? undefined;
+  const gradYear = member.user.grad_year != null ? String(member.user.grad_year) : undefined;
+  const school = [major, gradYear].filter(Boolean).join(' · ');
   const badge = roleToBadge(member.rbac_role?.name);
   const color = pickAvatarColor(name);
 
   return (
-    <div className="group flex flex-col gap-3 rounded-2xl border-[1.5px] border-ink-200 bg-white p-5 transition-colors hover:border-ink-400">
+    <div className="group flex flex-col gap-3 rounded-2xl border-[1.5px] border-ink-200 bg-white p-5 shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-card-hover">
       <div className="flex items-start gap-3">
         <Avatar name={name} color={color} size="lg" />
         <div className="min-w-0 flex-1">
           <p className="truncate font-display text-[18px] font-bold leading-tight text-ink-900">
             {name}
           </p>
+          {school && (
+            <p className="mt-0.5 truncate text-[13px] text-ink-600">{school}</p>
+          )}
           <p className="mt-0.5 truncate font-code text-[11px] text-ink-400">
             <FaEnvelope className="mr-1.5 inline h-2.5 w-2.5 text-ink-400" />
             {email}

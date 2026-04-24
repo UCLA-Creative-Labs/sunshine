@@ -154,7 +154,7 @@ export default function ProjectDirectory() {
 
         {!loading && filtered.length === 0 && (
           <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
-            <div className="w-[72px] h-[72px] rounded-full bg-cream-100 border border-ink-200 flex items-center justify-center">
+            <div className="w-[72px] h-[72px] rounded-full bg-ink-100 border border-ink-200 flex items-center justify-center">
               <svg
                 width="28" height="28" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -397,7 +397,7 @@ function ProjectCard({ project: p, onOpen }: { project: Project; onOpen: (p: Pro
     <button
       type="button"
       onClick={() => onOpen(p)}
-      className="group relative text-left bg-surface-card border border-ink-100 rounded-[12px] p-5 pl-6 flex flex-col gap-3.5 min-h-[200px] hover:border-ink-300 hover:-translate-y-[2px] hover:shadow-md transition-all duration-300 overflow-hidden"
+      className="group relative text-left bg-surface-card border border-ink-100 rounded-[12px] p-5 pl-6 flex flex-col gap-3.5 min-h-[200px] hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover overflow-hidden"
     >
       <span
         aria-hidden="true"
@@ -417,7 +417,7 @@ function ProjectCard({ project: p, onOpen }: { project: Project; onOpen: (p: Pro
             {p.name}
           </h3>
           <div className="mt-1 flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center rounded-full bg-cream-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
+            <span className="inline-flex items-center rounded-full bg-ink-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
               {p.quarter}
             </span>
           </div>
@@ -442,7 +442,7 @@ function ProjectListRow({ project: p, onOpen }: { project: Project; onOpen: (p: 
     <button
       type="button"
       onClick={() => onOpen(p)}
-      className="group relative text-left w-full flex items-center gap-4 bg-surface-card border border-ink-100 rounded-[12px] pl-6 pr-5 py-4 hover:border-ink-300 hover:-translate-y-[1px] hover:shadow-md transition-all duration-300 overflow-hidden"
+      className="group relative text-left w-full flex items-center gap-4 bg-surface-card border border-ink-100 rounded-[12px] pl-6 pr-5 py-4 hover:border-ink-300 hover:-translate-y-[1px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover overflow-hidden"
     >
       <span
         aria-hidden="true"
@@ -554,7 +554,7 @@ function ProjectDetailModal({ project, onClose }: { project: Project; onClose: (
                 {project.name}
               </h2>
               <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center rounded-full bg-cream-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
+                <span className="inline-flex items-center rounded-full bg-ink-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
                   {project.quarter}
                 </span>
                 <span

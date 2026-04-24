@@ -158,7 +158,7 @@ export interface SpeechBubbleProps extends HTMLAttributes<HTMLDivElement> {
 const bubbleTones: Record<SpeechBubbleTone, string> = {
   blue:  'bg-cl-blue-700 text-white',
   ink:   'bg-ink-900 text-white',
-  cream: 'bg-cream-100 text-ink-900 ring-2 ring-ink-900',
+  cream: 'bg-ink-100 text-ink-900 ring-2 ring-ink-900',
 }
 
 const tailPositions: Record<SpeechBubbleTail, string> = {
@@ -171,7 +171,7 @@ const tailPositions: Record<SpeechBubbleTail, string> = {
 const tailColorClass: Record<SpeechBubbleTone, string> = {
   blue:  'after:border-t-cl-blue-700 after:border-l-cl-blue-700 after:border-b-cl-blue-700 after:border-r-cl-blue-700',
   ink:   'after:border-t-ink-900 after:border-l-ink-900 after:border-b-ink-900 after:border-r-ink-900',
-  cream: 'after:border-t-cream-100 after:border-l-cream-100 after:border-b-cream-100 after:border-r-cream-100',
+  cream: 'after:border-t-ink-100 after:border-l-ink-100 after:border-b-ink-100 after:border-r-ink-100',
 }
 
 export function SpeechBubble({

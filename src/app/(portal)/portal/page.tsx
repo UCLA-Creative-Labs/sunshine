@@ -1,3 +1,4 @@
+import DashboardHero from '@/components/portal/DashboardHero'
 import Link from 'next/link'
 import { Avatar, Badge, Card } from '@/components/portal/ui'
 import type { BadgeColor } from '@/components/portal/ui'
@@ -215,7 +216,7 @@ const WEEK: WeekEvent[] = [
 export default function PortalDashboard() {
   return (
     <div className="flex-1 w-full flex flex-col bg-cream-50">
-      <HeroBand />
+      <DashboardHero />
       <div className="mx-auto max-w-[1200px] w-full px-8 md:px-20 pt-12 pb-16 space-y-14">
         <RecentActivity />
         <Announcements />
@@ -224,93 +225,6 @@ export default function PortalDashboard() {
       </div>
       <PortalFooter />
     </div>
-  )
-}
-
-function HeroBand() {
-  return (
-    <section
-      className="relative overflow-hidden border-b border-ink-200"
-      style={{ backgroundColor: '#FFF8EF' }}
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(900px circle at 22% 28%, rgba(255,174,171,0.55), transparent 62%),' +
-            'radial-gradient(1100px circle at 80% 88%, rgba(255,174,171,0.50), transparent 68%),' +
-            'radial-gradient(520px circle at 92% 12%, rgba(158,204,255,0.30), transparent 60%),' +
-            'radial-gradient(440px circle at 8% 90%, rgba(189,213,130,0.28), transparent 60%),' +
-            'linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,201,181,0.28))',
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none opacity-[0.12] mix-blend-multiply"
-        style={{
-          backgroundImage: 'url(/textures/noise.png)',
-          backgroundSize: '240px 240px',
-        }}
-      />
-      <div className="relative mx-auto max-w-[1200px] px-8 md:px-20 py-20 md:py-28 grid grid-cols-1 md:grid-cols-[1fr_280px] gap-10 md:gap-14 items-end">
-        <div>
-          <h1 className="font-display font-bold text-[64px] md:text-[96px] leading-[0.92] tracking-[-0.035em] text-ink-900">
-            Good evening, <span className="text-cl-blue-700">MJ</span>
-            <span className="text-ink-900">!</span>
-          </h1>
-          <p className="mt-7 font-ui text-lg text-ink-600 max-w-xl leading-relaxed">
-            <a
-              href="#my-tasks"
-              className="text-ink-900 font-semibold underline decoration-cl-blue-700/40 hover:decoration-cl-blue-700 underline-offset-[6px] decoration-2 hover:text-cl-blue-700 transition-colors"
-            >
-              3 things waiting for you
-            </a>
-            , plus what&apos;s happening this week.
-          </p>
-        </div>
-        <div className="hidden md:flex justify-end items-end">
-          <BeanMascot />
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function BeanMascot() {
-  return (
-    <svg width="180" height="160" viewBox="0 0 180 160" aria-hidden="true" className="animate-bean-bob will-change-transform">
-      <defs>
-        <pattern id="bean-dots" width="4" height="4" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="0.6" fill="rgba(0,0,0,0.12)" />
-        </pattern>
-      </defs>
-      <g transform="translate(14,70)">
-        <circle cx="18" cy="18" r="16" fill="#FDE047" stroke="#1A1A1A" strokeWidth="2" />
-        <text x="18" y="23" textAnchor="middle" fontSize="16" fontWeight="900" fill="#1A1A1A">
-          $
-        </text>
-      </g>
-      <g transform="translate(42,28)">
-        <path
-          d="M20 40 C 8 40, 0 60, 8 82 C 16 104, 46 112, 70 102 C 96 92, 104 66, 94 46 C 86 30, 66 22, 48 26 C 34 29, 26 32, 20 40 Z"
-          fill="#86EFAC"
-          stroke="#1A1A1A"
-          strokeWidth="2.5"
-        />
-        <path
-          d="M20 40 C 8 40, 0 60, 8 82 C 16 104, 46 112, 70 102 C 96 92, 104 66, 94 46 C 86 30, 66 22, 48 26 C 34 29, 26 32, 20 40 Z"
-          fill="url(#bean-dots)"
-        />
-        <ellipse cx="26" cy="104" rx="6" ry="3" fill="#1A1A1A" />
-        <ellipse cx="58" cy="106" rx="6" ry="3" fill="#1A1A1A" />
-        <circle cx="44" cy="60" r="2.2" fill="#1A1A1A" />
-        <circle cx="70" cy="58" r="2.2" fill="#1A1A1A" />
-        <path d="M46 72 Q 56 82 68 70" fill="none" stroke="#1A1A1A" strokeWidth="2.2" strokeLinecap="round" />
-        <ellipse cx="38" cy="74" rx="4" ry="2" fill="#FCA5A5" opacity="0.8" />
-        <ellipse cx="76" cy="72" rx="4" ry="2" fill="#FCA5A5" opacity="0.8" />
-      </g>
-    </svg>
   )
 }
 
@@ -372,7 +286,7 @@ function RecentActivity() {
             <li
               key={row.id}
               className={
-                'flex items-center gap-3.5 py-4 -mx-2 px-2 rounded-lg hover:bg-cream-100 transition-colors duration-200 ' +
+                'flex items-center gap-3.5 py-4 -mx-2 px-2 rounded-lg hover:bg-ink-50 transition-colors duration-200 ' +
                 (i < ACTIVITY.length - 1 ? 'border-b border-ink-100 rounded-b-none' : '')
               }
             >
@@ -442,14 +356,14 @@ function Announcements() {
             className={
               'min-w-[280px] md:min-w-0 snap-start ' +
               'bg-surface-card border border-ink-100 rounded-[12px] shadow-sm ' +
-              'hover:-translate-y-[2px] hover:shadow-md transition-all duration-300 ' +
+              'hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover ' +
               'p-[22px] pb-[18px] flex flex-col gap-3.5 min-h-[200px] ' +
               (a.tilt ? 'md:-rotate-[1.2deg] md:origin-center' : '')
             }
           >
             <span className="font-code text-[11px] text-ink-400 tracking-wide">{a.index}</span>
             <div className="flex items-center gap-2.5">
-              <span className="w-[22px] h-[22px] rounded-[6px] bg-cream-100 text-cl-blue-700 inline-flex items-center justify-center">
+              <span className="w-[22px] h-[22px] rounded-[6px] bg-cl-blue-100 text-cl-blue-700 inline-flex items-center justify-center">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                   <path d="M12 2l2 6h6l-4.5 4 2 7-5.5-4-5.5 4 2-7L4 8h6z" />
                 </svg>
@@ -501,7 +415,7 @@ function MyTasks() {
         {TASKS.map((t) => (
           <div
             key={t.id}
-            className="grid grid-cols-[auto_1fr_auto] gap-4 items-center bg-surface-card border border-ink-100 rounded-[12px] px-[18px] py-[14px] hover:border-ink-300 hover:-translate-y-[2px] hover:shadow-md transition-all duration-300"
+            className="grid grid-cols-[auto_1fr_auto] gap-4 items-center bg-surface-card border border-ink-100 rounded-[12px] px-[18px] py-[14px] hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
           >
             <StatusIcon status={t.status} />
             <div className="min-w-0">
@@ -586,7 +500,7 @@ function MyProjects() {
         {PROJECTS.map((p) => (
           <div
             key={p.id}
-            className="bg-surface-card border border-ink-100 rounded-[12px] p-5 flex flex-col gap-3 hover:border-ink-300 hover:-translate-y-[2px] hover:shadow-md transition-all duration-300"
+            className="bg-surface-card border border-ink-100 rounded-[12px] p-5 flex flex-col gap-3 hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
           >
             <div className="flex items-center gap-3.5">
               <span
@@ -602,7 +516,7 @@ function MyProjects() {
                   {p.name}
                 </h3>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="inline-flex items-center rounded-full bg-cream-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
+                  <span className="inline-flex items-center rounded-full bg-ink-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
                     {p.quarter}
                   </span>
                   <Badge color={p.roleTone} className="text-[11px]">
@@ -679,10 +593,10 @@ function ThisWeek() {
               key={e.id}
               aria-current={isToday ? 'date' : undefined}
               className={
-                'min-w-[150px] md:min-w-0 snap-start rounded-[12px] p-4 flex flex-col gap-2 min-h-[150px] transition-all duration-300 ' +
+                'min-w-[150px] md:min-w-0 snap-start rounded-[12px] p-4 flex flex-col gap-2 min-h-[150px] transition-all duration-fast ease-out ' +
                 (isToday
-                  ? 'bg-cream-100 border border-ink-900 ring-1 ring-ink-900 shadow-md relative'
-                  : 'bg-surface-card border border-ink-100 hover:border-ink-300 hover:-translate-y-1 hover:shadow-md')
+                  ? 'bg-cl-blue-100 border border-ink-900 ring-1 ring-ink-900 shadow-card-hover relative'
+                  : 'bg-surface-card border border-ink-100 hover:border-ink-300 shadow-card hover:-translate-y-1 hover:shadow-card-hover')
               }
             >
               <div className="flex items-center gap-2">

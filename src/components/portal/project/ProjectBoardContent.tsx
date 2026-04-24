@@ -97,7 +97,7 @@ const COLUMN_STYLES: Record<ColumnKey, ColumnStyle> = {
 };
 
 const ADD_TASK_GHOST =
-  'mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-3 py-2.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:bg-cream-100 hover:text-ink-900';
+  'mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-3 py-2.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:bg-ink-50 hover:text-ink-900';
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -195,7 +195,7 @@ function BoardCard({
 
   return (
     <article
-      className={`group flex flex-col gap-2.5 rounded-2xl border-[1.5px] border-ink-200 bg-white px-4 py-3.5 shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-md ${enter}`}
+      className={`group flex flex-col gap-2.5 rounded-2xl border-[1.5px] border-ink-200 bg-white px-4 py-3.5 shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-card-hover ${enter}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between gap-2">

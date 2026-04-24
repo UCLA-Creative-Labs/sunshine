@@ -12,13 +12,6 @@ import type { Config } from 'tailwindcss'
  *   - fontFamily.display, .ui, .body, .accent, .code   (no collisions with default sans/serif/mono)
  *   - transitionDuration.fast, .base, .slow   (defaults are numeric — no collision)
  *
- * Keys intentionally NOT extended to preserve public-site rendering:
- *   - fontSize (xs/sm/base/lg/xl/... would override default line-heights)
- *   - borderRadius (sm/md/lg/xl would override default radii — Navbar, etc.)
- *   - boxShadow (sm/md/lg would override default tints)
- *   - transitionTimingFunction (out would collide with ease-out default)
- *   - fontFamily.mono (reserved for public-site — portal uses font-code for DM Mono)
- *
  * Dark mode: class-based via [data-theme="dark"]. No UI toggle ships in v1.
  * See TOKENS.md.
  */
@@ -115,11 +108,11 @@ const config: Config = {
         slow: 'var(--motion-duration-slow)',
       },
 
-      // Preserve existing public-site gradient aliases (unchanged from pre-Phase-1).
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      // New boxShadow keys — `card` / `card-hover` only.
+      // Default shadow-sm/md/lg keys deliberately NOT extended (preserves Tailwind defaults for public site).
+      boxShadow: {
+        card: 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
       },
 
       keyframes: {
@@ -127,9 +120,14 @@ const config: Config = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%':      { transform: 'translateY(-6px)' },
         },
+        'cl-fade-up': {
+          'from': { opacity: '0', transform: 'translateY(16px)' },
+          'to':   { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
-        'bean-bob': 'bean-bob 4.5s ease-in-out infinite',
+        'bean-bob':   'bean-bob 4.5s ease-in-out infinite',
+        'cl-fade-up': 'cl-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both',
       },
     },
   },

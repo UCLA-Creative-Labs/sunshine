@@ -20,7 +20,9 @@ export async function getProjectMembers(
         email,
         first_name,
         last_name,
-        created_at
+        created_at,
+        major,
+        grad_year
       ),
       rbac_role:roles!project_members_rbac_role_id_fkey (
         id,
