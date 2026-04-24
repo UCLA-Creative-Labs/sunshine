@@ -11,6 +11,7 @@ export interface AvatarProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'chil
   size?: AvatarSize
   color?: AvatarColor
   alt?: string
+  initials?: string
 }
 
 const sizes: Record<AvatarSize, { box: string; text: string; px: number }> = {
@@ -22,17 +23,16 @@ const sizes: Record<AvatarSize, { box: string; text: string; px: number }> = {
 }
 
 const colorBg: Record<AvatarColor, string> = {
-  pink:   'bg-cl-pink-700',
-  sky:    'bg-cl-sky-700',
-  purple: 'bg-cl-purple-700',
-  mint:   'bg-cl-mint-700',
-  coral:  'bg-cl-coral-700',
-  ink:    'bg-ink-900',
+  pink: 'bg-cl-pink-700',
+  blue: 'bg-cl-blue-700',
+  lime: 'bg-cl-lime-700',
+  mint: 'bg-cl-mint-700',
+  ink:  'bg-ink-900',
 }
 
-export function Avatar({ name, src, size = 'md', color, alt, className, ...rest }: AvatarProps) {
+export function Avatar({ name, src, size = 'md', color, alt, initials: initialsOverride, className, ...rest }: AvatarProps) {
   const { box, text, px } = sizes[size]
-  const initials = getInitials(name)
+  const initials = initialsOverride ?? getInitials(name)
   const resolvedColor = color ?? pickAvatarColor(name)
   const label = alt ?? (name ? `${name}'s avatar` : 'Unknown user')
 

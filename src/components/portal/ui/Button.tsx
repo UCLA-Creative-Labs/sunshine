@@ -19,15 +19,15 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    'bg-cl-pink-700 text-white hover:bg-cl-pink-800 focus-visible:ring-cl-pink-100',
+    'bg-cl-blue-700 text-white hover:bg-cl-blue-800 focus-visible:ring-cl-blue-100',
   secondary:
-    'bg-white text-cl-sky-700 border border-cl-sky-700 hover:bg-cl-sky-100 focus-visible:ring-cl-sky-100',
+    'bg-white text-cl-blue-700 border border-cl-blue-700 hover:bg-cl-blue-100 focus-visible:ring-cl-blue-100',
   ghost:
-    'bg-transparent text-ink-900 hover:bg-ink-100 focus-visible:ring-cl-pink-100',
+    'bg-transparent text-ink-900 hover:bg-ink-100 focus-visible:ring-cl-blue-100',
   danger:
-    'bg-white text-cl-danger-700 border border-cl-danger-700 hover:bg-cl-danger-700 hover:text-white focus-visible:ring-cl-pink-100',
+    'bg-white text-cl-danger-700 border border-cl-danger-700 hover:bg-cl-danger-700 hover:text-white focus-visible:ring-cl-danger-500/20',
   icon:
-    'bg-white text-ink-900 border border-ink-200 hover:bg-cream-100 hover:border-ink-900 focus-visible:ring-cl-pink-100',
+    'bg-white text-ink-900 border border-ink-200 hover:bg-cream-100 hover:border-ink-900 focus-visible:ring-cl-blue-100',
 }
 
 const sizes: Record<ButtonSize, string> = {

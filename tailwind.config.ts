@@ -9,7 +9,7 @@ import type { Config } from 'tailwindcss'
  * Keys we add:
  *   - colors.cl-*, colors.cream, colors.ink, colors.surface, colors.interactive,
  *     colors.text-*, colors.border-*   (all NEW prefixes)
- *   - fontFamily.display, .ui, .body   (defaults are sans/serif/mono — no collision)
+ *   - fontFamily.display, .ui, .body, .accent, .code   (no collisions with default sans/serif/mono)
  *   - transitionDuration.fast, .base, .slow   (defaults are numeric — no collision)
  *
  * Keys intentionally NOT extended to preserve public-site rendering:
@@ -17,12 +17,7 @@ import type { Config } from 'tailwindcss'
  *   - borderRadius (sm/md/lg/xl would override default radii — Navbar, etc.)
  *   - boxShadow (sm/md/lg would override default tints)
  *   - transitionTimingFunction (out would collide with ease-out default)
- *   - fontFamily.mono (default mono stack is fine)
- *
- * For Phase 2 portal components, consume token values either via arbitrary
- * value syntax — `rounded-[var(--radius-lg)]`, `text-[length:var(--text-xl)]`,
- * `shadow-[var(--shadow-md)]` — or add NEW prefixed keys (e.g. rounded-card,
- * shadow-card, text-display) when a naming convention emerges.
+ *   - fontFamily.mono (reserved for public-site — portal uses font-code for DM Mono)
  *
  * Dark mode: class-based via [data-theme="dark"]. No UI toggle ships in v1.
  * See TOKENS.md.
@@ -37,38 +32,28 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // CL accent families — all new prefixed keys, no collision
+        // CL palette families (4: 1 primary + 3 accents per Figma 2026-04-22)
+        'cl-blue': {
+          100: 'rgb(var(--color-cl-blue-100) / <alpha-value>)',
+          500: 'rgb(var(--color-cl-blue-500) / <alpha-value>)',
+          700: 'rgb(var(--color-cl-blue-700) / <alpha-value>)',
+          800: 'rgb(var(--color-cl-blue-800) / <alpha-value>)',
+        },
         'cl-pink': {
           100: 'rgb(var(--color-cl-pink-100) / <alpha-value>)',
           500: 'rgb(var(--color-cl-pink-500) / <alpha-value>)',
           700: 'rgb(var(--color-cl-pink-700) / <alpha-value>)',
           800: 'rgb(var(--color-cl-pink-800) / <alpha-value>)',
         },
-        'cl-sky': {
-          100: 'rgb(var(--color-cl-sky-100) / <alpha-value>)',
-          500: 'rgb(var(--color-cl-sky-500) / <alpha-value>)',
-          700: 'rgb(var(--color-cl-sky-700) / <alpha-value>)',
-          800: 'rgb(var(--color-cl-sky-800) / <alpha-value>)',
-        },
-        'cl-purple': {
-          100: 'rgb(var(--color-cl-purple-100) / <alpha-value>)',
-          500: 'rgb(var(--color-cl-purple-500) / <alpha-value>)',
-          700: 'rgb(var(--color-cl-purple-700) / <alpha-value>)',
+        'cl-lime': {
+          100: 'rgb(var(--color-cl-lime-100) / <alpha-value>)',
+          500: 'rgb(var(--color-cl-lime-500) / <alpha-value>)',
+          700: 'rgb(var(--color-cl-lime-700) / <alpha-value>)',
         },
         'cl-mint': {
           100: 'rgb(var(--color-cl-mint-100) / <alpha-value>)',
           500: 'rgb(var(--color-cl-mint-500) / <alpha-value>)',
           700: 'rgb(var(--color-cl-mint-700) / <alpha-value>)',
-        },
-        'cl-yellow': {
-          100: 'rgb(var(--color-cl-yellow-100) / <alpha-value>)',
-          500: 'rgb(var(--color-cl-yellow-500) / <alpha-value>)',
-          700: 'rgb(var(--color-cl-yellow-700) / <alpha-value>)',
-        },
-        'cl-coral': {
-          100: 'rgb(var(--color-cl-coral-100) / <alpha-value>)',
-          500: 'rgb(var(--color-cl-coral-500) / <alpha-value>)',
-          700: 'rgb(var(--color-cl-coral-700) / <alpha-value>)',
         },
 
         // Cream surfaces — new prefix
@@ -82,6 +67,7 @@ const config: Config = {
           50:  'rgb(var(--color-ink-50)  / <alpha-value>)',
           100: 'rgb(var(--color-ink-100) / <alpha-value>)',
           200: 'rgb(var(--color-ink-200) / <alpha-value>)',
+          300: 'rgb(var(--color-ink-300) / <alpha-value>)',
           400: 'rgb(var(--color-ink-400) / <alpha-value>)',
           600: 'rgb(var(--color-ink-600) / <alpha-value>)',
           900: 'rgb(var(--color-ink-900) / <alpha-value>)',
@@ -96,28 +82,30 @@ const config: Config = {
         },
         'cl-info':    'rgb(var(--color-info-500)    / <alpha-value>)',
 
-        // Semantic aliases (preferred in new Phase 2+ components)
+        // Semantic aliases (preferred in new Phase 2+ components) — blue primary
         surface:              'rgb(var(--color-cream-50)    / <alpha-value>)',
         'surface-card':       'rgb(var(--color-white)       / <alpha-value>)',
         'text-primary':       'rgb(var(--color-ink-900)     / <alpha-value>)',
         'text-secondary':     'rgb(var(--color-ink-600)     / <alpha-value>)',
         'text-muted':         'rgb(var(--color-ink-400)     / <alpha-value>)',
-        interactive:          'rgb(var(--color-cl-pink-700) / <alpha-value>)',
-        'interactive-hover':  'rgb(var(--color-cl-pink-800) / <alpha-value>)',
-        'interactive-subtle': 'rgb(var(--color-cl-pink-100) / <alpha-value>)',
-        'interactive-alt':    'rgb(var(--color-cl-sky-700)  / <alpha-value>)',
+        interactive:          'rgb(var(--color-cl-blue-700) / <alpha-value>)',
+        'interactive-hover':  'rgb(var(--color-cl-blue-800) / <alpha-value>)',
+        'interactive-subtle': 'rgb(var(--color-cl-blue-100) / <alpha-value>)',
+        'interactive-alt':    'rgb(var(--color-cl-pink-700) / <alpha-value>)',
         'border-subtle':      'rgb(var(--color-ink-100)     / <alpha-value>)',
         'border-default':     'rgb(var(--color-ink-200)     / <alpha-value>)',
         'border-strong':      'rgb(var(--color-ink-400)     / <alpha-value>)',
-        'border-focus':       'rgb(var(--color-cl-pink-700) / <alpha-value>)',
+        'border-focus':       'rgb(var(--color-cl-blue-700) / <alpha-value>)',
       },
 
-      // New font-family keys (defaults are sans/serif/mono — no collision).
-      // Usage: font-display / font-ui / font-body on Phase 2 components.
+      // New font-family keys (defaults are sans/serif/mono — no collision with public site).
+      // Usage: font-display (DIN Condensed) / font-ui|body (Inter) / font-accent (Texturina Italic) / font-code (DM Mono)
       fontFamily: {
         display: ['var(--font-display)'],
         ui:      ['var(--font-ui)'],
         body:    ['var(--font-body)'],
+        accent:  ['var(--font-accent)'],
+        code:    ['var(--font-mono)'],
       },
 
       // New duration keys (Tailwind defaults are 75/100/150/200/300/500/700/1000).
@@ -132,6 +120,16 @@ const config: Config = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+
+      keyframes: {
+        'bean-bob': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%':      { transform: 'translateY(-6px)' },
+        },
+      },
+      animation: {
+        'bean-bob': 'bean-bob 4.5s ease-in-out infinite',
       },
     },
   },

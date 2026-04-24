@@ -1,4 +1,4 @@
-import { PortalNavbar } from '@/components/portal/ui';
+import { Avatar, PortalNavbar } from '@/components/portal/ui';
 import {
   SHOW_INTERNAL_TAB_TO_INTERNAL_USERS_ONLY,
   getInternalRoleForUser,
@@ -9,6 +9,7 @@ const BASE_PORTAL_TABS = [
   { id: 'dashboard', label: 'Dashboard', href: '/portal' },
   { id: 'project-directory', label: 'Project Directory', href: '/portal/directory' },
   { id: 'my-project', label: 'My Project', href: '/portal/my-project' },
+  { id: 'members', label: 'Members', href: '/portal/members' },
   { id: 'profile', label: 'Profile', href: '/portal/profile' },
 ];
 
@@ -37,7 +38,10 @@ export default async function PortalPageLayout({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PortalNavbar tabs={portalTabs} />
+      <PortalNavbar
+        tabs={portalTabs}
+        trailing={<Avatar name="MJ Bagaoisan" size="sm" color="blue" />}
+      />
       <main className="flex flex-1 bg-surface">{children}</main>
     </div>
   );

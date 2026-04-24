@@ -1,5 +1,13 @@
-import { Sidebar, SidebarHeader, type SidebarItem } from '@/components/portal/ui';
-import { RxHome, RxDashboard, RxRows, RxPerson, RxFileText, RxGear } from 'react-icons/rx';
+import {
+  ActivityPanel,
+  ProjectHeaderBand,
+  Sidebar,
+  type ProjectHeaderLead,
+  type SidebarItem,
+} from '@/components/portal/ui';
+import { pickAvatarColor } from '@/components/portal/ui';
+import { AddTaskHeaderButton } from '@/components/portal/project/AddTaskHeaderButton';
+import { RxHome, RxDashboard, RxRows, RxPerson, RxGear } from 'react-icons/rx';
 import { createClient } from '@/lib/supabase/server';
 
 interface ProjectLayoutProps {
@@ -7,48 +15,88 @@ interface ProjectLayoutProps {
   params: Promise<{ projectId: string }>;
 }
 
-const PROJECT_NAV: Array<{ id: string; label: string; path: string; icon: SidebarItem['icon'] }> = [
-  { id: 'overview', label: 'Overview', path: 'overview', icon: RxHome },
-  { id: 'board',    label: 'Board',    path: 'board',    icon: RxDashboard },
-  { id: 'list',     label: 'List',     path: 'list',     icon: RxRows },
-  { id: 'members',  label: 'Members',  path: 'members',  icon: RxPerson },
-  { id: 'docs',     label: 'Docs',     path: 'docs',     icon: RxFileText },
-  { id: 'settings', label: 'Settings', path: 'settings', icon: RxGear },
+type ProjectNavEntry = {
+  id: string;
+  label: string;
+  path: string;
+  Icon: React.ComponentType<{ size?: number; className?: string }>;
+};
+
+const PROJECT_NAV: ProjectNavEntry[] = [
+  { id: 'overview', label: 'Overview', path: 'overview', Icon: RxHome },
+  { id: 'board',    label: 'Board',    path: 'board',    Icon: RxDashboard },
+  { id: 'list',     label: 'List',     path: 'list',     Icon: RxRows },
+  { id: 'members',  label: 'Members',  path: 'members',  Icon: RxPerson },
+  { id: 'settings', label: 'Settings', path: 'settings', Icon: RxGear },
 ];
 
 export default async function ProjectLayout({ children, params }: ProjectLayoutProps) {
   const { projectId } = await params;
 
   let projectName: string | undefined;
-  let logoUrl: string | undefined;
+  let subtitle: string | undefined;
+  let term: string | undefined;
+  let leads: ProjectHeaderLead[] = [];
+  let memberCount = 0;
+  let githubUrl: string | undefined;
+
   if (projectId) {
     const supabase = await createClient();
-    const { data } = await supabase
+    const { data: project } = await supabase
       .from('projects')
-      .select('projectName, logoUrl')
+      .select('projectName, projectDescription, year, quarter, projectLeads, projectMembers, githubUrl')
       .eq('id', projectId)
       .single();
-    projectName = data?.projectName ?? undefined;
-    logoUrl = data?.logoUrl ?? undefined;
+
+    if (project) {
+      projectName = project.projectName ?? undefined;
+      subtitle = project.projectDescription ?? undefined;
+      githubUrl = project.githubUrl ?? undefined;
+
+      const yr = typeof project.year === 'string' ? project.year.slice(-2) : '';
+      const q = typeof project.quarter === 'string' ? project.quarter : '';
+      term = q || yr ? `${q} ${yr}`.trim() : undefined;
+
+      const leadNames = Array.isArray(project.projectLeads) ? project.projectLeads : [];
+      leads = leadNames.map((name: string) => ({
+        name,
+        color: pickAvatarColor(name),
+      }));
+
+      const allMembers = Array.isArray(project.projectMembers) ? project.projectMembers : [];
+      memberCount = Math.max(0, allMembers.length);
+    }
   }
 
-  const items: SidebarItem[] = PROJECT_NAV.map((item) => ({
-    id: item.id,
-    label: item.label,
-    href: `/portal/projects/${projectId}/${item.path}`,
-    icon: item.icon,
+  const items: SidebarItem[] = PROJECT_NAV.map((entry) => ({
+    id: entry.id,
+    label: entry.label,
+    href: `/portal/projects/${projectId}/${entry.path}`,
+    icon: <entry.Icon size={20} />,
   }));
 
   return (
-    <div className="flex flex-1 text-text-primary">
-      <Sidebar
-        className="flex-shrink-0"
-        ariaLabel="Project sections"
-        header={<SidebarHeader title={projectName ?? 'Project'} logoUrl={logoUrl} />}
-        items={items}
+    <div className="flex min-w-0 flex-1 flex-col text-text-primary">
+      <ProjectHeaderBand
+        projectName={projectName ?? 'Project'}
+        eyebrowState="active project"
+        subtitle={subtitle}
+        term={term}
+        leads={leads}
+        memberCount={memberCount > 0 ? memberCount : undefined}
+        githubUrl={githubUrl}
+        actions={projectId ? <AddTaskHeaderButton projectId={projectId} /> : null}
       />
-      <div className="flex-1 px-6 py-8 md:px-10 md:py-10">
-        <div className="mx-auto max-w-5xl space-y-6">{children}</div>
+
+      <div className="flex min-w-0 flex-1">
+        <Sidebar
+          className="flex-shrink-0"
+          ariaLabel="Project sections"
+          label="Project"
+          items={items}
+        />
+        <div className="min-w-0 flex-1 px-5 py-6 md:px-8 md:py-8">{children}</div>
+        <ActivityPanel className="hidden xl:block" />
       </div>
     </div>
   );

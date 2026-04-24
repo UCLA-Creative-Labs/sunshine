@@ -4,7 +4,12 @@ import { Sidebar, SidebarHeader, type SidebarItem } from '@/components/portal/ui
 import { RxDashboard } from 'react-icons/rx';
 
 const INTERNAL_NAV: SidebarItem[] = [
-  { id: 'projects', label: 'Projects', href: '/portal/internal/projects', icon: RxDashboard },
+  {
+    id: 'projects',
+    label: 'Projects',
+    href: '/portal/internal/projects',
+    icon: <RxDashboard size={20} />,
+  },
 ];
 
 export default async function InternalLayout({

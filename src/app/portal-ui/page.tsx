@@ -11,6 +11,13 @@ import {
   Input,
   Select,
   Switch,
+  GridTexture,
+  NoiseTexture,
+  DashedBox,
+  PillLockup,
+  SpeechBubble,
+  CursorIcon,
+  Squiggle,
 } from '@/components/portal/ui'
 
 export default function PortalUiGallery() {
@@ -22,7 +29,7 @@ export default function PortalUiGallery() {
       <div className="max-w-6xl mx-auto px-8 py-16 space-y-16">
         <header className="space-y-2 pb-6 border-b border-ink-900">
           <p className="font-ui text-xs font-bold text-ink-600 tracking-widest uppercase">Phase 2 — Core components</p>
-          <h1 className="font-display text-5xl leading-[1.05] tracking-[-0.035em]">Portal UI Gallery</h1>
+          <h1 className="font-display text-5xl leading-[1.05] tracking-[-0.035em] uppercase">Portal UI Gallery</h1>
           <p className="font-body text-base text-ink-600 max-w-prose">
             Visual verification of the Phase 2 token-driven component set. All styles consume
             <span className="mx-1 font-ui font-semibold text-sm bg-ink-100 px-1.5 py-0.5 rounded">src/styles/tokens.css</span> via Tailwind aliases.
@@ -49,19 +56,19 @@ export default function PortalUiGallery() {
 
         <Section num="02" title="Badges">
           <div className="flex flex-wrap gap-2.5">
-            <Badge color="sky" dot>Todo</Badge>
-            <Badge color="coral" dot>In Progress</Badge>
-            <Badge color="yellow" dot>In Review</Badge>
+            <Badge color="blue" dot>Todo</Badge>
+            <Badge color="pink" dot>In Progress</Badge>
+            <Badge color="lime" dot>In Review</Badge>
             <Badge color="mint" dot>Done</Badge>
           </div>
           <div className="flex flex-wrap gap-2.5 mt-3">
             <Badge color="pink">Marketing</Badge>
-            <Badge color="sky">Engineering</Badge>
-            <Badge color="purple">Design</Badge>
+            <Badge color="blue">Engineering</Badge>
+            <Badge color="lime">Design</Badge>
             <Badge color="mint">Docs</Badge>
-            <Badge color="yellow">UX</Badge>
-            <Badge color="coral">Ops</Badge>
-            <Badge color="ink">Alumni</Badge>
+            <Badge color="ink">UX</Badge>
+            <Badge color="pink">Ops</Badge>
+            <Badge color="blue">Alumni</Badge>
           </div>
         </Section>
 
@@ -134,6 +141,66 @@ export default function PortalUiGallery() {
             description="Create your first task to start tracking work for this project."
             action={<Button variant="primary">+ Add Task</Button>}
           />
+        </Section>
+
+        <Section num="07" title="Decor — Figma vocabulary">
+          <div className="flex flex-wrap items-center gap-4">
+            <PillLockup>Creative Labs Fall 25</PillLockup>
+            <PillLockup tone="blue">New</PillLockup>
+            <PillLockup tone="ghost">Outline</PillLockup>
+          </div>
+
+          <div className="flex flex-wrap items-end gap-6 mt-6">
+            <SpeechBubble tone="blue" tail="bottom-left">
+              <span className="font-accent italic font-normal">have a </span>
+              <span className="font-display font-normal uppercase">COOL</span>
+              <span className="font-accent italic font-normal"> idea?</span>
+            </SpeechBubble>
+            <SpeechBubble tone="ink" tail="bottom-right">
+              <span className="font-accent italic font-normal">have a cool idea?</span>
+            </SpeechBubble>
+            <SpeechBubble tone="cream" tail="top-left">
+              <span className="font-display font-bold uppercase text-xs tracking-[0.08em]">apply now!</span>
+            </SpeechBubble>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-8 mt-6">
+            <div className="flex flex-col items-center gap-2">
+              <CursorIcon size={32} />
+              <span className="font-ui text-[10px] font-bold text-ink-600 uppercase tracking-widest">CursorIcon</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Squiggle width={80} height={28} />
+              <span className="font-ui text-[10px] font-bold text-ink-600 uppercase tracking-widest">Squiggle</span>
+            </div>
+            <DashedBox className="flex-1 min-w-[220px]">
+              <span className="font-ui font-bold text-sm text-ink-600">DashedBox — measurement / placeholder wrapper</span>
+            </DashedBox>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
+            <div className="relative h-40 rounded-lg border border-ink-200 overflow-hidden bg-white">
+              <GridTexture variant="css" cellSize={24} />
+              <div className="relative z-10 p-4">
+                <p className="font-ui font-bold text-xs uppercase tracking-widest text-ink-600">GridTexture · css</p>
+                <p className="font-body text-sm text-ink-900 mt-1">Pure CSS, infinite scale, 24px cell.</p>
+              </div>
+            </div>
+            <div className="relative h-40 rounded-lg border border-ink-200 overflow-hidden bg-white">
+              <GridTexture variant="raster" opacity={0.5} />
+              <div className="relative z-10 p-4">
+                <p className="font-ui font-bold text-xs uppercase tracking-widest text-ink-600">GridTexture · raster</p>
+                <p className="font-body text-sm text-ink-900 mt-1">Exact Figma grid.png at 0.5 opacity.</p>
+              </div>
+            </div>
+            <div className="relative h-40 rounded-lg overflow-hidden bg-ink-900 md:col-span-2">
+              <NoiseTexture opacity={0.7} />
+              <div className="relative z-10 p-6 flex items-center gap-3">
+                <CursorIcon size={28} />
+                <p className="font-display text-3xl uppercase tracking-wide text-white">Noise hero surface</p>
+              </div>
+            </div>
+          </div>
         </Section>
       </div>
     </main>

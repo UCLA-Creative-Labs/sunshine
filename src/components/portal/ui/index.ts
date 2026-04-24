@@ -37,3 +37,31 @@ export type { SidebarProps, SidebarItem, SidebarHeaderProps } from './Sidebar'
 
 export { PageHeader } from './PageHeader'
 export type { PageHeaderProps } from './PageHeader'
+
+export { ProjectHeaderBand } from './ProjectHeaderBand'
+export type { ProjectHeaderBandProps, ProjectHeaderLead } from './ProjectHeaderBand'
+
+export { ActivityPanel } from './ActivityPanel'
+export type { ActivityPanelProps, ActivityItem } from './ActivityPanel'
+
+export {
+  GridTexture,
+  NoiseTexture,
+  DashedBox,
+  PillLockup,
+  SpeechBubble,
+  CursorIcon,
+  Squiggle,
+} from './Decor'
+export type {
+  GridTextureProps,
+  NoiseTextureProps,
+  DashedBoxProps,
+  PillLockupProps,
+  PillTone,
+  SpeechBubbleProps,
+  SpeechBubbleTone,
+  SpeechBubbleTail,
+  CursorIconProps,
+  SquiggleProps,
+} from './Decor'

@@ -8,12 +8,14 @@ export type SidebarItem = {
   id: string
   label: string
   href: string
-  icon?: React.ComponentType<{ size?: number; className?: string }>
+  icon?: React.ReactNode
 }
 
 export interface SidebarProps {
   items: SidebarItem[]
   header?: React.ReactNode
+  label?: string
+  footer?: React.ReactNode
   ariaLabel?: string
   className?: string
 }
@@ -21,6 +23,8 @@ export interface SidebarProps {
 export function Sidebar({
   items,
   header,
+  label,
+  footer,
   ariaLabel = 'Portal sections',
   className,
 }: SidebarProps) {
@@ -37,16 +41,21 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        'flex min-h-screen w-60 flex-col border-r-2 border-border-default bg-surface-card px-6 py-6',
+        'flex w-[220px] min-h-full flex-col border-r-[1.5px] border-ink-200 bg-cream-50 py-5 pb-4',
         className,
       )}
     >
-      {header ? <div className="mt-4 mb-12">{header}</div> : null}
+      {header ? <div className="mb-8 px-4">{header}</div> : null}
 
-      <nav className="flex flex-col gap-2" aria-label={ariaLabel}>
+      {label ? (
+        <div className="mb-3 px-4 font-code text-[11px] uppercase tracking-[0.12em] text-ink-400">
+          {label}
+        </div>
+      ) : null}
+
+      <nav className="flex flex-col gap-1 px-3" aria-label={ariaLabel}>
         {items.map((item) => {
           const isActive = pathname?.startsWith(item.href) ?? false
-          const Icon = item.icon
           return (
             <button
               key={item.id}
@@ -54,20 +63,36 @@ export function Sidebar({
               onClick={() => handleSelect(item)}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-3 text-base font-ui font-semibold',
-                'transition-colors duration-base',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card',
+                'relative flex items-center gap-2.5 rounded-lg px-[14px] py-3',
+                'font-display text-[13px] font-bold uppercase tracking-[0.06em]',
+                'transition-colors duration-fast',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-cl-blue-100 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50',
                 isActive
-                  ? 'bg-interactive-subtle text-interactive'
-                  : 'text-text-secondary hover:bg-cream-100 hover:text-text-primary',
+                  ? 'bg-cl-blue-100 text-cl-blue-700'
+                  : 'text-ink-600 hover:bg-ink-100',
               )}
             >
-              {Icon ? <Icon size={20} /> : null}
+              {isActive ? (
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-1.5 bottom-1.5 w-[2px] rounded-sm bg-cl-blue-700"
+                />
+              ) : null}
+              {item.icon ?? null}
               <span>{item.label}</span>
             </button>
           )
         })}
       </nav>
+
+      {footer ? (
+        <>
+          <div className="mx-4 my-4 h-px bg-ink-200" />
+          <div className="px-4 font-code text-[11px] uppercase tracking-[0.12em] text-ink-400">
+            {footer}
+          </div>
+        </>
+      ) : null}
     </aside>
   )
 }
@@ -88,7 +113,7 @@ export function SidebarHeader({ title, logoUrl }: SidebarHeaderProps) {
           <img src={logoUrl} alt="" className="h-full w-full object-contain" />
         </div>
       ) : null}
-      <span className="font-display text-2xl leading-tight text-cl-purple-700">
+      <span className="font-display text-2xl leading-tight tracking-wide uppercase text-cl-blue-700">
         {title}
       </span>
     </div>

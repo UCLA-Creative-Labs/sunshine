@@ -18,6 +18,7 @@ export interface PortalNavbarProps {
   defaultValue?: string
   onValueChange?: (value: string) => void
   className?: string
+  trailing?: React.ReactNode
 }
 
 // "My Project" tab href is /portal/my-project but actual project sub-routes
@@ -33,6 +34,7 @@ export function PortalNavbar({
   defaultValue,
   onValueChange,
   className,
+  trailing,
 }: PortalNavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -110,20 +112,20 @@ export function PortalNavbar({
   return (
     <header
       className={cn(
-        'w-full bg-surface-card border-b-2 border-border-default px-6 md:px-8 py-6',
+        'w-full bg-surface-card border-b border-ink-200 px-6 md:px-8 h-[68px]',
         className,
       )}
     >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="flex items-center gap-3">
-          <Image src="/cl-logo.svg" alt="Creative Labs Logo" width={36} height={36} />
-          <span className="font-ui text-xl md:text-2xl font-extrabold tracking-wide text-text-primary">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center h-full gap-6">
+        <div className="flex items-center gap-2.5 justify-self-start">
+          <Image src="/cl-logo.svg" alt="Creative Labs Logo" width={28} height={28} />
+          <span className="font-display font-bold text-lg uppercase tracking-wide text-ink-900 leading-none">
             CREATIVE LABS
           </span>
         </div>
 
-        <nav aria-label="Membership portal navigation" className="md:flex-1">
-          <div ref={listRef} role="tablist" className="flex items-center justify-center gap-8">
+        <nav aria-label="Membership portal navigation" className="justify-self-center">
+          <div ref={listRef} role="tablist" className="flex items-center gap-10">
             {tabs.map((tab, idx) => {
               const isSelected = tab.id === currentValue
               return (
@@ -139,19 +141,19 @@ export function PortalNavbar({
                   onClick={() => handleSelect(tab)}
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   className={cn(
-                    'relative px-0 py-1 text-sm md:text-base font-ui',
+                    'relative px-0 py-1 font-display font-bold uppercase text-[13px] tracking-[0.06em]',
                     'focus:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface-card',
                     'transition-colors duration-base',
                     isSelected
-                      ? 'font-semibold text-text-primary'
-                      : 'font-normal text-text-secondary hover:text-text-primary',
-                    tab.disabled && 'opacity-40 cursor-not-allowed hover:text-text-secondary',
+                      ? 'text-ink-900'
+                      : 'text-ink-600 hover:text-ink-900',
+                    tab.disabled && 'opacity-40 cursor-not-allowed hover:text-ink-600',
                   )}
                 >
                   <span className="relative inline-flex flex-col items-center">
                     <span>{tab.label}</span>
                     {isSelected && (
-                      <span className="mt-1 h-[2px] w-full bg-interactive" aria-hidden="true" />
+                      <span className="mt-1.5 h-[2px] w-full bg-cl-blue-700" aria-hidden="true" />
                     )}
                   </span>
                 </button>
@@ -159,6 +161,8 @@ export function PortalNavbar({
             })}
           </div>
         </nav>
+
+        <div className="justify-self-end flex items-center">{trailing}</div>
       </div>
     </header>
   )
