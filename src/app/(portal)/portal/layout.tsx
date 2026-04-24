@@ -1,7 +1,4 @@
-// Portal-specific layout with sidebar/navigation
-// This layout applies to all pages under /portal/*
-
-import MembershipPortalNavbar from '@/components/MembershipPortalNavbar';
+import { PortalNavbar } from '@/components/portal/ui';
 import {
   SHOW_INTERNAL_TAB_TO_INTERNAL_USERS_ONLY,
   getInternalRoleForUser,
@@ -40,8 +37,8 @@ export default async function PortalPageLayout({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <MembershipPortalNavbar tabs={portalTabs} />
-      <main className="flex flex-1 bg-[#F6F8FA]">{children}</main>
+      <PortalNavbar tabs={portalTabs} />
+      <main className="flex flex-1 bg-surface">{children}</main>
     </div>
   );
 }

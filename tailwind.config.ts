@@ -90,7 +90,10 @@ const config: Config = {
         // Status — prefixed to avoid collision with native Tailwind color keys
         'cl-success': 'rgb(var(--color-success-500) / <alpha-value>)',
         'cl-warning': 'rgb(var(--color-warning-500) / <alpha-value>)',
-        'cl-danger':  'rgb(var(--color-danger-500)  / <alpha-value>)',
+        'cl-danger': {
+          500: 'rgb(var(--color-danger-500) / <alpha-value>)',
+          700: 'rgb(var(--color-danger-700) / <alpha-value>)',
+        },
         'cl-info':    'rgb(var(--color-info-500)    / <alpha-value>)',
 
         // Semantic aliases (preferred in new Phase 2+ components)

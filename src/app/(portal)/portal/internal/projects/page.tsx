@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getAllProjects } from '@/lib/supabase/projectService';
 import { Project } from '@/types/project';
+import { PageHeader, Select } from '@/components/portal/ui';
 
 function quarterSortKey(quarter: string, year: string): number {
   const rank: Record<string, number> = { spring: 3, winter: 2, fall: 1 };
@@ -57,22 +58,22 @@ export default function InternalProjectsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-        {quarters.length > 1 && (
-          <select
-            value={selectedQuarter}
-            onChange={(e) => setSelectedQuarter(e.target.value)}
-            className="text-sm border border-[#D4D7E5] rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          >
-            {quarters.map((q) => (
-              <option key={q} value={q}>
-                {q}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
+      <PageHeader
+        title="Projects"
+        action={
+          quarters.length > 1 ? (
+            <Select
+              value={selectedQuarter}
+              onChange={(e) => setSelectedQuarter(e.target.value)}
+              wrapperClassName="w-44"
+            >
+              {quarters.map((q) => (
+                <option key={q} value={q}>{q}</option>
+              ))}
+            </Select>
+          ) : undefined
+        }
+      />
 
       <div className="rounded-2xl border border-[#D4D7E5] bg-white shadow-lg overflow-hidden">
         {filtered.length === 0 ? (

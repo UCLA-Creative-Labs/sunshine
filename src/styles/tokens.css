@@ -53,8 +53,8 @@
   --color-cl-coral-700: 194  65  12;  /* #C2410C — TEXT, 4.97:1 AA */
 
   /* ---- Cream (warm surfaces) ---- */
-  --color-cream-50:  255 251 235;     /* #FFFBEB — page bg */
-  --color-cream-100: 254 243 199;     /* #FEF3C7 — card alt bg */
+  --color-cream-50:  250 250 247;     /* #FAFAF7 — page bg, muted warm off-white */
+  --color-cream-100: 254 243 199;     /* #FEF3C7 — hero accent wash + alt card bg */
 
   /* ---- Ink (neutrals) ---- */
   --color-ink-50:  248 248 248;       /* #F8F8F8 */
