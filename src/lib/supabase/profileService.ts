@@ -7,6 +7,8 @@ export interface Profile {
   last_name: string | null;
   display_name?: string | null;
   created_at: string;
+  major?: string | null;
+  grad_year?: number | null;
 }
 
 export async function getCurrentUserId(): Promise<string | null> {
