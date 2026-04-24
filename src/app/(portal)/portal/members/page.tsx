@@ -1,16 +1,20 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Avatar, Badge, Input } from '@/components/portal/ui'
 import type { BadgeColor } from '@/components/portal/ui'
+import {
+  getInternalRoster,
+  getProjectRosters,
+  type InternalRow,
+  type Member,
+  type ProjectGroup,
+  type ProjectMemberRow,
+  type ProjectPosition,
+} from '@/lib/services/rosterService'
 
 type AccentColor = 'pink' | 'blue' | 'lime' | 'mint' | 'ink'
-
-/* ──────────────────────────────────────────────────────────────────
- * Demo data pulled from creativelabsucla.com/team (public roster).
- * Swap for live Supabase data when the members table lands.
- * ──────────────────────────────────────────────────────────────── */
 
 type InternalTeam =
   | 'presidents'
@@ -40,201 +44,29 @@ const INTERNAL_TEAMS: Array<{
   { id: 'alumni',         label: 'Alumni',             badgeLabel: 'Alumni',     eyebrow: 'legacy',       blurb: 'Past members who helped shape the club.',                  tone: 'ink'  },
 ]
 
-type Member = {
-  id: string
-  name: string
-  initials?: string
-  avatarColor: AccentColor
-  gradYear?: string
-  major?: string
-}
-
-type InternalRow = {
-  member: Member
-  team: InternalTeam
-  title: string
-  isDirector: boolean
-}
-
-type ProjectPosition = 'lead' | 'pm' | 'member'
-type ExpertiseTag = 'Dev' | 'Design' | 'Marketing' | 'Business' | 'PM'
-
-type ProjectMemberRow = {
-  member: Member
-  position: ProjectPosition
-  expertise: ExpertiseTag[]
-}
-
-type ProjectGroup = {
-  id: string
-  name: string
-  initial: string
-  logoColor: AccentColor
-  quarter: string
-  members: ProjectMemberRow[]
-}
-
-/* ── Real roster (32 members) ──────────────────────────────────── */
-
-// Presidents
-const ANGELINA: Member = { id: 'u-angelina', name: 'Angelina Yang', avatarColor: 'pink', gradYear: '2027', major: 'Statistics & Data Science' }
-const KATE:     Member = { id: 'u-kate',     name: 'Kate Ma',       avatarColor: 'blue', gradYear: '2026', major: 'Cognitive Science' }
-
-// Senior Advisor
-const COLEMAN:  Member = { id: 'u-coleman',  name: 'Coleman Leung', avatarColor: 'ink',  gradYear: '2026', major: 'Cog Sci & Asian American Studies' }
-
-// Projects
-const SAHITHI:  Member = { id: 'u-sahithi',  name: 'Sahithi Lingampalli', avatarColor: 'mint', gradYear: '2027', major: 'Design | Media Arts & Cog Sci' }
-const DANIEL_M: Member = { id: 'u-daniel-m', name: 'Daniel Mastick',      avatarColor: 'blue', gradYear: '2027', major: 'Computer Science' }
-const ELLEN:    Member = { id: 'u-ellen',    name: 'Ellen Chen',          avatarColor: 'pink', gradYear: '2027' }
-const MAAHIKA:  Member = { id: 'u-maahika',  name: 'Maahika Samudrala',   avatarColor: 'lime', gradYear: '2027', major: 'Cognitive Science' }
-const NAOMI:    Member = { id: 'u-naomi',    name: 'Naomi Gong',          avatarColor: 'mint', gradYear: '2027', major: 'CS' }
-const SUHANA:   Member = { id: 'u-suhana',   name: 'Suhana Agarwal',      avatarColor: 'ink',  gradYear: '2028' }
-
-// Tech
-const SUNNY:    Member = { id: 'u-sunny',    name: 'Sunny Vinay',     avatarColor: 'blue', gradYear: '2027', major: 'Computer Science' }
-const TRAVIS:   Member = { id: 'u-travis',   name: 'Travis Nguyen',   avatarColor: 'pink', gradYear: '2026', major: 'Computer Science' }
-const BRYAN:    Member = { id: 'u-bryan',    name: 'Bryan Zhang',     avatarColor: 'lime', gradYear: '2029' }
-const DANIELLE: Member = { id: 'u-danielle', name: 'Danielle Hon',    avatarColor: 'mint', gradYear: '2029', major: 'Computer Science' }
-const MJ:       Member = { id: 'u-mj',       name: 'Marc Jowell Bagaoisan', initials: 'MJ', avatarColor: 'blue', gradYear: '2027', major: 'CS & Linguistics' }
-const SHAWN:    Member = { id: 'u-shawn',    name: 'Shawn Lin',       avatarColor: 'ink',  gradYear: '2028' }
-const STEPH:    Member = { id: 'u-steph',    name: 'Stephanie Pham',  avatarColor: 'pink', gradYear: '2028', major: 'Mathematics of Computation' }
-
-// Marketing
-const RICKY:    Member = { id: 'u-ricky',    name: 'Ricky Shi',      avatarColor: 'lime', gradYear: '2027', major: 'Communication & Economics' }
-const TYLER:    Member = { id: 'u-tyler',    name: 'Tyler Ng',       avatarColor: 'pink', gradYear: '2027', major: 'Communications' }
-const CARMEN:   Member = { id: 'u-carmen',   name: 'Carmen Ng',      avatarColor: 'mint', gradYear: '2027', major: 'Cognitive Science' }
-const CECILE:   Member = { id: 'u-cecile',   name: 'Cecile Nguyen',  avatarColor: 'blue', gradYear: '2028' }
-const JOCELYN:  Member = { id: 'u-jocelyn',  name: 'Jocelyn Tan',    avatarColor: 'lime', gradYear: '2027' }
-const PRISCILLA:Member = { id: 'u-priscilla', name: 'Priscilla Lee', avatarColor: 'pink', gradYear: '2027', major: 'Cognitive Science' }
-const YEHNA:    Member = { id: 'u-yehna',    name: 'Yehna Song',     avatarColor: 'ink',  gradYear: '2028' }
-
-// Finance
-const AANIKA:   Member = { id: 'u-aanika',   name: 'Aanika Raja',    avatarColor: 'mint', gradYear: '2028' }
-
-// Design
-const ANNIE:    Member = { id: 'u-annie',    name: 'Annie Liu',      avatarColor: 'pink', gradYear: '2028', major: 'Bioengineering' }
-const KAYLEN:   Member = { id: 'u-kaylen',   name: 'Kaylen Ho',      avatarColor: 'blue', gradYear: '2027', major: 'Cognitive Science' }
-const ANGELYN:  Member = { id: 'u-angelyn',  name: 'Angelyn',        initials: 'AN',      avatarColor: 'lime', gradYear: '2029' }
-const CHLOE:    Member = { id: 'u-chloe',    name: 'Chloe Rong',     avatarColor: 'mint', gradYear: '2029', major: 'Design | Media Arts' }
-const DAI:      Member = { id: 'u-dai',      name: 'Dai Le',         avatarColor: 'pink', gradYear: '2027', major: 'Cognitive Science' }
-const DANIEL_L: Member = { id: 'u-daniel-l', name: 'Daniel Li',      avatarColor: 'blue', gradYear: '2028', major: 'Mechanical Engineering' }
-const KIRA:     Member = { id: 'u-kira',     name: 'Kira Tran',      avatarColor: 'lime', gradYear: '2028', major: 'Cognitive Science' }
-const NATALIE:  Member = { id: 'u-natalie',  name: 'Natalie Yoon',   avatarColor: 'ink',  gradYear: '2027' }
-
-const INTERNAL: InternalRow[] = [
-  // Co-presidents
-  { member: ANGELINA,  team: 'presidents',     title: 'Co-president',                 isDirector: true  },
-  { member: KATE,      team: 'presidents',     title: 'Co-president',                 isDirector: true  },
-
-  // Senior advisor
-  { member: COLEMAN,   team: 'senior-advisor', title: 'Senior advisor',               isDirector: true  },
-
-  // Projects
-  { member: SAHITHI,   team: 'projects',       title: 'Director of Projects',         isDirector: true  },
-  { member: DANIEL_M,  team: 'projects',       title: 'Projects',                     isDirector: false },
-  { member: ELLEN,     team: 'projects',       title: 'Projects',                     isDirector: false },
-  { member: MAAHIKA,   team: 'projects',       title: 'Projects',                     isDirector: false },
-  { member: NAOMI,     team: 'projects',       title: 'Projects',                     isDirector: false },
-  { member: SUHANA,    team: 'projects',       title: 'Projects',                     isDirector: false },
-
-  // Tech
-  { member: SUNNY,     team: 'tech',           title: 'Director of Tech',             isDirector: true  },
-  { member: TRAVIS,    team: 'tech',           title: 'Director of Tech',             isDirector: true  },
-  { member: BRYAN,     team: 'tech',           title: 'Tech',                         isDirector: false },
-  { member: DANIELLE,  team: 'tech',           title: 'Tech',                         isDirector: false },
-  { member: MJ,        team: 'tech',           title: 'Tech',                         isDirector: false },
-  { member: SHAWN,     team: 'tech',           title: 'Tech',                         isDirector: false },
-  { member: STEPH,     team: 'tech',           title: 'Tech',                         isDirector: false },
-
-  // Marketing
-  { member: RICKY,     team: 'marketing',      title: 'Director of Marketing',        isDirector: true  },
-  { member: TYLER,     team: 'marketing',      title: 'Director of Marketing',        isDirector: true  },
-  { member: CARMEN,    team: 'marketing',      title: 'Marketing',                    isDirector: false },
-  { member: CECILE,    team: 'marketing',      title: 'Marketing',                    isDirector: false },
-  { member: JOCELYN,   team: 'marketing',      title: 'Marketing',                    isDirector: false },
-  { member: PRISCILLA, team: 'marketing',      title: 'Marketing',                    isDirector: false },
-  { member: YEHNA,     team: 'marketing',      title: 'Marketing',                    isDirector: false },
-
-  // Finance
-  { member: AANIKA,    team: 'finance',        title: 'Director of Finance',          isDirector: true  },
-
-  // Design
-  { member: ANNIE,     team: 'design',         title: 'Design Director',              isDirector: true  },
-  { member: KAYLEN,    team: 'design',         title: 'Design Director',              isDirector: true  },
-  { member: ANGELYN,   team: 'design',         title: 'Design',                       isDirector: false },
-  { member: CHLOE,     team: 'design',         title: 'Design',                       isDirector: false },
-  { member: DAI,       team: 'design',         title: 'Design',                       isDirector: false },
-  { member: DANIEL_L,  team: 'design',         title: 'Design',                       isDirector: false },
-  { member: KIRA,      team: 'design',         title: 'Design',                       isDirector: false },
-  { member: NATALIE,   team: 'design',         title: 'Design',                       isDirector: false },
-]
-
-/* Demo project assignments — swap for real data when projects table lands. */
-const PROJECTS: ProjectGroup[] = [
-  {
-    id: 'p-bruinbites',
-    name: 'BruinBites',
-    initial: 'B',
-    logoColor: 'pink',
-    quarter: 'Winter 25-26',
-    members: [
-      { member: CHLOE,    position: 'lead',   expertise: ['Design', 'PM'] },
-      { member: ELLEN,    position: 'pm',     expertise: ['PM'] },
-      { member: DAI,      position: 'member', expertise: ['Design'] },
-      { member: CARMEN,   position: 'member', expertise: ['Marketing'] },
-      { member: KIRA,     position: 'member', expertise: ['Design'] },
-    ],
-  },
-  {
-    id: 'p-studybug',
-    name: 'Studybug',
-    initial: 'S',
-    logoColor: 'blue',
-    quarter: 'Winter 25-26',
-    members: [
-      { member: MJ,       position: 'lead',   expertise: ['Dev'] },
-      { member: MAAHIKA,  position: 'pm',     expertise: ['PM'] },
-      { member: DANIELLE, position: 'member', expertise: ['Dev'] },
-      { member: STEPH,    position: 'member', expertise: ['Dev'] },
-      { member: NATALIE,  position: 'member', expertise: ['Design'] },
-    ],
-  },
-  {
-    id: 'p-cohabit',
-    name: 'Cohabit',
-    initial: 'C',
-    logoColor: 'ink',
-    quarter: 'Winter 25-26',
-    members: [
-      { member: NAOMI,     position: 'lead',   expertise: ['Dev', 'PM'] },
-      { member: SUHANA,    position: 'pm',     expertise: ['PM'] },
-      { member: PRISCILLA, position: 'member', expertise: ['Marketing'] },
-      { member: DANIEL_L,  position: 'member', expertise: ['Design'] },
-      { member: JOCELYN,   position: 'member', expertise: ['Marketing'] },
-    ],
-  },
-  {
-    id: 'p-thermosense',
-    name: 'ThermoSense',
-    initial: 'T',
-    logoColor: 'blue',
-    quarter: 'Winter 25-26',
-    members: [
-      { member: SHAWN,    position: 'lead',   expertise: ['Dev'] },
-      { member: DANIEL_M, position: 'pm',     expertise: ['PM', 'Dev'] },
-      { member: BRYAN,    position: 'member', expertise: ['Dev'] },
-      { member: ANGELYN,  position: 'member', expertise: ['Design'] },
-      { member: YEHNA,    position: 'member', expertise: ['Marketing'] },
-    ],
-  },
-]
-
 type Scope = 'all' | 'internal' | 'projects'
 
 export default function MembersDirectory() {
   const [query, setQuery] = useState('')
   const [scope, setScope] = useState<Scope>('all')
+  const [internal, setInternal] = useState<InternalRow[]>([])
+  const [projects, setProjects] = useState<ProjectGroup[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([getInternalRoster(), getProjectRosters()]).then(
+      ([internalRows, projectRows]) => {
+        if (cancelled) return
+        setInternal(internalRows)
+        setProjects(projectRows)
+        setLoading(false)
+      },
+    )
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const q = query.trim().toLowerCase()
   const matches = (m: Member, extra = '') =>
@@ -245,21 +77,21 @@ export default function MembersDirectory() {
     extra.toLowerCase().includes(q)
 
   const internalFiltered = useMemo(
-    () => INTERNAL.filter((r) => matches(r.member, `${r.title} ${r.team}`)),
+    () => internal.filter((r) => matches(r.member, `${r.title} ${r.team}`)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [q],
+    [q, internal],
   )
 
   const projectsFiltered = useMemo(
     () =>
-      PROJECTS.map((p) => ({
-        ...p,
-        members: p.members.filter((pm) =>
-          matches(pm.member, `${pm.position} ${pm.expertise.join(' ')} ${p.name}`),
-        ),
-      })).filter((p) => p.members.length > 0),
+      projects
+        .map((p) => ({
+          ...p,
+          members: p.members.filter((pm) => matches(pm.member, `${pm.position} ${p.name}`)),
+        }))
+        .filter((p) => p.members.length > 0),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [q],
+    [q, projects],
   )
 
   const showInternal = scope !== 'projects'
@@ -267,13 +99,15 @@ export default function MembersDirectory() {
 
   const totalMembersUnique = useMemo(() => {
     const ids = new Set<string>()
-    INTERNAL.forEach((r) => ids.add(r.member.id))
-    PROJECTS.forEach((p) => p.members.forEach((pm) => ids.add(pm.member.id)))
+    internal.forEach((r) => ids.add(r.member.id))
+    projects.forEach((p) => p.members.forEach((pm) => ids.add(pm.member.id)))
     return ids.size
-  }, [])
+  }, [internal, projects])
 
-  const internalCount       = showInternal ? internalFiltered.length : 0
-  const projectsMemberCount = showProjects ? projectsFiltered.reduce((acc, p) => acc + p.members.length, 0) : 0
+  const internalCount = showInternal ? internalFiltered.length : 0
+  const projectsMemberCount = showProjects
+    ? projectsFiltered.reduce((acc, p) => acc + p.members.length, 0)
+    : 0
 
   const hasFilters = Boolean(q) || scope !== 'all'
   const clearFilters = () => {
@@ -283,10 +117,10 @@ export default function MembersDirectory() {
 
   const emptyInternal = showInternal && internalFiltered.length === 0
   const emptyProjects = showProjects && projectsFiltered.length === 0
-  const totallyEmpty  =
+  const totallyEmpty =
     (scope === 'internal' && emptyInternal) ||
     (scope === 'projects' && emptyProjects) ||
-    (scope === 'all'      && emptyInternal && emptyProjects)
+    (scope === 'all' && emptyInternal && emptyProjects)
 
   return (
     <div className="flex-1 w-full bg-cream-50">
@@ -304,7 +138,7 @@ export default function MembersDirectory() {
           <p className="mt-5 font-ui text-lg text-ink-600 max-w-2xl leading-relaxed">
             Internal board + everyone on an active project.{' '}
             <span className="font-code text-[13px] text-ink-400">
-              {totalMembersUnique} unique · {INTERNAL.length} internal seats · {PROJECTS.length} active projects
+              {totalMembersUnique} unique · {internal.length} internal seats · {projects.length} active projects
             </span>
           </p>
         </div>
@@ -336,7 +170,13 @@ export default function MembersDirectory() {
           )}
         </div>
 
-        {showInternal && internalFiltered.length > 0 && (
+        {loading && (
+          <div className="mt-16 flex flex-col items-center gap-2 py-14 text-center">
+            <p className="font-accent italic text-[15px] text-ink-400">loading roster…</p>
+          </div>
+        )}
+
+        {!loading && showInternal && internalFiltered.length > 0 && (
           <section className="mt-10">
             <SectionHeader
               num="A"
@@ -387,7 +227,7 @@ export default function MembersDirectory() {
           </section>
         )}
 
-        {showProjects && projectsFiltered.length > 0 && (
+        {!loading && showProjects && projectsFiltered.length > 0 && (
           <section className="mt-14">
             <SectionHeader
               num="B"
@@ -403,7 +243,7 @@ export default function MembersDirectory() {
           </section>
         )}
 
-        {totallyEmpty && (
+        {!loading && totallyEmpty && (
           <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
             <div className="w-[72px] h-[72px] rounded-full bg-cream-100 border border-ink-200 flex items-center justify-center">
               <svg
@@ -674,7 +514,7 @@ function ProjectBlock({ project }: { project: ProjectGroup }) {
 }
 
 function ProjectMemberCard({ row }: { row: ProjectMemberRow }) {
-  const { member, position, expertise } = row
+  const { member, position } = row
   return (
     <Link
       href={`#${member.id}`}
@@ -688,11 +528,13 @@ function ProjectMemberCard({ row }: { row: ProjectMemberRow }) {
           </h4>
           <PositionPill position={position} />
         </div>
-        <div className="flex items-center gap-1 mt-1 flex-wrap">
-          {expertise.map((tag) => (
-            <ExpertisePill key={tag} tag={tag} />
-          ))}
-        </div>
+        {(member.major || member.gradYear) && (
+          <p className="font-code text-[10px] text-ink-400 mt-1 tracking-wide truncate">
+            {member.major ?? ''}
+            {member.major && member.gradYear ? ' · ' : ''}
+            {member.gradYear ? `'${member.gradYear.slice(-2)}` : ''}
+          </p>
+        )}
       </div>
     </Link>
   )
@@ -714,22 +556,6 @@ function PositionPill({ position }: { position: ProjectPosition }) {
     )
   }
   return null
-}
-
-const EXPERTISE_TONE: Record<ExpertiseTag, BadgeColor> = {
-  Dev:       'blue',
-  Design:    'pink',
-  Marketing: 'lime',
-  Business:  'mint',
-  PM:        'ink',
-}
-
-function ExpertisePill({ tag }: { tag: ExpertiseTag }) {
-  return (
-    <Badge color={EXPERTISE_TONE[tag]} className="text-[10px] px-1.5 py-0.5">
-      {tag}
-    </Badge>
-  )
 }
 
 function colorBg(c: AccentColor): string {

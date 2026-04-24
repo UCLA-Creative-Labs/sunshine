@@ -1,201 +1,48 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useEffect, useMemo, useState } from 'react'
+import { RxGithubLogo, RxFigmaLogo, RxExternalLink, RxCross2 } from 'react-icons/rx'
 import { Avatar, Input } from '@/components/portal/ui'
+import { getPublicProjectDirectory, type DirectoryProject, type DirectoryPerson } from '@/lib/services/rosterService'
 
 type AccentColor = 'pink' | 'blue' | 'lime' | 'mint' | 'ink'
 type ProjectStatus = 'active' | 'archived'
-
-type Project = {
-  id: string
-  name: string
-  initial: string
-  description: string
-  quarter: string
-  startedAt: number
-  logoColor: AccentColor
-  status: ProjectStatus
-  members: Array<{ name: string; initials?: string; color: AccentColor }>
-  overflow: number
-}
-
-const PROJECTS: Project[] = [
-  {
-    id: 'p-bruinbites',
-    name: 'BruinBites',
-    initial: 'B',
-    description: "Can't decide where to eat? A group decision-maker that shortlists 5 spots within walking distance.",
-    quarter: 'Winter 25-26',
-    startedAt: 20260108,
-    logoColor: 'pink',
-    status: 'active',
-    members: [
-      { name: 'MJ Bagaoisan', color: 'blue' },
-      { name: 'Aarushi Gupta', color: 'mint' },
-      { name: 'Travis Nguyen', color: 'pink' },
-    ],
-    overflow: 2,
-  },
-  {
-    id: 'p-studybug',
-    name: 'Studybug',
-    initial: 'S',
-    description: "Pomodoro study buddy that shows your cohort's focus streaks — shipped this quarter to the app store.",
-    quarter: 'Winter 25-26',
-    startedAt: 20260115,
-    logoColor: 'blue',
-    status: 'active',
-    members: [
-      { name: 'Travis Nguyen', color: 'blue' },
-      { name: 'MJ Bagaoisan', color: 'pink' },
-      { name: 'Shawn Lin', color: 'lime' },
-    ],
-    overflow: 5,
-  },
-  {
-    id: 'p-cohabit',
-    name: 'Cohabit',
-    initial: 'C',
-    description: 'Roommate-matching tool for UCLA transfers. Personality + habit prompts, no LinkedIn-style clout signals.',
-    quarter: 'Winter 25-26',
-    startedAt: 20260122,
-    logoColor: 'ink',
-    status: 'active',
-    members: [
-      { name: 'Cohabit', initials: 'CH', color: 'ink' },
-      { name: 'Aarushi Gupta', color: 'mint' },
-    ],
-    overflow: 3,
-  },
-  {
-    id: 'p-thermosense',
-    name: 'ThermoSense',
-    initial: 'T',
-    description: 'Hardware + firmware sprint. Low-power temperature rig for the Kerckhoff greenhouse pilot.',
-    quarter: 'Winter 25-26',
-    startedAt: 20260201,
-    logoColor: 'blue',
-    status: 'active',
-    members: [
-      { name: 'ThermoSense', initials: 'TS', color: 'lime' },
-      { name: 'MJ Bagaoisan', color: 'blue' },
-    ],
-    overflow: 4,
-  },
-  {
-    id: 'p-alumni-map',
-    name: 'Alumni Map',
-    initial: 'A',
-    description: 'Interactive map of where CL alumni landed. Opt-in pins, city-grained, no PII beyond first name + company.',
-    quarter: 'Fall 25-26',
-    startedAt: 20250920,
-    logoColor: 'lime',
-    status: 'archived',
-    members: [
-      { name: 'Shawn Lin', color: 'lime' },
-      { name: 'Travis Nguyen', color: 'blue' },
-    ],
-    overflow: 1,
-  },
-  {
-    id: 'p-bruinbeats',
-    name: 'BruinBeats',
-    initial: 'B',
-    description: 'Collaborative Spotify playlist tool, auto-generated from the frat-row Friday queue. Shipped, then sunset.',
-    quarter: 'Fall 25-26',
-    startedAt: 20250915,
-    logoColor: 'pink',
-    status: 'archived',
-    members: [{ name: 'Aarushi Gupta', color: 'mint' }],
-    overflow: 2,
-  },
-  {
-    id: 'p-nightsprint',
-    name: 'NightSprint',
-    initial: 'N',
-    description: 'Late-night study check-ins for YRL. Never got past the pilot but the figma file is a treasure.',
-    quarter: 'Spring 24-25',
-    startedAt: 20250410,
-    logoColor: 'pink',
-    status: 'archived',
-    members: [{ name: 'MJ Bagaoisan', color: 'blue' }],
-    overflow: 0,
-  },
-  {
-    id: 'p-classwatch',
-    name: 'ClassWatch',
-    initial: 'C',
-    description: 'Registrar-seat-opening notifier. Ran one enrollment cycle before MyUCLA changed their endpoints on us.',
-    quarter: 'Spring 24-25',
-    startedAt: 20250405,
-    logoColor: 'blue',
-    status: 'archived',
-    members: [{ name: 'Travis Nguyen', color: 'blue' }],
-    overflow: 3,
-  },
-  {
-    id: 'p-takeover-tracker',
-    name: 'Takeover Tracker',
-    initial: 'T',
-    description: 'IG-story takeover schedule + analytics for Creative Labs + partner orgs during rush week.',
-    quarter: 'Winter 24-25',
-    startedAt: 20250120,
-    logoColor: 'lime',
-    status: 'archived',
-    members: [{ name: 'Shawn Lin', color: 'lime' }],
-    overflow: 1,
-  },
-  {
-    id: 'p-slugprint',
-    name: 'SlugPrint',
-    initial: 'S',
-    description: "Physical zine issue #3 — interviews with CL alumni now at Figma, Warby, and a solo studio in Brooklyn.",
-    quarter: 'Fall 24-25',
-    startedAt: 20240920,
-    logoColor: 'lime',
-    status: 'archived',
-    members: [{ name: 'Aarushi Gupta', color: 'mint' }],
-    overflow: 2,
-  },
-  {
-    id: 'p-cycleshare',
-    name: 'CycleShare',
-    initial: 'C',
-    description: 'Campus-cycle pickup pitch to UCLA Transportation. Deck, financial model, pilot-zone plan.',
-    quarter: 'Fall 24-25',
-    startedAt: 20240915,
-    logoColor: 'mint',
-    status: 'archived',
-    members: [{ name: 'MJ Bagaoisan', color: 'blue' }],
-    overflow: 1,
-  },
-  {
-    id: 'p-campus-cooker',
-    name: 'Campus Cooker',
-    initial: 'C',
-    description: 'Meal-kit prototype tuned to dorm microwaves. Two tasting rounds, one failed crowdfund, great memory.',
-    quarter: 'Spring 23-24',
-    startedAt: 20240410,
-    logoColor: 'mint',
-    status: 'archived',
-    members: [{ name: 'Shawn Lin', color: 'lime' }],
-    overflow: 0,
-  },
-]
+type Project = DirectoryProject
 
 type SortMode = 'newest' | 'alpha' | 'quarter'
 type ViewMode = 'grid' | 'list'
 type StatusFilter = 'all' | ProjectStatus
 
 export default function ProjectDirectory() {
-  const [query, setQuery]   = useState('')
-  const [status, setStatus] = useState<StatusFilter>('all')
-  const [sort, setSort]     = useState<SortMode>('newest')
-  const [view, setView]     = useState<ViewMode>('grid')
+  const [query, setQuery]       = useState('')
+  const [status, setStatus]     = useState<StatusFilter>('all')
+  const [sort, setSort]         = useState<SortMode>('newest')
+  const [view, setView]         = useState<ViewMode>('grid')
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading]   = useState(true)
+  const [selected, setSelected] = useState<Project | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getPublicProjectDirectory().then((list) => {
+      if (cancelled) return
+      setProjects(list)
+      setLoading(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!selected) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selected])
 
   const filtered = useMemo(() => {
-    let list = PROJECTS
+    let list = projects
     if (status !== 'all') list = list.filter((p) => p.status === status)
     const q = query.trim().toLowerCase()
     if (q) {
@@ -211,14 +58,14 @@ export default function ProjectDirectory() {
       return b.startedAt - a.startedAt
     })
     return list
-  }, [query, status, sort])
+  }, [projects, query, status, sort])
 
   const activeList   = filtered.filter((p) => p.status === 'active')
   const archivedList = filtered.filter((p) => p.status === 'archived')
 
-  const total          = PROJECTS.length
-  const totalActive    = PROJECTS.filter((p) => p.status === 'active').length
-  const totalArchived  = total - totalActive
+  const total         = projects.length
+  const totalActive   = projects.filter((p) => p.status === 'active').length
+  const totalArchived = total - totalActive
 
   const hasFilters = Boolean(query.trim()) || status !== 'all'
   const clearFilters = () => {
@@ -275,7 +122,13 @@ export default function ProjectDirectory() {
           )}
         </div>
 
-        {activeList.length > 0 && (
+        {loading && (
+          <div className="mt-16 flex flex-col items-center gap-2 py-14 text-center">
+            <p className="font-accent italic text-[15px] text-ink-400">loading projects…</p>
+          </div>
+        )}
+
+        {!loading && activeList.length > 0 && (
           <section className="mt-10">
             <SectionHeader
               num="A"
@@ -283,11 +136,11 @@ export default function ProjectDirectory() {
               title="Active projects"
               count={activeList.length}
             />
-            <ProjectList projects={activeList} view={view} />
+            <ProjectList projects={activeList} view={view} onOpen={setSelected} />
           </section>
         )}
 
-        {archivedList.length > 0 && (
+        {!loading && archivedList.length > 0 && (
           <section className="mt-14">
             <SectionHeader
               num="B"
@@ -295,11 +148,11 @@ export default function ProjectDirectory() {
               title="Archive"
               count={archivedList.length}
             />
-            <ProjectList projects={archivedList} view={view} />
+            <ProjectList projects={archivedList} view={view} onOpen={setSelected} />
           </section>
         )}
 
-        {filtered.length === 0 && (
+        {!loading && filtered.length === 0 && (
           <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
             <div className="w-[72px] h-[72px] rounded-full bg-cream-100 border border-ink-200 flex items-center justify-center">
               <svg
@@ -334,6 +187,8 @@ export default function ProjectDirectory() {
           </div>
         )}
       </div>
+
+      {selected && <ProjectDetailModal project={selected} onClose={() => setSelected(null)} />}
     </div>
   )
 }
@@ -517,12 +372,12 @@ function ViewToggle({ value, onChange }: { value: ViewMode; onChange: (v: ViewMo
   )
 }
 
-function ProjectList({ projects, view }: { projects: Project[]; view: ViewMode }) {
+function ProjectList({ projects, view, onOpen }: { projects: Project[]; view: ViewMode; onOpen: (p: Project) => void }) {
   if (view === 'list') {
     return (
       <div className="flex flex-col gap-2.5">
         {projects.map((p) => (
-          <ProjectListRow key={p.id} project={p} />
+          <ProjectListRow key={p.id} project={p} onOpen={onOpen} />
         ))}
       </div>
     )
@@ -530,18 +385,19 @@ function ProjectList({ projects, view }: { projects: Project[]; view: ViewMode }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {projects.map((p) => (
-        <ProjectCard key={p.id} project={p} />
+        <ProjectCard key={p.id} project={p} onOpen={onOpen} />
       ))}
     </div>
   )
 }
 
-function ProjectCard({ project: p }: { project: Project }) {
+function ProjectCard({ project: p, onOpen }: { project: Project; onOpen: (p: Project) => void }) {
   const accent = p.logoColor
   return (
-    <Link
-      href={`#${p.id}`}
-      className="group relative bg-surface-card border border-ink-100 rounded-[12px] p-5 pl-6 flex flex-col gap-3.5 min-h-[200px] hover:border-ink-300 hover:-translate-y-[2px] hover:shadow-md transition-all duration-300 overflow-hidden"
+    <button
+      type="button"
+      onClick={() => onOpen(p)}
+      className="group relative text-left bg-surface-card border border-ink-100 rounded-[12px] p-5 pl-6 flex flex-col gap-3.5 min-h-[200px] hover:border-ink-300 hover:-translate-y-[2px] hover:shadow-md transition-all duration-300 overflow-hidden"
     >
       <span
         aria-hidden="true"
@@ -573,19 +429,20 @@ function ProjectCard({ project: p }: { project: Project }) {
       <div className="mt-auto flex items-center justify-between pt-2">
         <AvatarCluster members={p.members} overflow={p.overflow} />
         <span className="font-ui text-[13px] font-bold text-cl-blue-700 group-hover:underline underline-offset-4">
-          Open →
+          View →
         </span>
       </div>
-    </Link>
+    </button>
   )
 }
 
-function ProjectListRow({ project: p }: { project: Project }) {
+function ProjectListRow({ project: p, onOpen }: { project: Project; onOpen: (p: Project) => void }) {
   const accent = p.logoColor
   return (
-    <Link
-      href={`#${p.id}`}
-      className="group relative flex items-center gap-4 bg-surface-card border border-ink-100 rounded-[12px] pl-6 pr-5 py-4 hover:border-ink-300 hover:-translate-y-[1px] hover:shadow-md transition-all duration-300 overflow-hidden"
+    <button
+      type="button"
+      onClick={() => onOpen(p)}
+      className="group relative text-left w-full flex items-center gap-4 bg-surface-card border border-ink-100 rounded-[12px] pl-6 pr-5 py-4 hover:border-ink-300 hover:-translate-y-[1px] hover:shadow-md transition-all duration-300 overflow-hidden"
     >
       <span
         aria-hidden="true"
@@ -612,9 +469,9 @@ function ProjectListRow({ project: p }: { project: Project }) {
       </div>
       <AvatarCluster members={p.members} overflow={p.overflow} />
       <span className="font-ui text-[13px] font-bold text-cl-blue-700 shrink-0 group-hover:underline underline-offset-4">
-        Open →
+        View →
       </span>
-    </Link>
+    </button>
   )
 }
 
@@ -643,6 +500,154 @@ function AvatarCluster({
         <span className="ml-1 inline-flex items-center justify-center rounded-full w-7 h-7 bg-ink-100 text-ink-900 font-ui font-extrabold text-[10px] ring-2 ring-white">
           +{overflow}
         </span>
+      )}
+    </div>
+  )
+}
+
+function ProjectDetailModal({ project, onClose }: { project: Project; onClose: () => void }) {
+  const accent = project.logoColor
+  const links = [
+    project.githubUrl ? { label: 'GitHub', href: project.githubUrl, Icon: RxGithubLogo } : null,
+    project.figmaUrl ? { label: 'Figma', href: project.figmaUrl, Icon: RxFigmaLogo } : null,
+    project.demoUrl ? { label: 'Demo', href: project.demoUrl, Icon: RxExternalLink } : null,
+  ].filter(Boolean) as { label: string; href: string; Icon: React.ComponentType<{ size?: number }> }[]
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/50 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="project-modal-title"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-2xl bg-surface-card shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center rounded-full text-ink-600 hover:bg-ink-100 hover:text-ink-900"
+        >
+          <RxCross2 size={18} />
+        </button>
+
+        <div className={'h-2 w-full rounded-t-2xl ' + colorBg(accent)} />
+
+        <div className="px-6 pt-6 pb-6 md:px-8 md:pt-8 md:pb-8">
+          <div className="flex items-start gap-3">
+            <span
+              className={
+                'w-12 h-12 rounded-[10px] shrink-0 inline-flex items-center justify-center font-display font-bold text-xl text-white leading-none ' +
+                colorBg(accent)
+              }
+            >
+              {project.initial}
+            </span>
+            <div className="min-w-0 flex-1 pr-8">
+              <h2
+                id="project-modal-title"
+                className="font-ui font-extrabold text-[22px] leading-tight text-ink-900 m-0"
+              >
+                {project.name}
+              </h2>
+              <div className="mt-1.5 flex items-center gap-2 flex-wrap">
+                <span className="inline-flex items-center rounded-full bg-cream-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
+                  {project.quarter}
+                </span>
+                <span
+                  className={
+                    'inline-flex items-center rounded-full font-code text-[10px] px-2 py-0.5 tracking-wide ' +
+                    (project.status === 'active'
+                      ? 'bg-cl-blue-100 text-cl-blue-700'
+                      : 'bg-ink-100 text-ink-600')
+                  }
+                >
+                  {project.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <p className="font-code text-[10px] uppercase tracking-[0.14em] text-ink-400">
+              description
+            </p>
+            {project.description ? (
+              <p className="mt-1.5 font-ui text-sm leading-relaxed text-ink-900 whitespace-pre-wrap">
+                {project.description}
+              </p>
+            ) : (
+              <p className="mt-1.5 font-ui text-sm italic text-ink-400">
+                No description yet.
+              </p>
+            )}
+          </div>
+
+          <div className="mt-5">
+            <p className="font-code text-[10px] uppercase tracking-[0.14em] text-ink-400">
+              links
+            </p>
+            {links.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {links.map(({ label, href, Icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-surface-card px-3.5 py-1.5 font-ui text-[13px] font-bold text-ink-900 hover:bg-ink-50"
+                  >
+                    <Icon size={14} />
+                    {label}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-1.5 font-ui text-sm italic text-ink-400">
+                No links set.
+              </p>
+            )}
+          </div>
+
+          <MemberGroup title="Leads" people={project.leads} emptyLabel="No leads listed" />
+          <MemberGroup title="Members" people={project.otherMembers} emptyLabel="No members listed" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function MemberGroup({
+  title,
+  people,
+  emptyLabel,
+}: {
+  title: string
+  people: DirectoryPerson[]
+  emptyLabel: string
+}) {
+  return (
+    <div className="mt-5">
+      <div className="flex items-baseline gap-2">
+        <p className="font-code text-[10px] uppercase tracking-[0.14em] text-ink-400">
+          {title.toLowerCase()}
+        </p>
+        <span className="font-code text-[10px] text-ink-400">({people.length})</span>
+      </div>
+      {people.length === 0 ? (
+        <p className="mt-1.5 font-ui text-sm italic text-ink-400">{emptyLabel}</p>
+      ) : (
+        <ul className="mt-2 flex flex-col gap-1.5">
+          {people.map((m) => (
+            <li key={m.name} className="flex items-center gap-2.5">
+              <Avatar name={m.name} initials={m.initials} color={m.color} size="xs" className="w-7 h-7 text-[10px]" />
+              <span className="font-ui text-sm text-ink-900">{m.name}</span>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )

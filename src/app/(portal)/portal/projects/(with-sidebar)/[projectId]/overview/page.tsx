@@ -26,7 +26,7 @@ export default function Page({ params }: { params: Promise<{ projectId: string }
 
   return (
     <>
-      <MyProjectContent 
+      <MyProjectContent
         projectId={projectId}
         currentUserId={userId}
       />
