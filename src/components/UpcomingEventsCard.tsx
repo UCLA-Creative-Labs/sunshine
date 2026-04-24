@@ -1,7 +1,4 @@
-import { Lato } from "next/font/google";
 import Link from "next/link";
-
-const lato = Lato({ weight: "700", subsets: ["latin"] });
 
 interface UpcomingEventsCardProps {
   title: string;
@@ -36,7 +33,7 @@ export default function UpcomingEventsCard({
       </div>
 
       <div className="">
-        <h1 className={`text-3xl ${lato.className}`}>{title}</h1>
+        <h1 className="text-3xl font-bold font-[family-name:var(--font-lato)]">{title}</h1>
         <div className="text-lg space-y-2">
           <p>
             <strong>Event Time:</strong> {eventTime}

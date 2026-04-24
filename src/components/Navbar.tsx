@@ -2,26 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-
-const SCROLLY_POINT = 150;
-
 export default function Navbar() {
-  const [pastScrollPoint, setPastScrollPoint] = useState(false);
-
-  useEffect(() => {
-    window.addEventListener("scroll", () => {
-      setPastScrollPoint(window.scrollY > SCROLLY_POINT);
-    });
-  });
-
   return (
     <div
       id="navbar"
-      className={`transition z-50 ease-in-out delay-100 flex justify-between min-w-full p-8 lg:px-20 dark:bg-[#000000] sticky top-0 ${
-        pastScrollPoint ? "bg-[#000000] text-white" : "bg-[#85b6ff]"
-      }`}
-      style={{}}
+      className="transition z-50 ease-in-out delay-100 flex justify-between min-w-full p-8 lg:px-20 sticky top-0 bg-[#000000] text-white"
     >
       <div
         id="title"
@@ -33,9 +18,7 @@ export default function Navbar() {
             src="/cl-logo.svg"
             width={40}
             height={40}
-            className={`transition ease-in-out delay-100 dark:invert ${
-              pastScrollPoint && "invert"
-            }`}
+            className="transition ease-in-out delay-100 invert"
           />
           <Link
             href="/"
@@ -47,7 +30,7 @@ export default function Navbar() {
       </div>
       <nav
         id="navigation"
-        className="hidden md:flex divide-x-2 divide-black dark:divide-white items-center [&>div]:pl-6 space-x-6"
+        className="hidden md:flex divide-x-2 divide-white items-center [&>div]:pl-6 space-x-6"
       >
         <div id="links" className="flex space-x-6 lg:text-xl">
           <Link href="/about">ABOUT</Link>

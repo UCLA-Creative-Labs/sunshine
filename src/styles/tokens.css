@@ -1,0 +1,238 @@
+/*
+ * Creative Labs Portal — Design Tokens (Phase 1)
+ *
+ * TIER 1: Primitives (brand/perceptual, rarely change)
+ * TIER 2: Semantic (intent-mapped, mapped from primitives)
+ *
+ * Each color primitive is stored as SPACE-SEPARATED RGB CHANNELS (not hex)
+ * so Tailwind v3's `rgb(var(--...) / <alpha-value>)` pattern works. This
+ * preserves the bg-cl-pink-700/50 opacity shorthand.
+ *
+ * Hex equivalents are in the right-side comment of each channel line.
+ * If you change a hex, UPDATE BOTH. See TOKENS.md.
+ *
+ * Rule: -500 variants are FILL ONLY. Never assign to `color:` (text).
+ * Rule: -700 variants are AA-safe on white for body text.
+ */
+
+:root {
+  /* ================================================================
+   * TIER 1 — PRIMITIVES
+   * ================================================================ */
+
+  /* ---- Pink (primary brand) ---- */
+  --color-cl-pink-100: 252 231 243;   /* #FCE7F3 — chip bg */
+  --color-cl-pink-500: 236 72 153;    /* #EC4899 — FILL ONLY, 4.05:1 */
+  --color-cl-pink-700: 190 24 93;     /* #BE185D — TEXT, 5.73:1 AA */
+  --color-cl-pink-800: 159 23 84;     /* #9F1754 — hover/pressed */
+
+  /* ---- Sky (secondary) ---- */
+  --color-cl-sky-100:  219 234 254;   /* #DBEAFE — chip bg */
+  --color-cl-sky-500:   96 165 250;   /* #60A5FA — FILL ONLY */
+  --color-cl-sky-700:   29  78 216;   /* #1D4ED8 — TEXT, 6.96:1 AA */
+  --color-cl-sky-800:   30  64 175;   /* #1E40AF — hover */
+
+  /* ---- Purple ---- */
+  --color-cl-purple-100: 237 233 254; /* #EDE9FE — chip bg */
+  --color-cl-purple-500: 167 139 250; /* #A78BFA — FILL ONLY */
+  --color-cl-purple-700: 124  58 237; /* #7C3AED — TEXT, 5.94:1 AA */
+
+  /* ---- Mint ---- */
+  --color-cl-mint-100: 209 250 229;   /* #D1FAE5 — chip bg */
+  --color-cl-mint-500:  52 211 153;   /* #34D399 — FILL ONLY */
+  --color-cl-mint-700:   4 120  87;   /* #047857 — TEXT, 5.38:1 AA */
+
+  /* ---- Yellow ---- */
+  --color-cl-yellow-100: 254 243 199; /* #FEF3C7 — chip bg */
+  --color-cl-yellow-500: 253 224  71; /* #FDE047 — FILL ONLY */
+  --color-cl-yellow-700: 161  98   7; /* #A16207 — TEXT, 4.75:1 AA */
+
+  /* ---- Coral ---- */
+  --color-cl-coral-100: 254 215 170;  /* #FED7AA — chip bg */
+  --color-cl-coral-500: 251 146  60;  /* #FB923C — FILL ONLY */
+  --color-cl-coral-700: 194  65  12;  /* #C2410C — TEXT, 4.97:1 AA */
+
+  /* ---- Cream (warm surfaces) ---- */
+  --color-cream-50:  255 251 235;     /* #FFFBEB — page bg */
+  --color-cream-100: 254 243 199;     /* #FEF3C7 — card alt bg */
+
+  /* ---- Ink (neutrals) ---- */
+  --color-ink-50:  248 248 248;       /* #F8F8F8 */
+  --color-ink-100: 243 244 246;       /* #F3F4F6 — subtle border */
+  --color-ink-200: 229 231 235;       /* #E5E7EB — card border */
+  --color-ink-400: 156 163 175;       /* #9CA3AF — muted text */
+  --color-ink-600: 107 114 128;       /* #6B7280 — secondary text, 4.83:1 */
+  --color-ink-900:  26  26  26;       /* #1A1A1A — primary text, 16.7:1 AAA */
+
+  /* ---- Status (Primer-verified, AA) ---- */
+  --color-success-500:  26 127  55;   /* #1A7F37 — 5.08:1 AA */
+  --color-warning-500: 154 103   0;   /* #9A6700 — 4.87:1 AA */
+  --color-danger-500:  207  34  46;   /* #CF222E — 5.36:1 AA */
+  --color-danger-700:  185  28  28;   /* #B91C1C — used in style tile */
+  --color-info-500:      9 105 218;   /* #0969DA — 5.19:1 AA */
+
+  /* ---- Pure ---- */
+  --color-white: 255 255 255;         /* #FFFFFF */
+  --color-black:   0   0   0;         /* #000000 */
+
+  /* ================================================================
+   * TIER 1 — TYPOGRAPHY PRIMITIVES
+   * ================================================================
+   * --font-lato, --font-mulish, --font-archivo-black are provided by
+   * next/font in src/app/layout.tsx. Reference them here with fallback
+   * stacks so any existing `font-[family-name:var(--font-lato)]` inline
+   * usages keep working.
+   */
+  --font-display: var(--font-archivo-black), 'Archivo Black', 'Mulish', system-ui, sans-serif;
+  --font-ui:      var(--font-mulish), 'Mulish', system-ui, sans-serif;
+  --font-body:    var(--font-lato), 'Lato', system-ui, sans-serif;
+  --font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type scale (Major Third 1.25) */
+  --text-xs:       0.75rem;   /* 12 */
+  --text-sm:       0.875rem;  /* 14 */
+  --text-base:     1rem;      /* 16 */
+  --text-lg:       1.125rem;  /* 18 */
+  --text-xl:       1.25rem;   /* 20 */
+  --text-2xl:      1.5rem;    /* 24 */
+  --text-3xl:      1.875rem;  /* 30 */
+  --text-4xl:      2.25rem;   /* 36 */
+  --text-display:  3rem;      /* 48 */
+
+  /* Display tracking (from Style Tile) */
+  --display-tracking: -0.035em;
+
+  /* ================================================================
+   * TIER 1 — SPACING (8px base)
+   * ================================================================ */
+  --spacing-1:   0.25rem;
+  --spacing-2:   0.5rem;
+  --spacing-3:   0.75rem;
+  --spacing-4:   1rem;
+  --spacing-6:   1.5rem;
+  --spacing-8:   2rem;
+  --spacing-12:  3rem;
+  --spacing-16:  4rem;
+
+  /* ================================================================
+   * TIER 1 — RADII
+   * ================================================================ */
+  --radius-xs:    0.25rem;    /*   4px */
+  --radius-sm:    0.375rem;   /*   6px */
+  --radius-md:    0.5rem;     /*   8px — chip */
+  --radius-lg:    0.75rem;    /*  12px — card */
+  --radius-xl:    1rem;       /*  16px */
+  --radius-full:  9999px;     /* pill */
+
+  /* ================================================================
+   * TIER 1 — SHADOWS (ink-900 tint)
+   * ================================================================ */
+  --shadow-xs: 0 1px 2px 0 rgb(26 26 26 / 0.05);
+  --shadow-sm: 0 1px 2px 0 rgb(26 26 26 / 0.05);
+  --shadow-md: 0 2px 4px -2px rgb(26 26 26 / 0.08), 0 4px 10px -3px rgb(26 26 26 / 0.06);
+  --shadow-lg: 0 6px 8px -4px rgb(26 26 26 / 0.10), 0 14px 28px -6px rgb(26 26 26 / 0.10);
+
+  /* ================================================================
+   * TIER 1 — MOTION
+   * ================================================================ */
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 300ms;
+  --motion-duration-slow: 500ms;
+  --motion-ease-out:    cubic-bezier(0, 0, 0.2, 1);
+  --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ================================================================
+   * TIER 2 — SEMANTIC (light mode defaults)
+   * ================================================================
+   * Answers "what is this for?" — not "what does it look like?".
+   * Component code should prefer semantic tokens after Phase 2.
+   */
+
+  /* Text roles */
+  --_text-primary:    var(--color-ink-900);
+  --_text-secondary:  var(--color-ink-600);
+  --_text-muted:      var(--color-ink-400);
+  --_text-brand:      var(--color-cl-purple-700);
+  --_text-on-fill:    var(--color-white);
+
+  /* Surface roles */
+  --_surface-page:    var(--color-cream-50);
+  --_surface-card:    var(--color-white);
+  --_surface-raised:  var(--color-white);
+  --_surface-alt:     var(--color-cream-100);
+
+  /* Interactive roles */
+  --_interactive:           var(--color-cl-pink-700);
+  --_interactive-hover:     var(--color-cl-pink-800);
+  --_interactive-subtle:    var(--color-cl-pink-100);
+  --_on-interactive:        var(--color-white);
+
+  --_interactive-alt:        var(--color-cl-sky-700);
+  --_interactive-alt-hover:  var(--color-cl-sky-800);
+  --_interactive-alt-subtle: var(--color-cl-sky-100);
+
+  /* Status roles */
+  --_status-success: var(--color-success-500);
+  --_status-warning: var(--color-warning-500);
+  --_status-danger:  var(--color-danger-500);
+  --_status-info:    var(--color-info-500);
+
+  /* Border roles */
+  --_border-subtle:  var(--color-ink-100);
+  --_border-default: var(--color-ink-200);
+  --_border-strong:  var(--color-ink-400);
+  --_border-focus:   var(--color-cl-pink-700);
+
+  /* Kanban column roles (text-safe 700 variants) */
+  --_kanban-todo:        var(--color-cl-sky-700);
+  --_kanban-in-progress: var(--color-cl-coral-700);
+  --_kanban-in-review:   var(--color-cl-yellow-700);
+  --_kanban-done:        var(--color-cl-mint-700);
+
+  /* Kanban column chip backgrounds (100 variants) */
+  --_kanban-todo-bg:        var(--color-cl-sky-100);
+  --_kanban-in-progress-bg: var(--color-cl-coral-100);
+  --_kanban-in-review-bg:   var(--color-cl-yellow-100);
+  --_kanban-done-bg:        var(--color-cl-mint-100);
+
+  /* Category accents (member/team/project labels) */
+  --_category-pink:   var(--color-cl-pink-700);
+  --_category-purple: var(--color-cl-purple-700);
+  --_category-mint:   var(--color-cl-mint-700);
+  --_category-yellow: var(--color-cl-yellow-700);
+  --_category-sky:    var(--color-cl-sky-700);
+  --_category-coral:  var(--color-cl-coral-700);
+}
+
+/* ================================================================
+ * TIER 2 — SEMANTIC (dark mode scaffold)
+ * ================================================================
+ * SCAFFOLD ONLY. No UI toggle ships in v1. Apply [data-theme="dark"]
+ * to <html> manually to preview.
+ */
+[data-theme="dark"] {
+  --_text-primary:    var(--color-ink-50);
+  --_text-secondary:  229 231 235;      /* #E5E7EB */
+  --_text-muted:      var(--color-ink-400);
+  --_text-brand:      var(--color-cl-purple-500);
+  --_text-on-fill:    var(--color-white);
+
+  --_surface-page:     11  11  12;      /* #0B0B0C */
+  --_surface-card:     24  24  27;      /* #18181B */
+  --_surface-raised:   39  39  42;      /* #27272A */
+  --_surface-alt:      31  31  34;      /* ~#1F1F22 */
+
+  --_interactive:           var(--color-cl-pink-500);
+  --_interactive-hover:     var(--color-cl-pink-700);
+  --_interactive-subtle:    var(--color-cl-pink-800);
+  --_on-interactive:        var(--color-white);
+
+  --_interactive-alt:        var(--color-cl-sky-500);
+  --_interactive-alt-hover:  var(--color-cl-sky-700);
+  --_interactive-alt-subtle: var(--color-cl-sky-800);
+
+  --_border-subtle:  39  39  42;        /* #27272A */
+  --_border-default: 63  63  70;        /* #3F3F46 */
+  --_border-strong:  82  82  91;        /* #52525B */
+  --_border-focus:   var(--color-cl-pink-500);
+}

@@ -1,15 +1,12 @@
 import ContentSection from "@/components/ContentSection";
-import { Lato } from "next/font/google"
 import GenericCard from "@/components/GenericCard";
-
-const lato = Lato({ weight: '700', subsets: ['latin'] });
 
 function RoleCard({ src, imgSrc, title, desc, appTime, className }: { src: string, imgSrc: string, title: string, desc?:string, appTime?: string, className?: string }) {
 	return (
 		<div className={`border-2 border-black-300 rounded-lg p-6 flex flex-col h-full transition-transform duration-300 hover:scale-105 ${className}`}>
 			<div className="flex flex-col items-center w-full space-y-4 group flex-grow">
 				<img src={imgSrc} className="h-24 w-24 py-4 drop-shadow-lg group-hover:scale-110 transition ease-in-out duration-300" />
-				<h1 className={`text-center text-2xl ${lato.className}`}>{title}</h1>
+				<h1 className="text-center text-2xl font-bold font-[family-name:var(--font-lato)]">{title}</h1>
 				{appTime && <p className="text-sm font-semibold text-gray-500">{appTime}</p>}
 				<p className="leading-relaxed text-center">{desc}</p>
 			</div>

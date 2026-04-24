@@ -1,8 +1,5 @@
 import React from "react";
-import { Lato } from "next/font/google";
 import Link from "next/link";
-
-const lato = Lato({ weight: "700", subsets: ["latin"] });
 
 interface Person {
   name: string;

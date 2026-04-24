@@ -1,19 +1,24 @@
+/* Import design tokens (Tier 1 primitives + Tier 2 semantic) BEFORE Tailwind
+   so :root vars exist for all layers. Tokens are DORMANT — they only affect
+   rendering when a component opts in via cl-* utilities (see TOKENS.md). */
+@import '../styles/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 0, 0, 0;
+/* WCAG 2.3.3 AAA / SC 2.3.1 A — reduced-motion safety backstop.
+   Invisible to users who don't have OS-level reduce-motion enabled;
+   acts as a last line of defense for those who do. Applies globally
+   across the whole app (main site + portal) because motion sensitivity
+   is a health concern, not a brand concern. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
 }

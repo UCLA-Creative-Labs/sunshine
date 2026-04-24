@@ -1,11 +1,8 @@
 'use client';
 
-import { Lato } from 'next/font/google';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-
-const lato = Lato({ weight: '900', subsets: ['latin'] });
 
 const SCROLLY_POINT = 150;
 
@@ -55,7 +52,7 @@ export default function PortalNavbar() {
             >
                 <Link
                     href="/portal"
-                    className={'text-xl tracking-widest ' + lato.className}
+                    className="text-xl tracking-widest font-black font-[family-name:var(--font-lato)]"
                 >
                     PORTAL
                 </Link>

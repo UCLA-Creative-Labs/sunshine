@@ -1,7 +1,4 @@
 import React from "react";
-import { Lato } from "next/font/google";
-
-const lato = Lato({ weight: "700", subsets: ["latin"] });
 
 interface PersonCardProps {
   name: string;
@@ -20,7 +17,7 @@ export default function PersonCard({ name, position, quote, image, contact }: Pe
       </div>
 
       {/* Name & Position */}
-      <h2 className={`text-xl font-bold ${lato.className}`}>{name}</h2>
+      <h2 className="text-xl font-bold font-[family-name:var(--font-lato)]">{name}</h2>
       <p className="text-sm text-gray-600 mb-2">{position}</p>
 
       {/* Quote */}
