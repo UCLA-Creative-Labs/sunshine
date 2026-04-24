@@ -1,18 +1,27 @@
-import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers'
+import {
+  UIStateProvider,
+  SIDEBAR_COLLAPSED_COOKIE,
+  ACTIVITY_HIDDEN_COOKIE,
+} from '@/components/portal/ui/UIStateProvider'
 
-// This layout wraps all portal pages and handles authentication
-// TODO: Add authentication check here
-export default function PortalLayout({
-    children,
+export default async function PortalLayout({
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    // TODO: Check if user is authenticated
-    // If not authenticated, redirect to /login
-    // const session = await getServerSession()
-    // if (!session) {
-    //   redirect('/login')
-    // }
+  const cookieStore = await cookies()
+  const sidebarCollapsed = cookieStore.get(SIDEBAR_COLLAPSED_COOKIE)?.value === '1'
+  const activityHidden = cookieStore.get(ACTIVITY_HIDDEN_COOKIE)?.value === '1'
 
-    return <>{children}</>;
+  return (
+    <UIStateProvider
+      initialSidebarCollapsed={sidebarCollapsed}
+      initialActivityHidden={activityHidden}
+    >
+      <div className="font-[family-name:var(--font-inter)] min-h-screen">
+        {children}
+      </div>
+    </UIStateProvider>
+  );
 }

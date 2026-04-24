@@ -45,6 +45,15 @@ export { ActivityPanel } from './ActivityPanel'
 export type { ActivityPanelProps, ActivityItem } from './ActivityPanel'
 
 export {
+  UIStateProvider,
+  useUIState,
+  useUIStateOptional,
+  SIDEBAR_COLLAPSED_COOKIE,
+  ACTIVITY_HIDDEN_COOKIE,
+} from './UIStateProvider'
+export type { UIStateProviderProps } from './UIStateProvider'
+
+export {
   GridTexture,
   NoiseTexture,
   DashedBox,

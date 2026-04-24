@@ -94,9 +94,10 @@ export default async function ProjectLayout({ children, params }: ProjectLayoutP
           ariaLabel="Project sections"
           label="Project"
           items={items}
+          collapsible
         />
         <div className="min-w-0 flex-1 px-5 py-6 md:px-8 md:py-8">{children}</div>
-        <ActivityPanel className="hidden xl:block" />
+        <ActivityPanel className="hidden xl:flex xl:flex-col" controlled />
       </div>
     </div>
   );
