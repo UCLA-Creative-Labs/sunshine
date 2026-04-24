@@ -9,6 +9,7 @@ import { useTaskActions } from '@/lib/hooks/useTaskActions';
 import { AddTaskModal } from './tasks/AddTaskModal';
 import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
+import { GitHubBadge } from './tasks/GitHubBadge';
 import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 import { getProfileDisplayName } from '@/lib/utils/profileName';
@@ -78,6 +79,9 @@ interface BoardCardProps {
   onDelete?: () => void;
   canEdit?: boolean;
   isCompleted?: boolean;
+  githubUrl?: string | null;
+  githubIssueNumber?: number | null;
+  onPushToGithub?: () => void;
 }
 
 function getInitials(name: string | undefined | null): string {
@@ -100,7 +104,7 @@ function AvatarStack({ initials }: { initials: string[] }) {
   );
 }
 
-function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onMarkComplete, onDelete, canEdit = false, isCompleted = false }: BoardCardProps) {
+function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onMarkComplete, onDelete, canEdit = false, isCompleted = false, githubUrl, githubIssueNumber, onPushToGithub }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
   const isSingleAssignee = assignees.length === 1;
@@ -111,14 +115,19 @@ function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, 
       style={{ transitionDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs md:text-sm font-medium text-black/80 truncate flex-1">{title}</p>
+        <div className="flex flex-col gap-1 flex-1 min-w-0 pr-2">
+          <p className="text-xs md:text-sm font-medium text-black/80 truncate">{title}</p>
+          <GitHubBadge githubUrl={githubUrl} githubIssueNumber={githubIssueNumber} />
+        </div>
         {onEdit && onMarkComplete && onDelete && (
-          <TaskActionsMenu 
+          <TaskActionsMenu
             onEdit={onEdit}
             onMarkComplete={onMarkComplete}
             onDelete={onDelete}
             canEdit={canEdit}
             isCompleted={isCompleted}
+            githubUrl={githubUrl}
+            onPushToGithub={onPushToGithub}
           />
         )}
       </div>
@@ -181,7 +190,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions();
+  const { updateTaskAction, deleteTaskAction, pushToGithubAction, isUpdating } = useTaskActions();
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -199,15 +208,16 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
     if (result) {
       setIsModalOpen(false);
+      await pushToGithubAction(String(result.id));
       refetch();
     }
   };
 
   // handle task deletion
-  const handleDeleteTask = async (taskId: string) => {
+  const handleDeleteTask = async (taskId: string, hasGithubIssue: boolean) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
-    
-    const success = await deleteTaskAction(taskId);
+
+    const success = await deleteTaskAction(taskId, hasGithubIssue);
     if (success) {
       refetch();
     }
@@ -220,8 +230,8 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
 
   const handleEditSubmit = async (input: UpdateTaskInput) => {
     if (!editingTask) return;
-    
-    const success = await updateTaskAction(String(editingTask.id), input);
+
+    const success = await updateTaskAction(String(editingTask.id), input, !!editingTask.github_issue_number);
     if (success) {
       setEditingTask(null);
       refetch();
@@ -232,7 +242,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     const input: UpdateTaskInput = {
       status: 'done',
     };
-    
+
     const success = await updateTaskAction(String(task.id), input);
     if (success) {
       refetch();
@@ -338,9 +348,12 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString())}
+                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
                   isCompleted={task.status === 'done'}
+                  githubUrl={task.github_issue_url}
+                  githubIssueNumber={task.github_issue_number}
+                  onPushToGithub={() => pushToGithubAction(task.id.toString())}
                 />
               ))}
             </BoardColumn>
@@ -357,9 +370,12 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString())}
+                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
                   isCompleted={task.status === 'done'}
+                  githubUrl={task.github_issue_url}
+                  githubIssueNumber={task.github_issue_number}
+                  onPushToGithub={() => pushToGithubAction(task.id.toString())}
                 />
               ))}
             </BoardColumn>
@@ -376,9 +392,12 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString())}
+                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
                   isCompleted={task.status === 'done'}
+                  githubUrl={task.github_issue_url}
+                  githubIssueNumber={task.github_issue_number}
+                  onPushToGithub={() => pushToGithubAction(task.id.toString())}
                 />
               ))}
             </BoardColumn>
@@ -395,9 +414,11 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString())}
+                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
                   isCompleted={task.status === 'done'}
+                  githubUrl={task.github_issue_url}
+                  onPushToGithub={() => pushToGithubAction(task.id.toString())}
                 />
               ))}
             </BoardColumn>

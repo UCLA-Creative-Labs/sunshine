@@ -12,6 +12,7 @@ import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 import { getProfileDisplayName } from '@/lib/utils/profileName';
+import { GitHubBadge } from './tasks/GitHubBadge';
 
 type StatusId = "todo" | "in_progress" | "in_review" | "done";
 type Priority = "low" | "medium" | "high" | "urgent";
@@ -137,12 +138,13 @@ interface StatusSectionProps {
   delay?: number;
   onEditTask: (task: TaskWithAssignments) => void;
   onMarkComplete: (task: TaskWithAssignments) => void;
-  onDeleteTask: (taskId: string) => void;
+  onDeleteTask: (taskId: string, hasGithubIssue: boolean) => void;
+  onPushToGithubTask?: (taskId: string) => void;
   canEdit: boolean;
   dbTasks: TaskWithAssignments[];
 }
 
-function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onMarkComplete, onDeleteTask, canEdit, dbTasks }: StatusSectionProps) {
+function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onMarkComplete, onDeleteTask, onPushToGithubTask, canEdit, dbTasks }: StatusSectionProps) {
   const meta = STATUS_META[status];
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
@@ -173,37 +175,36 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask,
         </button>
 
         <div className="flex-1 space-y-3">
-            <button
-              type="button"
-              onClick={onToggle}
-              className="flex w-full items-center justify-between rounded-xl px-6 py-2 text-left text-sm md:text-base font-semibold shadow-md border transition-all duration-200 ease-out hover:shadow-lg hover:-translate-y-0.5"
-              style={{ backgroundColor: meta.bandBg, color: `${meta.textColor}E6`, borderColor: meta.borderColor }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="relative flex h-5 w-5 items-center justify-center">
-                  <span className="absolute h-5 w-5 rounded-full bg-white/80 shadow-sm" />
-                  <span className={`relative h-2 w-2 rounded-full ${meta.dotColor}`} />
+          <button
+            type="button"
+            onClick={onToggle}
+            className="flex w-full items-center justify-between rounded-xl px-6 py-2 text-left text-sm md:text-base font-semibold shadow-md border transition-all duration-200 ease-out hover:shadow-lg hover:-translate-y-0.5"
+            style={{ backgroundColor: meta.bandBg, color: `${meta.textColor}E6`, borderColor: meta.borderColor }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="relative flex h-5 w-5 items-center justify-center">
+                <span className="absolute h-5 w-5 rounded-full bg-white/80 shadow-sm" />
+                <span className={`relative h-2 w-2 rounded-full ${meta.dotColor}`} />
+              </span>
+              <span className="flex items-baseline gap-2">
+                <span>{meta.label}</span>
+                <span className="text-[14px] font-medium" style={{ color: `${meta.textColor}A6` }}>
+                  {tasks.length}
                 </span>
-                <span className="flex items-baseline gap-2">
-                  <span>{meta.label}</span>
-                  <span className="text-[14px] font-medium" style={{ color: `${meta.textColor}A6` }}>
-                    {tasks.length}
-                  </span>
-                </span>
-              </div>
-            </button>
+              </span>
+            </div>
+          </button>
 
-            {/* table */}
-            <div
-              className={`overflow-hidden transition-all duration-300 ease-out ${
-                isOpen && tasks.length > 0
-                  ? "max-h-[2000px] opacity-100"
-                  : "max-h-0 opacity-0"
+          {/* table */}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-out ${isOpen && tasks.length > 0
+              ? "max-h-[2000px] opacity-100"
+              : "max-h-0 opacity-0"
               }`}
-            >
-              {tasks.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full table-fixed text-left text-xs md:text-sm text-black/80">
+          >
+            {tasks.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="min-w-full table-fixed text-left text-xs md:text-sm text-black/80">
                   <colgroup>
                     <col className="w-[32%]" />
                     <col className="w-[16%]" />
@@ -222,68 +223,77 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask,
                       <th className="px-6 py-3 font-semibold"></th>
                     </tr>
                   </thead>
-                <tbody>
-                  {tasks.map((task) => (
-                    <tr key={task.id} className="border-b border-[#E2E4F0] transition-colors duration-150 hover:bg-gray-50/50">
-                      <td className="px-6 py-3 align-middle">
-                        <div className="flex items-center h-full">
-                          <span className="truncate">{task.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 align-middle">
-                        <div className="flex items-center h-full">
-                          <span
-                            className="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-medium text-black/70"
-                            style={{ backgroundColor: task.labelColor }}
-                          >
-                            {task.label}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 align-middle">
-                        <div className="flex items-center h-full">
-                          <span className="text-[11px] font-medium text-black/60">
-                            {task.dueDate}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 align-middle">
-                        <div className="flex items-center h-full">
-                          <AssigneeGroup assignees={task.assignees} />
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 align-middle">
-                        <div className="flex items-center h-full">
-                          <PriorityPill priority={task.priority} />
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 align-middle">
-                        <div className="flex items-center justify-center h-full">
-                          <TaskActionsMenu 
-                            onEdit={() => {
-                              const dbTask = dbTasks.find(t => t.id.toString() === task.id);
-                              if (dbTask) onEditTask(dbTask);
-                            }}
-                            onMarkComplete={() => {
-                              const dbTask = dbTasks.find(t => t.id.toString() === task.id);
-                              if (dbTask) onMarkComplete(dbTask);
-                            }}
-                            onDelete={() => onDeleteTask(task.id)}
-                            canEdit={canEdit}
-                            isCompleted={task.status === 'done'}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-                </div>
-              )}
-            </div>
+                  <tbody>
+                    {tasks.map((task) => (
+                      <tr key={task.id} className="border-b border-[#E2E4F0] transition-colors duration-150 hover:bg-gray-50/50">
+                        <td className="px-6 py-3 align-middle w-full max-w-0">
+                          <div className="flex flex-col justify-center h-full gap-1">
+                            <span className="truncate block font-medium text-black/80">{task.name}</span>
+                            <GitHubBadge
+                              githubUrl={dbTasks.find(t => t.id.toString() === task.id)?.github_issue_url}
+                              githubIssueNumber={dbTasks.find(t => t.id.toString() === task.id)?.github_issue_number}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 align-middle">
+                          <div className="flex items-center h-full">
+                            <span
+                              className="inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-medium text-black/70"
+                              style={{ backgroundColor: task.labelColor }}
+                            >
+                              {task.label}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 align-middle">
+                          <div className="flex items-center h-full">
+                            <span className="text-[11px] font-medium text-black/60">
+                              {task.dueDate}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 align-middle">
+                          <div className="flex items-center h-full">
+                            <AssigneeGroup assignees={task.assignees} />
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 align-middle">
+                          <div className="flex items-center h-full">
+                            <PriorityPill priority={task.priority} />
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 align-middle">
+                          <div className="flex items-center justify-center h-full">
+                            <TaskActionsMenu
+                              onEdit={() => {
+                                const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                                if (dbTask) onEditTask(dbTask);
+                              }}
+                              onMarkComplete={() => {
+                                const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                                if (dbTask) onMarkComplete(dbTask);
+                              }}
+                              onDelete={() => {
+                                const dbTask = dbTasks.find(t => t.id.toString() === task.id);
+                                onDeleteTask(task.id, !!dbTask?.github_issue_number);
+                              }}
+                              onPushToGithub={onPushToGithubTask ? () => onPushToGithubTask(task.id) : undefined}
+                              canEdit={canEdit}
+                              isCompleted={task.status === 'done'}
+                              githubUrl={dbTasks.find(t => t.id.toString() === task.id)?.github_issue_url}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
-      </section>
+      </div>
+    </section>
   );
 }
 
@@ -299,7 +309,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions();
+  const { updateTaskAction, deleteTaskAction, pushToGithubAction, isUpdating } = useTaskActions();
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -312,34 +322,44 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
       display_name: getProfileDisplayName(m.user),
     }));
 
-  // handle task creation
   const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
     const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
     if (result) {
       setIsModalOpen(false);
+      await pushToGithubAction(String(result.id));
       refetch();
     }
   };
 
   // handle task deletion
-  const handleDeleteTask = async (taskId: string) => {
+  const handleDeleteTask = async (taskId: string, hasGithubIssue: boolean) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
-    
-    const success = await deleteTaskAction(taskId);
+
+    const success = await deleteTaskAction(taskId, hasGithubIssue);
     if (success) {
       refetch();
     }
   };
 
-  
+  const handlePushToGithub = async (taskId: string) => {
+    const success = await pushToGithubAction(taskId);
+    if (success) {
+      window.alert('Task successfully pushed to a GitHub Issue!');
+      refetch();
+    } else {
+      window.alert('Failed to push task to GitHub. Note: Only project leads/managers can do this, and the project must have a valid GitHub URL. Check console for details.');
+    }
+  };
+
+
   const handleEditTask = (task: TaskWithAssignments) => {
     setEditingTask(task);
   };
 
   const handleEditSubmit = async (input: UpdateTaskInput) => {
     if (!editingTask) return;
-    
-    const success = await updateTaskAction(String(editingTask.id), input);
+
+    const success = await updateTaskAction(String(editingTask.id), input, !!editingTask.github_issue_number);
     if (success) {
       setEditingTask(null);
       refetch();
@@ -350,7 +370,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     const input: UpdateTaskInput = {
       status: 'done',
     };
-    
+
     const success = await updateTaskAction(String(task.id), input);
     if (success) {
       refetch();
@@ -363,12 +383,12 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     name: task.name,
     status: mapTaskStatusToStatusId(task.status),
     statusLabel: task.label,
-    dueDate: task.due_date 
+    dueDate: task.due_date
       ? new Date(task.due_date).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }).replace(/\//g, '/')
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).replace(/\//g, '/')
       : 'no due date',
     assignees: task.assignments.map(a => ({
       id: a.assignee.id,
@@ -423,7 +443,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
           </h1>
         </div>
         {canCreateTasks && (
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="inline-flex items-center gap-2 rounded-full bg-[#3F86FF] px-4 py-2 text-xs md:text-sm font-semibold text-white shadow-md transition-all duration-200 ease-out hover:bg-[#346edd] hover:-translate-y-0.5 hover:shadow-lg"
           >
@@ -452,6 +472,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onEditTask={handleEditTask}
             onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
+            onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
           />
@@ -464,6 +485,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onEditTask={handleEditTask}
             onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
+            onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
           />
@@ -476,6 +498,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onEditTask={handleEditTask}
             onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
+            onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
           />
@@ -488,6 +511,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onEditTask={handleEditTask}
             onMarkComplete={handleMarkComplete}
             onDeleteTask={handleDeleteTask}
+            onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
             dbTasks={dbTasks}
           />

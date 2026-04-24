@@ -7,11 +7,13 @@ interface TaskActionsMenuProps {
   onEdit: () => void;
   onMarkComplete: () => void;
   onDelete: () => void;
+  onPushToGithub?: () => void;
   canEdit: boolean;
   isCompleted?: boolean;
+  githubUrl?: string | null;
 }
 
-export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, canEdit, isCompleted = false }: TaskActionsMenuProps) {
+export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, onPushToGithub, canEdit, isCompleted = false, githubUrl }: TaskActionsMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -20,7 +22,7 @@ export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, canEdit, isC
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node) &&
-          buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
+        buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
@@ -33,7 +35,7 @@ export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, canEdit, isC
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     if (!isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
@@ -41,7 +43,7 @@ export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, canEdit, isC
         left: rect.right - 160,
       });
     }
-    
+
     setIsOpen(!isOpen);
   };
 
@@ -63,7 +65,7 @@ export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, canEdit, isC
       </button>
 
       {isOpen && createPortal(
-        <div 
+        <div
           ref={menuRef}
           className="fixed z-50 w-40 rounded-lg bg-white shadow-lg border border-gray-200 py-1"
           style={{
@@ -92,6 +94,33 @@ export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, canEdit, isC
             >
               Mark Complete
             </button>
+          )}
+          {githubUrl ? (
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full block px-4 py-2 text-left text-sm text-black hover:bg-gray-100 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen(false);
+              }}
+            >
+              View in GitHub
+            </a>
+          ) : (
+            onPushToGithub && !isCompleted && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen(false);
+                  onPushToGithub();
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-black hover:bg-gray-100 transition-colors"
+              >
+                Push to GitHub
+              </button>
+            )
           )}
           <button
             onClick={(e) => {
