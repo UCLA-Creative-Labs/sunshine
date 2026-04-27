@@ -8,7 +8,7 @@ import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useTaskActions } from '@/lib/hooks/useTaskActions';
 import { AddTaskModal } from './tasks/AddTaskModal';
 import { EditTaskModal } from './tasks/EditTaskModal';
-import { TaskActionsMenu } from './tasks/TaskActionsMenu';
+import { TaskContextMenu } from './tasks/TaskContextMenu';
 import { ADD_TASK_EVENT } from './AddTaskHeaderButton';
 import { Avatar, pickAvatarColor, type AvatarColor } from '@/components/portal/ui';
 import {
@@ -70,28 +70,28 @@ const COLUMN_STYLES: Record<ColumnKey, ColumnStyle> = {
     name: 'Todo',
     bandBg: 'bg-cl-blue-100',
     bandText: 'text-cl-blue-700',
-    countText: 'text-cl-blue-700/60',
+    countText: 'text-ink-900/50',
     icon: StatusIcon.circleOutline,
   },
   in_progress: {
     name: 'In Progress',
     bandBg: 'bg-cl-pink-100',
     bandText: 'text-cl-pink-700',
-    countText: 'text-cl-pink-700/60',
+    countText: 'text-ink-900/50',
     icon: StatusIcon.halfCircle,
   },
   in_review: {
     name: 'In Review',
     bandBg: 'bg-cl-lime-100',
     bandText: 'text-cl-lime-700',
-    countText: 'text-cl-lime-700/60',
+    countText: 'text-ink-900/50',
     icon: StatusIcon.eye,
   },
   done: {
     name: 'Done',
     bandBg: 'bg-cl-mint-100',
     bandText: 'text-cl-mint-700',
-    countText: 'text-cl-mint-700/60',
+    countText: 'text-ink-900/50',
     icon: StatusIcon.checkCircle,
   },
 };
@@ -134,7 +134,7 @@ function BoardColumn({ columnKey, count, children, delay = 0, onAddTask, isEmpty
       >
         <div className="flex items-center gap-2">
           <span aria-hidden>{style.icon}</span>
-          <span className="font-display text-[14px] font-bold uppercase tracking-[0.04em]">
+          <span className="font-display text-[14px] font-bold tracking-[-0.01em] text-ink-900">
             {style.name}
           </span>
         </div>
@@ -162,64 +162,103 @@ function BoardColumn({ columnKey, count, children, delay = 0, onAddTask, isEmpty
 }
 
 interface BoardCardProps {
+  taskId: number;
+  status: ColumnKey;
   title: string;
   tag?: string;
   tagColor?: string;
   assignees?: Assignee[];
   dueDate?: string;
   isOverdue?: boolean;
+  createdAt?: string;
   delay?: number;
-  onEdit?: () => void;
-  onMarkComplete?: () => void;
-  onDelete?: () => void;
-  canEdit?: boolean;
-  isCompleted?: boolean;
+  onSelect?: () => void;
+  onRequestMenu?: (x: number, y: number) => void;
 }
 
 function BoardCard({
+  taskId,
+  status,
   title,
   tag,
   tagColor,
   assignees = [],
   dueDate,
   isOverdue,
+  createdAt,
   delay = 0,
-  onEdit,
-  onMarkComplete,
-  onDelete,
-  canEdit = false,
-  isCompleted = false,
+  onSelect,
+  onRequestMenu,
 }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enter = mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2';
+  const statusIcon = COLUMN_STYLES[status].icon;
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!onSelect) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect();
+    }
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    if (!onRequestMenu) return;
+    e.preventDefault();
+    onRequestMenu(e.clientX, e.clientY);
+  };
 
   return (
     <article
-      className={`group flex flex-col gap-2.5 rounded-2xl border-[1.5px] border-ink-200 bg-white px-4 py-3.5 shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-300 hover:shadow-card-hover ${enter}`}
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      aria-label={onSelect ? `Open task #${taskId}: ${title}` : undefined}
+      onClick={onSelect}
+      onKeyDown={onSelect ? handleKeyDown : undefined}
+      onContextMenu={handleContextMenu}
+      className={`group flex flex-col gap-2 rounded-2xl border border-ink-100 bg-white px-4 py-3 shadow-card transition-shadow duration-fast ease-out hover:bg-overlay-hover hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cl-blue-700 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-50 ${onSelect ? 'cursor-pointer' : ''} ${enter}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between gap-2">
-        <h4 className="min-w-0 text-[15px] font-semibold leading-[1.35] text-ink-900">
-          {title}
-        </h4>
-        {onEdit && onMarkComplete && onDelete ? (
-          <div className="-mr-1 -mt-1 flex-shrink-0">
-            <TaskActionsMenu
-              onEdit={onEdit}
-              onMarkComplete={onMarkComplete}
-              onDelete={onDelete}
-              canEdit={canEdit}
-              isCompleted={isCompleted}
-            />
-          </div>
-        ) : null}
+      {/* Zone 1: ID left, assignees + actions right */}
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-code text-[11px] text-ink-400">#{taskId}</span>
+        <div className="flex items-center gap-1.5">
+          {assignees.length > 0 && (
+            <div className="flex -space-x-1.5">
+              {assignees.slice(0, 3).map((a) => (
+                <div key={a.id} className="ring-2 ring-white rounded-full" title={a.name}>
+                  <Avatar name={a.name} color={a.color} size="xs" />
+                </div>
+              ))}
+              {assignees.length > 3 ? (
+                <div
+                  className="ring-2 ring-white rounded-full flex h-7 w-7 items-center justify-center bg-ink-100 font-code text-[10px] font-semibold text-ink-600"
+                  title={assignees.slice(3).map((a) => a.name).join(', ')}
+                >
+                  +{assignees.length - 3}
+                </div>
+              ) : null}
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Zone 2: status icon + title */}
+      <div className="flex items-start gap-2">
+        <span aria-hidden className="mt-[3px] flex-shrink-0 text-ink-400">
+          {statusIcon}
+        </span>
+        <h4 className="min-w-0 text-[14px] font-medium leading-[1.4] text-ink-900">
+          {title}
+        </h4>
+      </div>
+
+      {/* Zone 3: tag + due date (only if present) */}
       {(tag || dueDate) && (
         <div className="flex items-center justify-between gap-2">
           {tag ? (
             <span
-              className="inline-flex rounded-md px-2 py-0.5 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900"
+              className="inline-flex rounded-md px-2 py-0.5 font-code text-[10px] tracking-[0.02em] text-ink-900"
               style={tagColor ? { backgroundColor: tagColor } : undefined}
             >
               {tag}
@@ -239,21 +278,10 @@ function BoardCard({
         </div>
       )}
 
-      {assignees.length > 0 && (
-        <div className="flex -space-x-1.5">
-          {assignees.slice(0, 3).map((a) => (
-            <div key={a.id} className="ring-2 ring-white rounded-full" title={a.name}>
-              <Avatar name={a.name} color={a.color} size="xs" />
-            </div>
-          ))}
-          {assignees.length > 3 ? (
-            <div
-              className="ring-2 ring-white rounded-full flex h-7 w-7 items-center justify-center bg-ink-100 font-code text-[10px] font-semibold text-ink-600"
-              title={assignees.slice(3).map((a) => a.name).join(', ')}
-            >
-              +{assignees.length - 3}
-            </div>
-          ) : null}
+      {/* Zone 4: footer */}
+      {createdAt && (
+        <div className="pt-1 font-code text-[10px] text-ink-400">
+          Created {createdAt}
         </div>
       )}
     </article>
@@ -270,10 +298,15 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { updateTaskAction, deleteTaskAction, isUpdating } = useTaskActions(projectId, currentUserId);
+  const { updateTaskAction, deleteTaskAction, setAssigneesAction, isUpdating } = useTaskActions(projectId, currentUserId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskWithAssignments | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    task: TaskWithAssignments;
+    x: number;
+    y: number;
+  } | null>(null);
 
   useEffect(() => {
     const handler = () => {
@@ -289,6 +322,17 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
       id: m.user.id,
       display_name: getProfileDisplayName(m.user),
     }));
+
+  const editAssigneeOptions = members.map((m) => ({
+    id: m.user.id,
+    display_name: getProfileDisplayName(m.user),
+  }));
+
+  const handleSetAssignees = async (userIds: string[]) => {
+    if (!editingTask) return;
+    const success = await setAssigneesAction(String(editingTask.id), userIds);
+    if (success) refetch();
+  };
 
   const handleCreateTask = async (
     input: CreateTaskInput,
@@ -406,18 +450,18 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                 {tasks.map((task, idx) => (
                   <BoardCard
                     key={task.id}
+                    taskId={task.id}
+                    status={task.status}
                     title={task.name}
                     tag={task.label}
                     tagColor={task.label_color}
                     assignees={getAssigneeInfo(task)}
                     dueDate={formatDate(task.due_date)}
                     isOverdue={isOverdueDate(task.due_date, task.status)}
+                    createdAt={formatDate(task.created_at)}
                     delay={idx * 60}
-                    onEdit={() => handleEditTask(task)}
-                    onMarkComplete={() => handleMarkComplete(task)}
-                    onDelete={() => handleDeleteTask(task)}
-                    canEdit={canCreateTasks}
-                    isCompleted={task.status === 'done'}
+                    onSelect={() => handleEditTask(task)}
+                    onRequestMenu={(x, y) => setContextMenu({ task, x, y })}
                   />
                 ))}
               </BoardColumn>
@@ -440,8 +484,23 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
           isOpen={!!editingTask}
           onClose={() => setEditingTask(null)}
           onSubmit={handleEditSubmit}
+          onSetAssignees={handleSetAssignees}
           task={editingTask}
+          assigneeOptions={editAssigneeOptions}
           isSubmitting={isUpdating}
+        />
+      ) : null}
+
+      {contextMenu ? (
+        <TaskContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          canEdit={canCreateTasks}
+          isCompleted={contextMenu.task.status === 'done'}
+          onEdit={() => handleEditTask(contextMenu.task)}
+          onMarkComplete={() => handleMarkComplete(contextMenu.task)}
+          onDelete={() => handleDeleteTask(contextMenu.task)}
+          onClose={() => setContextMenu(null)}
         />
       ) : null}
 

@@ -145,11 +145,11 @@ function EyebrowHeader({ label, sub, action }: EyebrowHeaderProps) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
       <div className="flex items-baseline gap-2">
-        <span className="font-display text-[13px] font-bold uppercase tracking-[0.08em] text-ink-900">
+        <h3 className="font-ui font-extrabold text-[16px] text-ink-900 leading-none m-0">
           {label}
-        </span>
+        </h3>
         {sub ? (
-          <span className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+          <span className="font-code text-[11px] text-ink-400">
             {sub}
           </span>
         ) : null}
@@ -179,71 +179,6 @@ function Section({
     </section>
   );
 }
-
-/* ----------------------------------------------------------------
- * Greeting — warm time-of-day opener
- * ---------------------------------------------------------------- */
-
-function greetingFor(hour: number): { hello: string; nudge: string } {
-  if (hour < 5) return { hello: 'Burning the midnight oil —', nudge: "here's where things stand" };
-  if (hour < 12) return { hello: 'Good morning —', nudge: "here's what's waiting for you" };
-  if (hour < 17) return { hello: 'Good afternoon —', nudge: 'keeping the rhythm' };
-  if (hour < 21) return { hello: 'Good evening —', nudge: 'wrapping the day' };
-  return { hello: 'Late one tonight —', nudge: 'easy does it' };
-}
-
-function Greeting({
-  openTaskCount,
-  overdueCount,
-}: {
-  openTaskCount: number;
-  overdueCount: number;
-}) {
-  const [hour, setHour] = useState<number | null>(null);
-  useEffect(() => {
-    setHour(new Date().getHours());
-  }, []);
-  const g = greetingFor(hour ?? 10);
-
-  let nudge: React.ReactNode;
-  if (overdueCount > 0) {
-    nudge = (
-      <>
-        <span className="text-cl-pink-700">{overdueCount} overdue</span>
-        <span className="text-ink-600"> — {g.nudge.toLowerCase()}</span>
-      </>
-    );
-  } else if (openTaskCount === 0) {
-    nudge = <span className="text-ink-600">inbox zero, nicely done</span>;
-  } else if (openTaskCount === 1) {
-    nudge = (
-      <>
-        <span className="text-ink-900">1 task</span>
-        <span className="text-ink-600"> on your plate</span>
-      </>
-    );
-  } else {
-    nudge = (
-      <>
-        <span className="text-ink-900">{openTaskCount} tasks</span>
-        <span className="text-ink-600"> on your plate</span>
-      </>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-1">
-      <p className="font-accent italic text-[15px] text-ink-400">{g.hello}</p>
-      <h2 className="font-display text-[28px] font-bold leading-[1.1] tracking-[-0.01em] text-ink-900 md:text-[32px]">
-        {nudge}
-      </h2>
-    </div>
-  );
-}
-
-/* ----------------------------------------------------------------
- * My Todo — localStorage-backed personal checklist
- * ---------------------------------------------------------------- */
 
 interface TodoItem {
   id: string;
@@ -329,11 +264,11 @@ function MyTodoSection({ userId }: { userId: string }) {
         label="My Todo"
         sub={openCount > 0 ? `${openCount} open` : todos.length > 0 ? 'all clear' : undefined}
       />
-      <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-1.5">
+      <div className="rounded-[12px] border border-ink-100 bg-white p-1.5">
         {sorted.map((todo) => (
           <div
             key={todo.id}
-            className="group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-ink-50"
+            className="group flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-overlay-hover"
           >
             <button
               type="button"
@@ -393,8 +328,8 @@ function MyTodoSection({ userId }: { userId: string }) {
             className="min-w-0 flex-1 bg-transparent text-[14px] text-ink-900 placeholder:text-ink-400 focus:outline-none"
           />
           {input ? (
-            <span className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
-              ↵ save
+            <span className="font-code text-[11px] text-ink-400">
+              ↵ Save
             </span>
           ) : null}
         </div>
@@ -402,11 +337,6 @@ function MyTodoSection({ userId }: { userId: string }) {
     </div>
   );
 }
-
-/* ----------------------------------------------------------------
- * My Task row
- * ---------------------------------------------------------------- */
-
 type TaskAssignee = { id: string; name: string; color: AvatarColor };
 
 function getAssignees(task: TaskWithAssignments): TaskAssignee[] {
@@ -429,7 +359,7 @@ function MyTaskRow({ task }: { task: TaskWithAssignments }) {
       className={`group flex items-center gap-3 rounded-xl border-[1.5px] px-4 py-2.5 transition-all duration-fast ${
         isOverdue
           ? 'border-cl-pink-100 bg-cl-pink-100/40 hover:bg-cl-pink-100/60 hover:shadow-sm'
-          : 'border-ink-200 bg-white hover:bg-ink-50 hover:shadow-sm'
+          : 'border-ink-100 bg-white hover:bg-overlay-hover hover:shadow-sm'
       }`}
     >
       <span className={`flex-shrink-0 ${statusIcon.tone}`} aria-hidden>
@@ -479,9 +409,6 @@ function MyTaskRow({ task }: { task: TaskWithAssignments }) {
   );
 }
 
-/* ----------------------------------------------------------------
- * Main
- * ---------------------------------------------------------------- */
 
 interface MyProjectContentProps {
   projectId: string;
@@ -555,15 +482,6 @@ export default function MyProjectContent({
           return a.sort_order - b.sort_order;
         }),
     [allTasks, currentUserId],
-  );
-
-  const myOverdueCount = useMemo(
-    () =>
-      myTasks.filter((t) => {
-        const d = daysUntil(t.due_date);
-        return d !== null && d < 0;
-      }).length,
-    [myTasks],
   );
 
   useEffect(() => {
@@ -680,11 +598,6 @@ export default function MyProjectContent({
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Greeting */}
-      <Section delay={0}>
-        <Greeting openTaskCount={myTasks.length} overdueCount={myOverdueCount} />
-      </Section>
-
       {/* 2-col */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
         {/* Main column — personal work + project surface */}
@@ -695,18 +608,17 @@ export default function MyProjectContent({
               action={
                 <a
                   href={`/portal/projects/${projectId}/list`}
-                  className="flex items-center gap-1 font-code text-[11px] uppercase tracking-[0.06em] text-ink-400 transition-colors hover:text-ink-900"
+                  className="font-ui text-[13px] font-bold text-cl-blue-700 hover:underline underline-offset-4"
                 >
-                  <span>view all</span>
-                  <FaArrowRight className="h-2.5 w-2.5" />
+                  View all →
                 </a>
               }
             />
             {isTasksLoading ? (
               <p className="font-accent italic text-[13px] text-ink-400">loading your tasks...</p>
             ) : tasksError ? (
-              <p className="font-code text-[11px] uppercase tracking-[0.08em] text-cl-pink-700">
-                failed to load tasks
+              <p className="font-ui text-[13px] text-cl-pink-700">
+                Failed to load tasks
               </p>
             ) : myTasks.length === 0 ? (
               <div className={`${EMPTY_STATE_CLASS} px-5 py-8`}>
@@ -729,7 +641,7 @@ export default function MyProjectContent({
                 {myTasks.length > MAX_TASKS && (
                   <a
                     href={`/portal/projects/${projectId}/list`}
-                    className="mt-1 flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-4 py-2.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-400 hover:bg-ink-50 hover:text-ink-900"
+                    className="mt-1 flex items-center justify-center gap-1.5 rounded-[12px] border border-dashed border-ink-200 bg-transparent px-4 py-2.5 font-ui text-[13px] font-medium text-ink-600 transition-colors hover:border-ink-300 hover:bg-overlay-hover hover:text-ink-900"
                   >
                     <span>+{myTasks.length - MAX_TASKS} more</span>
                     <FaArrowRight className="h-2.5 w-2.5" />
@@ -753,7 +665,7 @@ export default function MyProjectContent({
                   <button
                     type="button"
                     onClick={() => setShowAnnouncementModal(true)}
-                    className="flex items-center gap-1.5 rounded-md border-[1.5px] border-ink-200 bg-white px-3 py-1.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900"
+                    className="flex items-center gap-1.5 rounded-md border border-ink-100 bg-white px-3 py-1.5 font-ui text-[12px] font-bold text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900"
                   >
                     <span className="text-sm leading-none">+</span>
                     <span>add</span>
@@ -777,10 +689,10 @@ export default function MyProjectContent({
                   return (
                     <div
                       key={a.id}
-                      className={`flex items-start gap-3 rounded-xl border-[1.5px] px-4 py-3 transition-colors ${
+                      className={`flex items-start gap-3 rounded-[12px] border px-4 py-3 transition-colors ${
                         a.is_pinned
                           ? 'border-cl-pink-100 bg-cl-pink-100/30 hover:bg-cl-pink-100/50'
-                          : 'border-ink-200 bg-white hover:bg-ink-50'
+                          : 'border-ink-100 bg-white hover:bg-overlay-hover'
                       }`}
                     >
                       <span
@@ -795,7 +707,7 @@ export default function MyProjectContent({
                             {a.title}
                           </h4>
                           {publishDate ? (
-                            <span className="flex-shrink-0 font-code text-[10px] uppercase tracking-[0.06em] text-ink-400">
+                            <span className="flex-shrink-0 font-code text-[11px] text-ink-400">
                               {publishDate}
                             </span>
                           ) : null}
@@ -810,7 +722,7 @@ export default function MyProjectContent({
                   );
                 })}
                 {announcements.length > MAX_ANNOUNCEMENTS && (
-                  <p className="mt-1 text-center font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+                  <p className="mt-1 text-center font-code text-[11px] text-ink-400">
                     +{announcements.length - MAX_ANNOUNCEMENTS} older
                   </p>
                 )}
@@ -823,7 +735,7 @@ export default function MyProjectContent({
         <div className="flex flex-col gap-8">
           <Section delay={80}>
             <EyebrowHeader label="Team" />
-            <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-4">
+            <div className="rounded-[12px] border border-ink-100 bg-white p-4">
               <div className="mb-3 flex flex-col gap-3">
                 {projectLeads.length > 0 ? (
                   projectLeads.slice(0, 4).map((member) => (
@@ -837,8 +749,8 @@ export default function MyProjectContent({
                         <p className="truncate text-[13px] font-semibold text-ink-900">
                           {member.user.display_name || 'Unknown'}
                         </p>
-                        <p className="font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
-                          Project Lead
+                        <p className="font-ui text-[12px] text-ink-400">
+                          Project lead
                         </p>
                       </div>
                     </div>
@@ -851,10 +763,9 @@ export default function MyProjectContent({
               </div>
               <a
                 href={`/portal/projects/${projectId}/members`}
-                className="flex items-center justify-between border-t-[1.5px] border-ink-200 pt-3 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:text-ink-900"
+                className="flex items-center justify-between border-t border-ink-100 pt-3 font-ui text-[13px] font-bold text-cl-blue-700 hover:underline underline-offset-4"
               >
-                <span>all {memberCount} members</span>
-                <FaArrowRight className="h-2.5 w-2.5" />
+                <span>View all {memberCount} members →</span>
               </a>
             </div>
           </Section>
@@ -867,7 +778,7 @@ export default function MyProjectContent({
                   <button
                     type="button"
                     onClick={() => setShowEventModal(true)}
-                    className="flex items-center gap-1.5 rounded-md border-[1.5px] border-ink-200 bg-white px-3 py-1.5 font-code text-[11px] uppercase tracking-[0.06em] text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900"
+                    className="flex items-center gap-1.5 rounded-md border border-ink-100 bg-white px-3 py-1.5 font-ui text-[12px] font-bold text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900"
                   >
                     <span className="text-sm leading-none">+</span>
                     <span>add</span>
@@ -885,7 +796,7 @@ export default function MyProjectContent({
                   <ProjectEventCard key={event.id} event={event} compact />
                 ))}
                 {events.length > MAX_EVENTS && (
-                  <p className="mt-1 text-center font-code text-[10px] uppercase tracking-[0.08em] text-ink-400">
+                  <p className="mt-1 text-center font-code text-[11px] text-ink-400">
                     +{events.length - MAX_EVENTS} more
                   </p>
                 )}
@@ -896,14 +807,14 @@ export default function MyProjectContent({
           {projectLinks.length > 0 && (
             <Section delay={200}>
               <EyebrowHeader label="Links" />
-              <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-2">
+              <div className="rounded-[12px] border border-ink-100 bg-white p-2">
                 {projectLinks.map(({ key, label, url, Icon }) => (
                   <a
                     key={key}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-ink-50"
+                    className="group flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-overlay-hover"
                   >
                     <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-ink-100 transition-colors group-hover:bg-ink-200">
                       <Icon className="h-3.5 w-3.5 text-ink-900" />
