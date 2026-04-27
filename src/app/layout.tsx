@@ -44,7 +44,7 @@ const lato = Lato({
 })
 
 const mulish = Mulish({
-  weight: '800',
+  weight: ['400', '700', '800'],
   subsets: ['latin'],
   variable: '--font-mulish',
   display: 'swap',

@@ -1,20 +1,5 @@
 import type { Config } from 'tailwindcss'
 
-/**
- * Tailwind v3 config — STRICTLY ADDITIVE.
- *
- * Rule: never define an `extend.*` key that matches a Tailwind default key,
- * because `extend` merges on top of defaults — same key = silent override.
- *
- * Keys we add:
- *   - colors.cl-*, colors.cream, colors.ink, colors.surface, colors.interactive,
- *     colors.text-*, colors.border-*   (all NEW prefixes)
- *   - fontFamily.display, .ui, .body, .accent, .code   (no collisions with default sans/serif/mono)
- *   - transitionDuration.fast, .base, .slow   (defaults are numeric — no collision)
- *
- * Dark mode: class-based via [data-theme="dark"]. No UI toggle ships in v1.
- * See TOKENS.md.
- */
 const config: Config = {
   darkMode: ['class', '[data-theme="dark"]'],
   content: [
@@ -25,7 +10,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // CL palette families (4: 1 primary + 3 accents per Figma 2026-04-22)
         'cl-blue': {
           100: 'rgb(var(--color-cl-blue-100) / <alpha-value>)',
           500: 'rgb(var(--color-cl-blue-500) / <alpha-value>)',
@@ -49,13 +33,11 @@ const config: Config = {
           700: 'rgb(var(--color-cl-mint-700) / <alpha-value>)',
         },
 
-        // Cream surfaces — new prefix
         cream: {
           50:  'rgb(var(--color-cream-50)  / <alpha-value>)',
           100: 'rgb(var(--color-cream-100) / <alpha-value>)',
         },
 
-        // Ink neutrals — new prefix (Tailwind default is "gray", "neutral", etc.)
         ink: {
           50:  'rgb(var(--color-ink-50)  / <alpha-value>)',
           100: 'rgb(var(--color-ink-100) / <alpha-value>)',
@@ -66,7 +48,6 @@ const config: Config = {
           900: 'rgb(var(--color-ink-900) / <alpha-value>)',
         },
 
-        // Status — prefixed to avoid collision with native Tailwind color keys
         'cl-success': 'rgb(var(--color-success-500) / <alpha-value>)',
         'cl-warning': 'rgb(var(--color-warning-500) / <alpha-value>)',
         'cl-danger': {
@@ -75,9 +56,8 @@ const config: Config = {
         },
         'cl-info':    'rgb(var(--color-info-500)    / <alpha-value>)',
 
-        // Semantic aliases (preferred in new Phase 2+ components) — blue primary
         surface:              'rgb(var(--color-cream-50)    / <alpha-value>)',
-        'surface-card':       'rgb(var(--color-white)       / <alpha-value>)',
+        'surface-card':       'rgb(var(--color-cream-card)  / <alpha-value>)',
         'text-primary':       'rgb(var(--color-ink-900)     / <alpha-value>)',
         'text-secondary':     'rgb(var(--color-ink-600)     / <alpha-value>)',
         'text-muted':         'rgb(var(--color-ink-400)     / <alpha-value>)',
@@ -89,10 +69,14 @@ const config: Config = {
         'border-default':     'rgb(var(--color-ink-200)     / <alpha-value>)',
         'border-strong':      'rgb(var(--color-ink-400)     / <alpha-value>)',
         'border-focus':       'rgb(var(--color-cl-blue-700) / <alpha-value>)',
+
+        overlay: {
+          hover:    'rgb(var(--_overlay-hover))',
+          active:   'rgb(var(--_overlay-active))',
+          selected: 'rgb(var(--_overlay-selected))',
+        },
       },
 
-      // New font-family keys (defaults are sans/serif/mono — no collision with public site).
-      // Usage: font-display (DIN Condensed) / font-ui|body (Inter) / font-accent (Texturina Italic) / font-code (DM Mono)
       fontFamily: {
         display: ['var(--font-display)'],
         ui:      ['var(--font-ui)'],
@@ -101,15 +85,12 @@ const config: Config = {
         code:    ['var(--font-mono)'],
       },
 
-      // New duration keys (Tailwind defaults are 75/100/150/200/300/500/700/1000).
       transitionDuration: {
         fast: 'var(--motion-duration-fast)',
         base: 'var(--motion-duration-base)',
         slow: 'var(--motion-duration-slow)',
       },
 
-      // New boxShadow keys — `card` / `card-hover` only.
-      // Default shadow-sm/md/lg keys deliberately NOT extended (preserves Tailwind defaults for public site).
       boxShadow: {
         card: 'var(--shadow-card)',
         'card-hover': 'var(--shadow-card-hover)',
@@ -133,4 +114,5 @@ const config: Config = {
   },
   plugins: [],
 }
+
 export default config

@@ -1,103 +1,73 @@
-/*
- * Creative Labs Portal — Design Tokens (Phase 1, Figma-aligned 2026-04-22)
- *
- * TIER 1: Primitives (brand/perceptual, rarely change)
- * TIER 2: Semantic (intent-mapped, mapped from primitives)
- *
- * Each color primitive is stored as SPACE-SEPARATED RGB CHANNELS (not hex)
- * so Tailwind v3's `rgb(var(--...) / <alpha-value>)` pattern works. This
- * preserves the bg-cl-blue-700/50 opacity shorthand.
- *
- * Hex equivalents are in the right-side comment of each channel line.
- * If you change a hex, UPDATE BOTH. See TOKENS.md.
- *
- * Rule: -500 variants are FILL ONLY. Never assign to `color:` (text).
- * Rule: -700 variants are AA-safe on white for body text.
- */
+/* Color primitives stored as space-separated RGB so Tailwind can apply
+   alpha via rgb(var(--...) / <alpha-value>). Update hex + channels together. */
 
 :root {
-  /* ================================================================
-   * TIER 1 — PRIMITIVES (Figma ground-truth palette)
-   * ================================================================ */
+  /* Blue (primary) */
+  --color-cl-blue-100: 214 232 255;   /* #D6E8FF */
+  --color-cl-blue-500:  92 163 255;   /* #5CA3FF — FILL ONLY */
+  --color-cl-blue-700:   0 102 204;   /* #0066CC — 5.56:1 AA */
+  --color-cl-blue-800:   0  76 153;   /* #004C99 */
 
-  /* ---- Blue (PRIMARY brand, #5CA3FF Figma) ---- */
-  --color-cl-blue-100: 214 232 255;   /* #D6E8FF — chip bg */
-  --color-cl-blue-500:  92 163 255;   /* #5CA3FF — FILL ONLY, 2.9:1 (Figma primary) */
-  --color-cl-blue-700:   0 102 204;   /* #0066CC — TEXT/interactive, 5.56:1 AA */
-  --color-cl-blue-800:   0  76 153;   /* #004C99 — hover/pressed */
+  /* Pink */
+  --color-cl-pink-100: 252 231 243;   /* #FCE7F3 */
+  --color-cl-pink-500: 236  72 153;   /* #EC4899 — FILL ONLY */
+  --color-cl-pink-700: 190  24  93;   /* #BE185D — 5.73:1 AA */
+  --color-cl-pink-800: 159  23  84;   /* #9F1754 */
 
-  /* ---- Pink (accent) ---- */
-  --color-cl-pink-100: 252 231 243;   /* #FCE7F3 — chip bg */
-  --color-cl-pink-500: 236  72 153;   /* #EC4899 — FILL ONLY, 4.05:1 */
-  --color-cl-pink-700: 190  24  93;   /* #BE185D — TEXT, 5.73:1 AA */
-  --color-cl-pink-800: 159  23  84;   /* #9F1754 — hover/pressed */
-
-  /* ---- Lime (accent, yellow-green on Figma board) ---- */
-  --color-cl-lime-100: 236 252 203;   /* #ECFCCB — chip bg */
+  /* Lime */
+  --color-cl-lime-100: 236 252 203;   /* #ECFCCB */
   --color-cl-lime-500: 132 204  22;   /* #84CC16 — FILL ONLY */
-  --color-cl-lime-700:  77 124  15;   /* #4D7C0F — TEXT, 4.93:1 AA */
+  --color-cl-lime-700:  77 124  15;   /* #4D7C0F — 4.93:1 AA */
 
-  /* ---- Mint (accent) ---- */
-  --color-cl-mint-100: 209 250 229;   /* #D1FAE5 — chip bg */
+  /* Mint */
+  --color-cl-mint-100: 209 250 229;   /* #D1FAE5 */
   --color-cl-mint-500:  52 211 153;   /* #34D399 — FILL ONLY */
-  --color-cl-mint-700:   4 120  87;   /* #047857 — TEXT, 5.38:1 AA */
+  --color-cl-mint-700:   4 120  87;   /* #047857 — 5.38:1 AA */
 
-  /* ---- Cream (warm surfaces) ---- */
-  --color-cream-50:  250 250 247;     /* #FAFAF7 — page bg, muted warm off-white */
-  --color-cream-100: 254 243 199;     /* #FEF3C7 — hero accent wash + alt card bg */
+  /* Cream surfaces */
+  --color-cream-50:  250 250 247;     /* #FAFAF7 */
+  --color-cream-100: 254 243 199;     /* #FEF3C7 */
+  --color-cream-card: 254 252 247;    /* #FEFCF7 */
 
-  /* ---- Ink (neutrals) ---- */
+  /* Ink neutrals */
   --color-ink-50:  248 248 248;       /* #F8F8F8 */
-  --color-ink-100: 243 244 246;       /* #F3F4F6 — subtle border */
-  --color-ink-200: 229 231 235;       /* #E5E7EB — card border */
-  --color-ink-300: 209 213 219;       /* #D1D5DB — visible border, dashed selection, hover */
-  --color-ink-400: 156 163 175;       /* #9CA3AF — muted text */
-  --color-ink-600: 107 114 128;       /* #6B7280 — secondary text, 4.83:1 */
-  --color-ink-900:  26  26  26;       /* #1A1A1A — primary text, 16.7:1 AAA */
+  --color-ink-100: 245 244 240;       /* #F5F4F0 */
+  --color-ink-200: 232 230 224;       /* #E8E6E0 */
+  --color-ink-300: 213 209 199;       /* #D5D1C7 */
+  --color-ink-400: 156 163 175;       /* #9CA3AF */
+  --color-ink-600: 107 114 128;       /* #6B7280 — 4.83:1 */
+  --color-ink-900:  26  26  26;       /* #1A1A1A — 16.7:1 AAA */
 
-  /* ---- Status (Primer-verified, AA) ---- */
+  /* Status */
   --color-success-500:  26 127  55;   /* #1A7F37 — 5.08:1 AA */
   --color-warning-500: 154 103   0;   /* #9A6700 — 4.87:1 AA */
   --color-danger-500:  207  34  46;   /* #CF222E — 5.36:1 AA */
   --color-danger-700:  185  28  28;   /* #B91C1C */
   --color-info-500:      9 105 218;   /* #0969DA — 5.19:1 AA */
 
-  /* ---- Pure ---- */
-  --color-white: 255 255 255;         /* #FFFFFF */
-  --color-black:   0   0   0;         /* #000000 */
+  --color-white: 255 255 255;
+  --color-black:   0   0   0;
 
-  /* ================================================================
-   * TIER 1 — TYPOGRAPHY PRIMITIVES
-   * ================================================================
-   * next/font variable names are defined in src/app/layout.tsx:
-   *   --font-din-condensed → DIN Condensed Bold (local .ttf)
-   *   --font-inter         → Inter (Google)
-   *   --font-texturina     → Texturina Italic (Google)
-   *   --font-dm-mono       → DM Mono (Google)
-   */
-  --font-display: 'CL Display', 'DIN Condensed', 'Oswald', 'Impact', system-ui, sans-serif;
+  /* Typography */
+  --font-display: var(--font-mulish), 'Mulish', system-ui, sans-serif;
   --font-ui:      var(--font-inter), 'Inter', system-ui, sans-serif;
   --font-body:    var(--font-inter), 'Inter', system-ui, sans-serif;
   --font-accent:  var(--font-texturina), 'Texturina', Georgia, serif;
   --font-mono:    var(--font-dm-mono), 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* Type scale (Major Third 1.25) */
-  --text-xs:       0.75rem;   /* 12 */
-  --text-sm:       0.875rem;  /* 14 */
-  --text-base:     1rem;      /* 16 */
-  --text-lg:       1.125rem;  /* 18 */
-  --text-xl:       1.25rem;   /* 20 */
-  --text-2xl:      1.5rem;    /* 24 */
-  --text-3xl:      1.875rem;  /* 30 */
-  --text-4xl:      2.25rem;   /* 36 */
-  --text-display:  3rem;      /* 48 */
+  --text-xs:       0.75rem;
+  --text-sm:       0.875rem;
+  --text-base:     1rem;
+  --text-lg:       1.125rem;
+  --text-xl:       1.25rem;
+  --text-2xl:      1.5rem;
+  --text-3xl:      1.875rem;
+  --text-4xl:      2.25rem;
+  --text-display:  3rem;
 
-  /* DIN Condensed wants tighter tracking at large sizes */
-  --display-tracking: -0.02em;
+  --display-tracking: -0.025em;
 
-  /* ================================================================
-   * TIER 1 — SPACING (8px base)
-   * ================================================================ */
+  /* Spacing */
   --spacing-1:   0.25rem;
   --spacing-2:   0.5rem;
   --spacing-3:   0.75rem;
@@ -107,26 +77,20 @@
   --spacing-12:  3rem;
   --spacing-16:  4rem;
 
-  /* ================================================================
-   * TIER 1 — RADII
-   * ================================================================ */
-  --radius-xs:    0.25rem;    /*   4px */
-  --radius-sm:    0.375rem;   /*   6px */
-  --radius-md:    0.5rem;     /*   8px — chip */
-  --radius-lg:    0.75rem;    /*  12px — card */
-  --radius-xl:    1rem;       /*  16px */
-  --radius-full:  9999px;     /* pill */
+  /* Radii */
+  --radius-xs:    0.25rem;
+  --radius-sm:    0.375rem;
+  --radius-md:    0.5rem;
+  --radius-lg:    0.75rem;
+  --radius-xl:    1rem;
+  --radius-full:  9999px;
 
-  /* ================================================================
-   * TIER 1 — SHADOWS (ink-900 tint)
-   * ================================================================ */
+  /* Shadows */
   --shadow-xs: 0 1px 2px 0 rgb(26 26 26 / 0.05);
   --shadow-sm: 0 1px 2px 0 rgb(26 26 26 / 0.05);
   --shadow-md: 0 2px 4px -2px rgb(26 26 26 / 0.08), 0 4px 10px -3px rgb(26 26 26 / 0.06);
   --shadow-lg: 0 6px 8px -4px rgb(26 26 26 / 0.10), 0 14px 28px -6px rgb(26 26 26 / 0.10);
 
-  /* Layered card shadows — ring + 2-3 ambient layers (Radix/Linear/Vercel 2026 pattern).
-     Pair with existing border-ink-100; the ring layer is complementary. */
   --shadow-card: 0 0 0 1px rgb(26 26 26 / 0.06),
                  0 1px 1px 0 rgb(26 26 26 / 0.04),
                  0 2px 1px -1px rgb(26 26 26 / 0.04),
@@ -136,94 +100,80 @@
                        0 8px 16px -4px rgb(26 26 26 / 0.08),
                        0 16px 32px -8px rgb(26 26 26 / 0.06);
 
-  /* ================================================================
-   * TIER 1 — MOTION
-   * ================================================================ */
+  /* Motion */
   --motion-duration-fast: 150ms;
   --motion-duration-base: 300ms;
   --motion-duration-slow: 500ms;
   --motion-ease-out:    cubic-bezier(0, 0, 0.2, 1);
   --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ================================================================
-   * TIER 2 — SEMANTIC (light mode defaults)
-   * ================================================================
-   * Answers "what is this for?" — not "what does it look like?".
-   * Component code should prefer semantic tokens after Phase 2.
-   */
-
-  /* Text roles */
+  /* Semantic — light mode */
   --_text-primary:    var(--color-ink-900);
   --_text-secondary:  var(--color-ink-600);
   --_text-muted:      var(--color-ink-400);
   --_text-brand:      var(--color-cl-blue-700);
   --_text-on-fill:    var(--color-white);
 
-  /* Surface roles */
   --_surface-page:    var(--color-cream-50);
-  --_surface-card:    var(--color-white);
+  --_surface-card:    var(--color-cream-card);
   --_surface-raised:  var(--color-white);
   --_surface-alt:     var(--color-cream-100);
 
-  /* Interactive roles — primary is BLUE per Figma */
+  --_overlay-hover:    26 26 26 / 0.04;
+  --_overlay-active:   26 26 26 / 0.08;
+  --_overlay-selected: 0 102 204 / 0.06;
+
   --_interactive:           var(--color-cl-blue-700);
   --_interactive-hover:     var(--color-cl-blue-800);
   --_interactive-subtle:    var(--color-cl-blue-100);
   --_on-interactive:        var(--color-white);
 
-  /* Interactive-alt — pink (accent, for secondary CTAs or contrast) */
   --_interactive-alt:        var(--color-cl-pink-700);
   --_interactive-alt-hover:  var(--color-cl-pink-800);
   --_interactive-alt-subtle: var(--color-cl-pink-100);
 
-  /* Status roles */
   --_status-success: var(--color-success-500);
   --_status-warning: var(--color-warning-500);
   --_status-danger:  var(--color-danger-500);
   --_status-info:    var(--color-info-500);
 
-  /* Border roles */
   --_border-subtle:  var(--color-ink-100);
   --_border-default: var(--color-ink-200);
   --_border-strong:  var(--color-ink-400);
   --_border-focus:   var(--color-cl-blue-700);
 
-  /* Kanban column roles (text-safe 700 variants, 4-col enum) */
   --_kanban-todo:        var(--color-cl-blue-700);
   --_kanban-in-progress: var(--color-cl-pink-700);
   --_kanban-in-review:   var(--color-cl-lime-700);
   --_kanban-done:        var(--color-cl-mint-700);
 
-  /* Kanban column chip backgrounds (100 variants) */
   --_kanban-todo-bg:        var(--color-cl-blue-100);
   --_kanban-in-progress-bg: var(--color-cl-pink-100);
   --_kanban-in-review-bg:   var(--color-cl-lime-100);
   --_kanban-done-bg:        var(--color-cl-mint-100);
 
-  /* Category accents (member/team/project labels) — 4 options */
   --_category-blue: var(--color-cl-blue-700);
   --_category-pink: var(--color-cl-pink-700);
   --_category-lime: var(--color-cl-lime-700);
   --_category-mint: var(--color-cl-mint-700);
 }
 
-/* ================================================================
- * TIER 2 — SEMANTIC (dark mode scaffold)
- * ================================================================
- * SCAFFOLD ONLY. No UI toggle ships in v1. Apply [data-theme="dark"]
- * to <html> manually to preview.
- */
+/* Semantic — dark mode (scaffold; apply [data-theme="dark"] to <html>) */
 [data-theme="dark"] {
   --_text-primary:    var(--color-ink-50);
-  --_text-secondary:  229 231 235;      /* #E5E7EB */
+  --_text-secondary:  229 231 235;
   --_text-muted:      var(--color-ink-400);
   --_text-brand:      var(--color-cl-blue-500);
   --_text-on-fill:    var(--color-white);
 
-  --_surface-page:     11  11  12;      /* #0B0B0C */
-  --_surface-card:     24  24  27;      /* #18181B */
-  --_surface-raised:   39  39  42;      /* #27272A */
-  --_surface-alt:      31  31  34;      /* ~#1F1F22 */
+  --_surface-page:     11  11  12;
+  --_surface-card:     24  24  27;
+  --_surface-raised:   39  39  42;
+  --_surface-alt:      31  31  34;
+
+  --_overlay-hover:    255 255 255 / 0.05;
+  --_overlay-active:   255 255 255 / 0.10;
+  --_overlay-selected: 92 163 255 / 0.12;
 
   --_interactive:           var(--color-cl-blue-500);
   --_interactive-hover:     var(--color-cl-blue-700);
@@ -234,8 +184,8 @@
   --_interactive-alt-hover:  var(--color-cl-pink-700);
   --_interactive-alt-subtle: var(--color-cl-pink-800);
 
-  --_border-subtle:  39  39  42;        /* #27272A */
-  --_border-default: 63  63  70;        /* #3F3F46 */
-  --_border-strong:  82  82  91;        /* #52525B */
+  --_border-subtle:  39  39  42;
+  --_border-default: 63  63  70;
+  --_border-strong:  82  82  91;
   --_border-focus:   var(--color-cl-blue-500);
 }

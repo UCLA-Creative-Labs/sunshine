@@ -3,26 +3,10 @@
    rendering when a component opts in via cl-* utilities (see TOKENS.md). */
 @import '../styles/tokens.css';
 
-/* DIN Condensed family. Two @font-face rules, same family-name, different
-   weights. Hand-written because next/font/local's multi-src array hits a
-   Turbopack regression in Next 16.1 ("unexpected data version"). The
-   tradeoff: no next/font auto-optimization for this family, but correct
-   weight 400 vs 700 face matching. Swap Oswald-Regular.ttf for a licensed
-   DIN Condensed Regular when available. */
-@font-face {
-  font-family: 'CL Display';
-  src: url('/fonts/Oswald-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'CL Display';
-  src: url('/fonts/DIN-Condensed-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* Portal display face is Mulish (public-site heading font, loaded via
+   next/font/google in layout.tsx). Previously a hand-rolled 'CL Display'
+   family stitched Oswald-Regular.ttf + DIN-Condensed-Bold.ttf together —
+   dropped in favor of the public-site Mulish for visual consistency. */
 
 @tailwind base;
 @tailwind components;

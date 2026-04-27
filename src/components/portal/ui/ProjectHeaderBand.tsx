@@ -66,7 +66,7 @@ export function ProjectHeaderBand({
   return (
     <header
       className={cn(
-        'flex flex-col gap-6 border-b-[1.5px] border-ink-200 bg-cream-50 px-5 py-6',
+        'flex flex-col gap-6 border-b-[1.5px] border-ink-100 bg-cream-50 px-5 py-6',
         'md:flex-row md:items-center md:justify-between md:gap-10 md:px-10 md:py-7',
         className,
       )}
@@ -88,7 +88,7 @@ export function ProjectHeaderBand({
           </div>
         ) : null}
 
-        <h1 className="font-display font-bold uppercase tracking-[-0.025em] leading-[0.9] text-ink-900 text-5xl md:text-6xl lg:text-7xl">
+        <h1 className="font-display font-bold uppercase tracking-[-0.04em] leading-[0.95] text-ink-900 text-5xl md:text-6xl lg:text-7xl">
           {projectName}
         </h1>
 
@@ -96,7 +96,7 @@ export function ProjectHeaderBand({
           <div className="flex flex-wrap items-center gap-2.5">
             {subtitle ? <span className="text-[15px] text-ink-600">{subtitle}</span> : null}
             {term ? (
-              <span className="inline-flex items-center rounded-full border border-ink-200 bg-ink-100 px-2.5 py-1 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900">
+              <span className="inline-flex items-center rounded-full border border-ink-100 bg-ink-100 px-2.5 py-1 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900">
                 {term}
               </span>
             ) : null}
@@ -150,7 +150,7 @@ export function ProjectHeaderBand({
               href={githubUrl ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-white px-3.5 py-2 font-ui text-[13px] font-semibold text-ink-600 transition-colors hover:border-ink-300 hover:bg-ink-50 hover:text-ink-900"
+              className="inline-flex items-center gap-1.5 rounded-full border border-ink-100 bg-white px-3.5 py-2 font-ui text-[13px] font-semibold text-ink-600 transition-colors hover:border-ink-300 hover:bg-ink-50 hover:text-ink-900"
             >
               view on github
               <ExternalLinkIcon />
