@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updateTask, deleteTask } from '../services/taskService';
+import { updateTask, deleteTask, setTaskAssignees } from '../services/taskService';
 import { UpdateTaskInput } from '../types/tasks';
 import { TaskStatus } from '../types/database';
 import { createActivityLogEntry } from '../supabase/activityService';
@@ -25,6 +25,10 @@ interface UseTaskActionsReturn {
   deleteTaskAction: (
     taskId: string,
     activityContext?: DeleteTaskActivityContext,
+  ) => Promise<boolean>;
+  setAssigneesAction: (
+    taskId: string,
+    userIds: string[],
   ) => Promise<boolean>;
 }
 
@@ -122,11 +126,40 @@ export function useTaskActions(
     return true;
   };
 
+  const setAssigneesAction = async (
+    taskId: string,
+    userIds: string[],
+  ): Promise<boolean> => {
+    if (!currentUserId) {
+      setError('Not signed in');
+      return false;
+    }
+    setIsUpdating(true);
+    setError(null);
+
+    const numericId = Number(taskId);
+    if (!Number.isFinite(numericId)) {
+      setError('Invalid task id');
+      setIsUpdating(false);
+      return false;
+    }
+
+    const result = await setTaskAssignees(numericId, userIds, currentUserId);
+
+    setIsUpdating(false);
+    if (!result.success) {
+      setError(result.error || 'Failed to update assignees');
+      return false;
+    }
+    return true;
+  };
+
   return {
     isUpdating,
     isDeleting,
     error,
     updateTaskAction,
     deleteTaskAction,
+    setAssigneesAction,
   };
 }

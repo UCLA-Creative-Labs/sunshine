@@ -81,6 +81,48 @@ export async function assignUsersToTask(
 }
 
 /**
+ * sets the exact set of assignees for a task by deleting all existing
+ * assignments and inserting the provided user ids. Empty array clears assignees.
+ */
+export async function setTaskAssignees(
+  taskId: number,
+  userIds: string[],
+  assignedBy: string,
+): Promise<TaskOperationResult<TaskAssignment[]>> {
+  const { error: delErr } = await supabase
+    .from('task_assignments')
+    .delete()
+    .eq('task_id', taskId);
+
+  if (delErr) {
+    console.error('Error clearing assignees:', delErr);
+    return { data: null, error: delErr.message, success: false };
+  }
+
+  if (userIds.length === 0) {
+    return { data: [], error: null, success: true };
+  }
+
+  const rows = userIds.map((userId) => ({
+    task_id: taskId,
+    user_id: userId,
+    assigned_by: assignedBy,
+  }));
+
+  const { data, error } = await supabase
+    .from('task_assignments')
+    .insert(rows)
+    .select();
+
+  if (error) {
+    console.error('Error setting assignees:', error);
+    return { data: null, error: error.message, success: false };
+  }
+
+  return { data: data as TaskAssignment[], error: null, success: true };
+}
+
+/**
  * fetches tasks with their assignments for a project
  */
 export async function getTasksWithAssignments(
