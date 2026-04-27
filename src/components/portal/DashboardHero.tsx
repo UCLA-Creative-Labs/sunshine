@@ -49,7 +49,7 @@ export default function DashboardHero() {
 
   return (
     <section
-      className="relative overflow-hidden border-b border-ink-200"
+      className="relative overflow-hidden border-b border-ink-100"
       style={{ backgroundColor: '#FFF8EF' }}
     >
       <div
@@ -72,7 +72,7 @@ export default function DashboardHero() {
           backgroundSize: '240px 240px',
         }}
       />
-      <div className="relative mx-auto max-w-[1200px] px-8 py-16 md:px-20 md:py-20 motion-safe:animate-cl-fade-up">
+      <div className="relative mx-auto max-w-[1200px] px-8 py-8 md:px-20 md:py-10 motion-safe:animate-cl-fade-up">
         <h1 className="font-display text-[48px] font-bold leading-[0.95] tracking-[-0.025em] text-ink-900 md:text-[64px]">
           Good {partOfDay}
           {firstName ? (

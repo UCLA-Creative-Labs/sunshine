@@ -112,7 +112,7 @@ export function PortalNavbar({
   return (
     <header
       className={cn(
-        'w-full bg-surface-card border-b border-ink-200 px-6 md:px-8 h-[68px]',
+        'w-full bg-surface-card border-b border-ink-100 px-6 md:px-8 h-[68px]',
         className,
       )}
     >

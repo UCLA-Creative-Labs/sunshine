@@ -19,7 +19,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'rounded-lg border border-dashed border-ink-200 bg-surface-card p-10',
+        'rounded-lg border border-dashed border-ink-100 bg-surface-card p-10',
         'flex flex-col items-center text-center gap-4',
         'sm:flex-row sm:text-left sm:gap-8',
         className,

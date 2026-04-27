@@ -147,7 +147,7 @@ export function PillLockup({ tone = 'ink', className, children, ...rest }: PillL
 /* ================================================================
  * SpeechBubble — rounded pill with tail, supports accent italic text
  * ================================================================ */
-export type SpeechBubbleTone = 'blue' | 'ink' | 'cream'
+export type SpeechBubbleTone = 'blue' | 'ink'
 export type SpeechBubbleTail = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right'
 
 export interface SpeechBubbleProps extends HTMLAttributes<HTMLDivElement> {
@@ -158,7 +158,6 @@ export interface SpeechBubbleProps extends HTMLAttributes<HTMLDivElement> {
 const bubbleTones: Record<SpeechBubbleTone, string> = {
   blue:  'bg-cl-blue-700 text-white',
   ink:   'bg-ink-900 text-white',
-  cream: 'bg-ink-100 text-ink-900 ring-2 ring-ink-900',
 }
 
 const tailPositions: Record<SpeechBubbleTail, string> = {
@@ -171,7 +170,6 @@ const tailPositions: Record<SpeechBubbleTail, string> = {
 const tailColorClass: Record<SpeechBubbleTone, string> = {
   blue:  'after:border-t-cl-blue-700 after:border-l-cl-blue-700 after:border-b-cl-blue-700 after:border-r-cl-blue-700',
   ink:   'after:border-t-ink-900 after:border-l-ink-900 after:border-b-ink-900 after:border-r-ink-900',
-  cream: 'after:border-t-ink-100 after:border-l-ink-100 after:border-b-ink-100 after:border-r-ink-100',
 }
 
 export function SpeechBubble({

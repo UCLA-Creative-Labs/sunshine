@@ -86,7 +86,7 @@ export function Sidebar({
                 collapsed ? 'justify-center px-0' : 'gap-2.5 px-[14px]',
                 isActive
                   ? 'bg-cl-blue-100 text-cl-blue-700'
-                  : 'text-ink-600 hover:bg-ink-100',
+                  : 'text-ink-400 hover:bg-overlay-hover hover:text-ink-600',
               )}
             >
               {isActive ? (
@@ -104,7 +104,7 @@ export function Sidebar({
 
       {collapsible && ui ? (
         <div className="mt-auto">
-          <div className={cn('my-4 h-px bg-ink-200', collapsed ? 'mx-2' : 'mx-4')} />
+          <div className={cn('my-4 h-px bg-ink-100', collapsed ? 'mx-2' : 'mx-4')} />
           <div className={cn(collapsed ? 'px-2 flex justify-center' : 'px-4')}>
             <button
               type="button"
@@ -113,7 +113,7 @@ export function Sidebar({
               title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               className={cn(
                 'flex items-center rounded-md py-2',
-                'font-code text-[11px] uppercase tracking-[0.12em] text-ink-400 hover:text-ink-600 hover:bg-ink-100',
+                'font-code text-[11px] uppercase tracking-[0.12em] text-ink-400 hover:text-ink-600 hover:bg-overlay-hover',
                 'transition-colors duration-fast',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-cl-blue-100',
                 collapsed ? 'w-full justify-center px-0' : 'gap-2 px-[10px]',
