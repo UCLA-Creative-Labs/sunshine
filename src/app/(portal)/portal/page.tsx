@@ -217,7 +217,7 @@ export default function PortalDashboard() {
   return (
     <div className="flex-1 w-full flex flex-col bg-cream-50">
       <DashboardHero />
-      <div className="mx-auto max-w-[1200px] w-full px-8 md:px-20 pt-12 pb-16 space-y-14">
+      <div className="mx-auto max-w-[1200px] w-full px-8 md:px-20 pt-6 pb-12 space-y-8">
         <RecentActivity />
         <Announcements />
         <YourStuff />
@@ -229,14 +229,10 @@ export default function PortalDashboard() {
 }
 
 function SectionHeader({
-  num,
-  context,
   title,
   count,
   trailing,
 }: {
-  num: string
-  context: string
   title: string
   count?: number
   trailing?: React.ReactNode
@@ -244,10 +240,6 @@ function SectionHeader({
   return (
     <div className="flex items-end justify-between gap-4 mb-5">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2.5 mb-2">
-          <span className="font-code text-[11px] tracking-[0.08em] text-ink-400">{num}</span>
-          <span className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-600">· {context}</span>
-        </div>
         <h2 className="font-ui font-extrabold text-[30px] leading-none tracking-[-0.02em] text-ink-900 flex items-baseline gap-3">
           {title}
           {typeof count === 'number' && (
@@ -275,20 +267,15 @@ function RecentActivity() {
   return (
     <section>
       <SectionHeader
-        num="02 / 07"
-        context="what's happening"
         title="Recent activity"
         trailing={<ViewLink href="#">View all →</ViewLink>}
       />
       <Card padding="none" className="px-7 shadow-none">
         <ul>
-          {ACTIVITY.map((row, i) => (
+          {ACTIVITY.map((row) => (
             <li
               key={row.id}
-              className={
-                'flex items-center gap-3.5 py-4 -mx-2 px-2 rounded-lg hover:bg-ink-50 transition-colors duration-200 ' +
-                (i < ACTIVITY.length - 1 ? 'border-b border-ink-100 rounded-b-none' : '')
-              }
+              className="flex items-center gap-3.5 py-4 -mx-2 px-2 rounded-lg hover:bg-overlay-hover transition-colors duration-200"
             >
               <ActivityAvatar avatar={row.avatar} />
               <div className="flex-1 min-w-0 font-ui text-sm truncate">{row.body}</div>
@@ -344,8 +331,6 @@ function Announcements() {
   return (
     <section>
       <SectionHeader
-        num="03 / 07"
-        context="pinned from the team"
         title="Announcements"
         trailing={<ViewLink href="#">View all →</ViewLink>}
       />
@@ -356,18 +341,12 @@ function Announcements() {
             className={
               'min-w-[280px] md:min-w-0 snap-start ' +
               'bg-surface-card border border-ink-100 rounded-[12px] shadow-sm ' +
-              'hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover ' +
+              'shadow-card transition-all duration-fast ease-out hover:shadow-card-hover ' +
               'p-[22px] pb-[18px] flex flex-col gap-3.5 min-h-[200px] ' +
               (a.tilt ? 'md:-rotate-[1.2deg] md:origin-center' : '')
             }
           >
-            <span className="font-code text-[11px] text-ink-400 tracking-wide">{a.index}</span>
             <div className="flex items-center gap-2.5">
-              <span className="w-[22px] h-[22px] rounded-[6px] bg-cl-blue-100 text-cl-blue-700 inline-flex items-center justify-center">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2l2 6h6l-4.5 4 2 7-5.5-4-5.5 4 2-7L4 8h6z" />
-                </svg>
-              </span>
               <span className="font-ui font-extrabold text-[13px] text-ink-900">
                 {a.author}{' '}
                 <span className="text-ink-600 font-semibold">· {a.role}</span>
@@ -377,7 +356,7 @@ function Announcements() {
               {a.title}
             </h3>
             <p className="font-ui text-sm text-ink-600 leading-[1.5] m-0 line-clamp-2">{a.body}</p>
-            <div className="mt-auto pt-3 border-t border-ink-100 flex items-center justify-between">
+            <div className="mt-auto pt-3 flex items-center justify-between">
               <Avatar size="xs" color={a.authorColor} name={a.author} initials={a.authorInitials} />
               <Link
                 href="#"
@@ -406,8 +385,6 @@ function MyTasks() {
   return (
     <div id="my-tasks" className="scroll-mt-24">
       <SectionHeader
-        num="04 / 07"
-        context="assigned to you"
         title="My tasks"
         count={TASKS.length}
       />
@@ -415,7 +392,7 @@ function MyTasks() {
         {TASKS.map((t) => (
           <div
             key={t.id}
-            className="grid grid-cols-[auto_1fr_auto] gap-4 items-center bg-surface-card border border-ink-100 rounded-[12px] px-[18px] py-[14px] hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
+            className="grid grid-cols-[auto_1fr_auto] gap-4 items-center bg-surface-card border border-ink-100 rounded-[12px] px-[18px] py-[14px] hover:border-ink-300 shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
           >
             <StatusIcon status={t.status} />
             <div className="min-w-0">
@@ -495,12 +472,12 @@ function StatusIcon({ status }: { status: TaskStatus }) {
 function MyProjects() {
   return (
     <div>
-      <SectionHeader num="05 / 07" context={`${PROJECTS.length} active`} title="My projects" />
+      <SectionHeader title="My projects" />
       <div className="space-y-3.5">
         {PROJECTS.map((p) => (
           <div
             key={p.id}
-            className="bg-surface-card border border-ink-100 rounded-[12px] p-5 flex flex-col gap-3 hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
+            className="bg-surface-card border border-ink-100 rounded-[12px] p-5 flex flex-col gap-3 hover:border-ink-300 shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
           >
             <div className="flex items-center gap-3.5">
               <span
@@ -580,8 +557,6 @@ function ThisWeek() {
   return (
     <section>
       <SectionHeader
-        num="06 / 07"
-        context="apr 20 – apr 24"
         title="This week"
         trailing={<ViewLink href="#">Open calendar →</ViewLink>}
       />

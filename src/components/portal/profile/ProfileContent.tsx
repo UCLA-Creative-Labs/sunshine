@@ -30,7 +30,7 @@ function MiniProjectCard({
         <button
             type="button"
             onClick={() => onClick(project)}
-            className="group flex flex-col gap-3 rounded-2xl border-[1.5px] border-ink-200 bg-white p-5 text-left shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-card-hover"
+            className="group flex flex-col gap-3 rounded-2xl border border-ink-100 bg-white p-5 text-left shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-card-hover"
         >
             <div className="flex items-start justify-between gap-3">
                 <h3 className="truncate font-display text-[16px] font-bold leading-tight text-ink-900">
@@ -211,9 +211,6 @@ const ProfileContent = () => {
     return (
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-5 py-6 md:px-8 md:py-10">
             <section className="flex flex-col gap-1">
-                <span className="font-code text-[11px] uppercase tracking-[0.08em] text-ink-400">
-                    your profile
-                </span>
                 <h1 className="font-display text-[32px] font-bold leading-tight tracking-[-0.01em] text-ink-900 md:text-[40px]">
                     Profile
                 </h1>
@@ -236,15 +233,7 @@ const ProfileContent = () => {
                 onEditBioEnd={handleBioUpdate}
             />
 
-            <section className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-6 md:p-8">
-                <div className="mb-5 flex items-baseline gap-2">
-                    <span className="font-code text-[11px] uppercase tracking-[0.08em] text-ink-400">
-                        my projects
-                    </span>
-                    <span className="font-code text-[10px] uppercase tracking-[0.06em] text-ink-400">
-                        · {projects.length}
-                    </span>
-                </div>
+            <section className="rounded-2xl border border-ink-100 bg-white p-6 md:p-8">
                 {projects.length === 0 ? (
                     <div className="rounded-2xl border-[1.5px] border-dashed border-ink-300 bg-transparent px-5 py-10 text-center">
                         <p className="font-accent italic text-[15px] text-ink-400">

@@ -75,15 +75,9 @@ export default function ProjectDirectory() {
 
   return (
     <div className="flex-1 w-full bg-cream-50">
-      <section className="border-b border-ink-200 bg-cream-50">
+      <section className="border-b border-ink-100 bg-cream-50">
         <div className="mx-auto max-w-[1200px] px-8 md:px-20 pt-14 pb-10 md:pt-20 md:pb-12">
-          <div className="flex items-center gap-2.5 mb-3">
-            <span className="font-code text-[11px] tracking-[0.08em] text-ink-400">07 / 07</span>
-            <span className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-600">
-              · browse + discover
-            </span>
-          </div>
-          <h1 className="font-display font-bold text-[56px] md:text-[80px] leading-[0.92] tracking-[-0.035em] text-ink-900">
+          <h1 className="font-display font-bold text-[56px] md:text-[80px] leading-[0.92] tracking-[-0.025em] text-ink-900">
             Projects
           </h1>
           <p className="mt-5 font-ui text-lg text-ink-600 max-w-2xl leading-relaxed">
@@ -131,8 +125,6 @@ export default function ProjectDirectory() {
         {!loading && activeList.length > 0 && (
           <section className="mt-10">
             <SectionHeader
-              num="A"
-              context="in-progress"
               title="Active projects"
               count={activeList.length}
             />
@@ -143,8 +135,6 @@ export default function ProjectDirectory() {
         {!loading && archivedList.length > 0 && (
           <section className="mt-14">
             <SectionHeader
-              num="B"
-              context="shipped + archived"
               title="Archive"
               count={archivedList.length}
             />
@@ -154,7 +144,7 @@ export default function ProjectDirectory() {
 
         {!loading && filtered.length === 0 && (
           <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
-            <div className="w-[72px] h-[72px] rounded-full bg-ink-100 border border-ink-200 flex items-center justify-center">
+            <div className="w-[72px] h-[72px] rounded-full bg-ink-100 border border-ink-100 flex items-center justify-center">
               <svg
                 width="28" height="28" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -194,25 +184,15 @@ export default function ProjectDirectory() {
 }
 
 function SectionHeader({
-  num,
-  context,
   title,
   count,
 }: {
-  num: string
-  context: string
   title: string
   count?: number
 }) {
   return (
     <div className="flex items-end justify-between gap-4 mb-5">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2.5 mb-2">
-          <span className="font-code text-[11px] tracking-[0.08em] text-ink-400">{num}</span>
-          <span className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-600">
-            · {context}
-          </span>
-        </div>
         <h2 className="font-ui font-extrabold text-[30px] leading-none tracking-[-0.02em] text-ink-900 flex items-baseline gap-3">
           {title}
           {typeof count === 'number' && (
@@ -391,46 +371,69 @@ function ProjectList({ projects, view, onOpen }: { projects: Project[]; view: Vi
   )
 }
 
+const SEASON_PILL: Record<string, { label: string; cls: string }> = {
+  fall:   { label: 'Fall',   cls: 'bg-cl-pink-100 text-cl-pink-700' },
+  winter: { label: 'Winter', cls: 'bg-cl-blue-100 text-cl-blue-700' },
+  spring: { label: 'Spring', cls: 'bg-cl-mint-100 text-cl-mint-700' },
+  summer: { label: 'Summer', cls: 'bg-cl-lime-100 text-cl-lime-700' },
+}
+
+function quarterPill(quarter: string): { label: string; cls: string } {
+  const trimmed = (quarter || '').trim()
+  const [seasonRaw, ...rest] = trimmed.split(/\s+/)
+  const yearSuffix = rest.join(' ')
+  const match = SEASON_PILL[(seasonRaw ?? '').toLowerCase()]
+  if (match) {
+    return {
+      label: yearSuffix ? `${match.label} ${yearSuffix}` : match.label,
+      cls: match.cls,
+    }
+  }
+  const label = trimmed ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1) : 'Unscheduled'
+  return { label, cls: 'bg-ink-100 text-ink-600' }
+}
+
 function ProjectCard({ project: p, onOpen }: { project: Project; onOpen: (p: Project) => void }) {
-  const accent = p.logoColor
+  const pill = quarterPill(p.quarter)
   return (
     <button
       type="button"
       onClick={() => onOpen(p)}
-      className="group relative text-left bg-surface-card border border-ink-100 rounded-[12px] p-5 pl-6 flex flex-col gap-3.5 min-h-[200px] hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover overflow-hidden"
+      className="group relative text-left bg-surface-card border border-ink-100 rounded-[14px] p-5 flex flex-col gap-4 min-h-[180px] hover:border-ink-300 shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
     >
-      <span
-        aria-hidden="true"
-        className={'absolute left-0 top-0 bottom-0 w-[4px] ' + colorBg(accent)}
-      />
-      <div className="flex items-center gap-3">
+      <div className="flex items-start justify-between gap-3">
+        <div
+          aria-hidden="true"
+          className="w-10 h-10 rounded-[10px] border-[1.5px] border-dashed border-ink-200 flex items-center justify-center text-ink-400 shrink-0"
+        >
+          <svg
+            width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+        </div>
         <span
           className={
-            'w-10 h-10 rounded-[10px] shrink-0 inline-flex items-center justify-center font-display font-bold text-lg text-white leading-none ' +
-            colorBg(accent)
+            'inline-flex items-center rounded-full font-ui text-[11px] font-bold px-2.5 py-1 leading-none shrink-0 ' +
+            pill.cls
           }
         >
-          {p.initial}
+          {pill.label}
         </span>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-ui font-extrabold text-[17px] text-ink-900 leading-[1.2] m-0 truncate">
-            {p.name}
-          </h3>
-          <div className="mt-1 flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center rounded-full bg-ink-100 text-ink-900 font-code text-[10px] px-2 py-0.5 tracking-wide">
-              {p.quarter}
-            </span>
-          </div>
-        </div>
       </div>
-      <p className="font-ui text-sm text-ink-600 leading-[1.45] m-0 line-clamp-2">
-        {p.description}
-      </p>
-      <div className="mt-auto flex items-center justify-between pt-2">
+      <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+        <h3 className="font-ui font-extrabold text-[18px] text-ink-900 leading-[1.25] m-0 truncate">
+          {p.name}
+        </h3>
+        <p className="font-ui text-sm text-ink-600 leading-[1.45] m-0 line-clamp-2">
+          {p.description}
+        </p>
+      </div>
+      <div className="flex items-center justify-end pt-1">
         <AvatarCluster members={p.members} overflow={p.overflow} />
-        <span className="font-ui text-[13px] font-bold text-cl-blue-700 group-hover:underline underline-offset-4">
-          View →
-        </span>
       </div>
     </button>
   )
@@ -598,7 +601,7 @@ function ProjectDetailModal({ project, onClose }: { project: Project; onClose: (
                     href={href}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-surface-card px-3.5 py-1.5 font-ui text-[13px] font-bold text-ink-900 hover:bg-ink-50"
+                    className="inline-flex items-center gap-2 rounded-full border border-ink-100 bg-surface-card px-3.5 py-1.5 font-ui text-[13px] font-bold text-ink-900 hover:bg-ink-50"
                   >
                     <Icon size={14} />
                     {label}

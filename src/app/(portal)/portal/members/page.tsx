@@ -124,15 +124,9 @@ export default function MembersDirectory() {
 
   return (
     <div className="flex-1 w-full bg-cream-50">
-      <section className="border-b border-ink-200 bg-cream-50">
+      <section className="border-b border-ink-100 bg-cream-50">
         <div className="mx-auto max-w-[1200px] px-8 md:px-20 pt-14 pb-10 md:pt-20 md:pb-12">
-          <div className="flex items-center gap-2.5 mb-3">
-            <span className="font-code text-[11px] tracking-[0.08em] text-ink-400">04 / 07</span>
-            <span className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-600">
-              · everyone here
-            </span>
-          </div>
-          <h1 className="font-display font-bold text-[56px] md:text-[80px] leading-[0.92] tracking-[-0.035em] text-ink-900">
+          <h1 className="font-display font-bold text-[56px] md:text-[80px] leading-[0.92] tracking-[-0.025em] text-ink-900">
             Members
           </h1>
           <p className="mt-5 font-ui text-lg text-ink-600 max-w-2xl leading-relaxed">
@@ -179,8 +173,6 @@ export default function MembersDirectory() {
         {!loading && showInternal && internalFiltered.length > 0 && (
           <section className="mt-10">
             <SectionHeader
-              num="A"
-              context="club leadership"
               title="Internal board"
               count={internalFiltered.length}
             />
@@ -196,8 +188,6 @@ export default function MembersDirectory() {
                 return (
                   <TeamBlock
                     key={t.id}
-                    index={String(idx + 1).padStart(2, '0')}
-                    eyebrow={t.eyebrow}
                     label={t.label}
                     blurb={t.blurb}
                     tone={t.tone}
@@ -212,10 +202,7 @@ export default function MembersDirectory() {
                       </div>
                     ) : (
                       <div className="py-10 text-center">
-                        <p className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-400">
-                          empty roster
-                        </p>
-                        <p className="font-ui text-sm text-ink-400 mt-2">
+                        <p className="font-ui text-sm text-ink-400">
                           Past members will land here once we start tracking them.
                         </p>
                       </div>
@@ -230,8 +217,6 @@ export default function MembersDirectory() {
         {!loading && showProjects && projectsFiltered.length > 0 && (
           <section className="mt-14">
             <SectionHeader
-              num="B"
-              context="by project"
               title="On a project"
               count={projectsFiltered.length}
             />
@@ -243,9 +228,35 @@ export default function MembersDirectory() {
           </section>
         )}
 
-        {!loading && totallyEmpty && (
+        {!loading && totallyEmpty && !hasFilters && internal.length === 0 && projects.length === 0 && (
           <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
-            <div className="w-[72px] h-[72px] rounded-full bg-ink-100 border border-ink-200 flex items-center justify-center">
+            <div className="w-[72px] h-[72px] rounded-full bg-cl-blue-100 border border-ink-100 flex items-center justify-center">
+              <svg
+                width="28" height="28" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                className="text-cl-blue-700"
+                aria-hidden="true"
+              >
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
+                <path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6" />
+              </svg>
+            </div>
+            <div className="max-w-sm">
+              <p className="font-ui font-extrabold text-lg text-ink-900">
+                Contentful → Supabase migration
+              </p>
+              <p className="mt-2 font-ui text-sm text-ink-600 leading-relaxed">
+                Roster data is moving over from the old CMS. Members will populate
+                here once the migration finishes.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!loading && totallyEmpty && (hasFilters || internal.length > 0 || projects.length > 0) && (
+          <div className="mt-16 flex flex-col items-center gap-4 py-14 text-center">
+            <div className="w-[72px] h-[72px] rounded-full bg-ink-100 border border-ink-100 flex items-center justify-center">
               <svg
                 width="28" height="28" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -281,25 +292,15 @@ export default function MembersDirectory() {
 }
 
 function SectionHeader({
-  num,
-  context,
   title,
   count,
 }: {
-  num: string
-  context: string
   title: string
   count?: number
 }) {
   return (
     <div className="flex items-end justify-between gap-4 mb-5">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2.5 mb-2">
-          <span className="font-code text-[11px] tracking-[0.08em] text-ink-400">{num}</span>
-          <span className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-600">
-            · {context}
-          </span>
-        </div>
         <h2 className="font-ui font-extrabold text-[30px] leading-none tracking-[-0.02em] text-ink-900 flex items-baseline gap-3">
           {title}
           {typeof count === 'number' && (
@@ -392,8 +393,6 @@ function PillGroup<T extends string>({
 }
 
 function TeamBlock({
-  index,
-  eyebrow,
   label,
   blurb,
   tone,
@@ -401,8 +400,6 @@ function TeamBlock({
   count,
   children,
 }: {
-  index: string
-  eyebrow: string
   label: string
   blurb: string
   tone: BadgeColor
@@ -411,15 +408,9 @@ function TeamBlock({
   children: React.ReactNode
 }) {
   return (
-    <div className="border-[1.5px] border-dashed border-ink-300 rounded-[14px] p-5 md:p-6">
+    <div className="bg-cream-50 rounded-[14px] p-5 md:p-6">
       <div className="flex items-end justify-between gap-4 mb-4">
         <div className="min-w-0">
-          <div className="flex items-center gap-2.5 mb-1.5">
-            <span className="font-code text-[11px] tracking-[0.08em] text-ink-400">{index}</span>
-            <span className="font-code text-[11px] tracking-[0.12em] uppercase text-ink-600">
-              · {eyebrow}
-            </span>
-          </div>
           <h3 className="font-ui font-extrabold text-[20px] leading-none tracking-[-0.01em] text-ink-900 flex items-baseline gap-2">
             {label}
             <span className="font-code text-xs text-ink-600 font-normal tracking-normal">({count})</span>
@@ -440,7 +431,7 @@ function InternalCard({ row }: { row: InternalRow }) {
   return (
     <Link
       href={`#${member.id}`}
-      className="group bg-surface-card border border-ink-100 rounded-[12px] p-4 flex items-center gap-3.5 hover:border-ink-300 hover:-translate-y-[2px] shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
+      className="group bg-surface-card border border-ink-100 rounded-[12px] p-4 flex items-center gap-3.5 hover:border-ink-300 shadow-card transition-all duration-fast ease-out hover:shadow-card-hover"
     >
       <Avatar name={member.name} initials={member.initials} color={member.avatarColor} size="md" />
       <div className="flex-1 min-w-0">

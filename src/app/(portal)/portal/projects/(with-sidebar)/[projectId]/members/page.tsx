@@ -48,7 +48,7 @@ function MemberCard({ member }: { member: ProjectMemberWithProfile }) {
   const color = pickAvatarColor(name);
 
   return (
-    <div className="group flex flex-col gap-3 rounded-2xl border-[1.5px] border-ink-200 bg-white p-5 shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-card-hover">
+    <div className="group flex flex-col gap-3 rounded-2xl border border-ink-100 bg-white p-5 shadow-card transition-all duration-fast ease-out hover:-translate-y-0.5 hover:border-ink-400 hover:shadow-card-hover">
       <div className="flex items-start gap-3">
         <Avatar name={name} color={color} size="lg" />
         <div className="min-w-0 flex-1">

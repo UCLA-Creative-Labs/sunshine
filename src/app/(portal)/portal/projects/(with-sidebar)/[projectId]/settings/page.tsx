@@ -171,7 +171,7 @@ export default function SettingsPage({
       </section>
 
       <div className="mt-8 flex max-w-2xl flex-col gap-6">
-        <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-6 md:p-8">
+        <div className="rounded-2xl border border-ink-100 bg-white p-6 md:p-8">
           <SectionHeader eyebrow="branding" title="Project logo" />
           <div className="mt-5 flex items-center gap-6">
             <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border-[1.5px] border-dashed border-ink-300 bg-cream-50">
@@ -215,7 +215,7 @@ export default function SettingsPage({
           </div>
         </div>
 
-        <div className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-6 md:p-8">
+        <div className="rounded-2xl border border-ink-100 bg-white p-6 md:p-8">
           <SectionHeader eyebrow="integrations" title="Project links" />
           <div className="mt-5 flex flex-col gap-5">
             {LINK_FIELDS.map(({ key, label, placeholder, icon }) => (

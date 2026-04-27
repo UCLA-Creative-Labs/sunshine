@@ -128,7 +128,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
     const gradYearOptions = getGradYearOptions().map(String);
 
     return (
-        <section className="rounded-2xl border-[1.5px] border-ink-200 bg-white p-6 md:p-8">
+        <section className="rounded-2xl border border-ink-100 bg-white p-6 md:p-8">
             <div className="flex flex-col gap-6 md:flex-row md:gap-7">
                 <div className="relative flex-shrink-0 self-start">
                     <div className="h-24 w-24 overflow-hidden rounded-2xl md:h-28 md:w-28">
@@ -226,7 +226,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                             <button
                                 type="button"
                                 onClick={onEditBioStart}
-                                className="rounded-xl border-[1.5px] border-ink-200 bg-white px-3.5 py-2.5 text-left text-sm text-ink-900 transition-colors hover:border-ink-400"
+                                className="rounded-xl border border-ink-100 bg-white px-3.5 py-2.5 text-left text-sm text-ink-900 transition-colors hover:border-ink-400"
                             >
                                 {bio}
                             </button>
@@ -250,7 +250,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                                 {achievements.map((a) => (
                                     <span
                                         key={a.id}
-                                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-ink-200 bg-ink-100 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900"
+                                        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-ink-100 bg-ink-100 font-code text-[10px] uppercase tracking-[0.06em] text-ink-900"
                                         title={a.type}
                                     >
                                         {a.type.slice(0, 1)}
