@@ -141,10 +141,11 @@ interface StatusSectionProps {
   onDeleteTask: (taskId: string, hasGithubIssue: boolean) => void;
   onPushToGithubTask?: (taskId: string) => void;
   canEdit: boolean;
+  currentUserId: string;
   dbTasks: TaskWithAssignments[];
 }
 
-function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onMarkComplete, onDeleteTask, onPushToGithubTask, canEdit, dbTasks }: StatusSectionProps) {
+function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask, onMarkComplete, onDeleteTask, onPushToGithubTask, canEdit, currentUserId, dbTasks }: StatusSectionProps) {
   const meta = STATUS_META[status];
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4";
@@ -279,6 +280,7 @@ function StatusSection({ status, tasks, isOpen, onToggle, delay = 0, onEditTask,
                               }}
                               onPushToGithub={onPushToGithubTask ? () => onPushToGithubTask(task.id) : undefined}
                               canEdit={canEdit}
+                              canPushToGithub={canEdit || ((dbTasks.find(t => t.id.toString() === task.id)?.assignments ?? []).some(a => a.user_id === currentUserId))}
                               isCompleted={task.status === 'done'}
                               githubUrl={dbTasks.find(t => t.id.toString() === task.id)?.github_issue_url}
                             />
@@ -474,6 +476,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onDeleteTask={handleDeleteTask}
             onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
+            currentUserId={currentUserId}
             dbTasks={dbTasks}
           />
           <StatusSection
@@ -487,6 +490,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onDeleteTask={handleDeleteTask}
             onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
+            currentUserId={currentUserId}
             dbTasks={dbTasks}
           />
           <StatusSection
@@ -500,6 +504,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onDeleteTask={handleDeleteTask}
             onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
+            currentUserId={currentUserId}
             dbTasks={dbTasks}
           />
           <StatusSection
@@ -513,6 +518,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
             onDeleteTask={handleDeleteTask}
             onPushToGithubTask={canCreateTasks ? handlePushToGithub : undefined}
             canEdit={canCreateTasks}
+            currentUserId={currentUserId}
             dbTasks={dbTasks}
           />
         </div>

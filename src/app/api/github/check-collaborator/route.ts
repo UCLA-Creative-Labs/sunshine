@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getInstallationClient } from '@/lib/github/githubApp';
-import { resolveCallerRole } from '@/lib/services/projectMemberService';
+import { userHasProjectEdit } from '@/lib/permissions/githubAccess';
 
 export const runtime = 'nodejs';
 
@@ -28,21 +28,12 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Missing projectId or userId' }, { status: 400 });
         }
 
-        // 3. Permission check - verify caller is part of the project.
-        // The instructions say "must be project member; only lead/manager can check other users"
-        // Wait, if targetUserId === user.id and they are just a base member, they can check themselves?
-        // Let's check their role to determine their privileges.
-        const callerRole = await resolveCallerRole(user.id, projectId, supabase);
-
-        if (!callerRole) {
-            return NextResponse.json({ error: 'You are not a member of this project.' }, { status: 403 });
-        }
-
-        const roleName = callerRole.name?.toLowerCase() || '';
-        const isLeadOrManager = roleName.includes('lead') || roleName.includes('manager');
-
-        if (targetUserId !== user.id && !isLeadOrManager) {
-            return NextResponse.json({ error: 'Only leads or managers can check collaborator status for other users.' }, { status: 403 });
+        // 3. Permission check: users may always check themselves; otherwise require project.edit.
+        if (targetUserId !== user.id) {
+            const hasEdit = await userHasProjectEdit(user.id, projectId, supabase);
+            if (!hasEdit) {
+                return NextResponse.json({ error: 'You do not have permission to check collaborator status for other users.' }, { status: 403 });
+            }
         }
 
         // 4. Fetch target user's github_username
@@ -96,7 +87,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to query GitHub collaborator status.' }, { status: 500 });
         }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Unexpected error in check-collaborator route:', err);
         return NextResponse.json({ error: 'An unexpected server error occurred.' }, { status: 500 });
     }

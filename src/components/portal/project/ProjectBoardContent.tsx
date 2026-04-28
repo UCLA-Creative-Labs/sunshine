@@ -78,6 +78,7 @@ interface BoardCardProps {
   onMarkComplete?: () => void;
   onDelete?: () => void;
   canEdit?: boolean;
+  canPushToGithub?: boolean;
   isCompleted?: boolean;
   githubUrl?: string | null;
   githubIssueNumber?: number | null;
@@ -104,7 +105,7 @@ function AvatarStack({ initials }: { initials: string[] }) {
   );
 }
 
-function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onMarkComplete, onDelete, canEdit = false, isCompleted = false, githubUrl, githubIssueNumber, onPushToGithub }: BoardCardProps) {
+function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, delay = 0, onEdit, onMarkComplete, onDelete, canEdit = false, canPushToGithub = false, isCompleted = false, githubUrl, githubIssueNumber, onPushToGithub }: BoardCardProps) {
   const mounted = useMountAnimation(delay);
   const enterClasses = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
   const isSingleAssignee = assignees.length === 1;
@@ -125,6 +126,7 @@ function BoardCard({ title, tag, tagColor = "#E5E7EB", assignees = [], dueDate, 
             onMarkComplete={onMarkComplete}
             onDelete={onDelete}
             canEdit={canEdit}
+            canPushToGithub={canPushToGithub}
             isCompleted={isCompleted}
             githubUrl={githubUrl}
             onPushToGithub={onPushToGithub}
@@ -208,7 +210,6 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
     if (result) {
       setIsModalOpen(false);
-      await pushToGithubAction(String(result.id));
       refetch();
     }
   };
@@ -350,6 +351,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
+                  canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
                   githubUrl={task.github_issue_url}
                   githubIssueNumber={task.github_issue_number}
@@ -372,6 +374,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
+                  canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
                   githubUrl={task.github_issue_url}
                   githubIssueNumber={task.github_issue_number}
@@ -394,6 +397,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
+                  canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
                   githubUrl={task.github_issue_url}
                   githubIssueNumber={task.github_issue_number}
@@ -416,8 +420,10 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   onMarkComplete={() => handleMarkComplete(task)}
                   onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
                   canEdit={canCreateTasks}
+                  canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
                   githubUrl={task.github_issue_url}
+                  githubIssueNumber={task.github_issue_number}
                   onPushToGithub={() => pushToGithubAction(task.id.toString())}
                 />
               ))}

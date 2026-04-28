@@ -1,13 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { getInstallationClient } from '@/lib/github/githubApp';
-import { resolveCallerRole } from '@/lib/services/projectMemberService';
+import { userCanActOnTaskIssue } from '@/lib/permissions/githubAccess';
 
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
+// Best-effort: clear the github_push_pending_at lock on a task. Errors are swallowed.
+async function clearLock(supabase: SupabaseClient, taskId: number | string): Promise<void> {
     try {
-        const supabase = await createClient();
+        await supabase
+            .from('tasks')
+            .update({ github_push_pending_at: null })
+            .eq('id', taskId);
+    } catch {
+        // Intentionally ignored — clearing the lock is best-effort.
+    }
+}
+
+export async function POST(request: NextRequest) {
+    const supabase = await createClient();
+    let lockedTaskId: number | string | null = null;
+
+    try {
 
         // 1. Auth check
         const {
@@ -64,13 +79,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 5. Guard: caller is lead/manager?
-        const callerRole = await resolveCallerRole(user.id, task.project_id, supabase);
-        const roleName = callerRole?.name?.toLowerCase() || '';
+        // 5. Guard: caller is an assignee on the task or has project.edit
+        const access = await userCanActOnTaskIssue(user.id, taskId, task.project_id, supabase);
 
-        if (!roleName.includes('lead') && !roleName.includes('manager')) {
+        if (!access.allowed) {
             return NextResponse.json(
-                { error: 'You do not have permission to push tasks to GitHub for this project.' },
+                { error: access.reason },
                 { status: 403 },
             );
         }
@@ -105,6 +119,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        lockedTaskId = taskId;
+
         // 9. Authenticate as GitHub App
         let octokit;
         try {
@@ -112,7 +128,8 @@ export async function POST(request: NextRequest) {
         } catch (authError) {
             console.error('GitHub auth error:', authError);
             // Unlock task
-            await supabase.from('tasks').update({ github_push_pending_at: null }).eq('id', taskId);
+            await clearLock(supabase, taskId);
+            lockedTaskId = null;
             return NextResponse.json(
                 { error: 'Failed to connect to the GitHub repository. Ensure the GitHub App is installed.' },
                 { status: 500 },
@@ -134,7 +151,8 @@ export async function POST(request: NextRequest) {
         } catch (apiError) {
             console.error('GitHub API error:', apiError);
             // Unlock task
-            await supabase.from('tasks').update({ github_push_pending_at: null }).eq('id', taskId);
+            await clearLock(supabase, taskId);
+            lockedTaskId = null;
             return NextResponse.json(
                 { error: 'Failed to create GitHub issue.' },
                 { status: 500 },
@@ -160,6 +178,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Successful update cleared the lock as part of the same row.
+        lockedTaskId = null;
+
         // 12. Log to activity_log (ignore errors to not block the main flow)
         supabase.from('activity_log').insert({
             user_id: user.id,
@@ -176,8 +197,11 @@ export async function POST(request: NextRequest) {
             issueUrl: issueData.html_url,
         });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Unexpected error in create-issue route:', err);
+        if (lockedTaskId !== null) {
+            await clearLock(supabase, lockedTaskId);
+        }
         return NextResponse.json(
             { error: 'An unexpected server error occurred.' },
             { status: 500 },

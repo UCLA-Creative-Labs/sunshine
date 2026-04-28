@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getInstallationClient } from '@/lib/github/githubApp';
-import { resolveCallerRole } from '@/lib/services/projectMemberService';
+import { userCanActOnTaskIssue } from '@/lib/permissions/githubAccess';
 
 export const runtime = 'nodejs';
 
@@ -64,14 +64,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 5. Guard: caller is lead/manager/edit? Since delete is allowed for editors.
-        // Actually, resolveCallerRole is the strict check we do for GitHub pushes. Let's just use it.
-        const callerRole = await resolveCallerRole(user.id, task.project_id, supabase);
-        const roleName = callerRole?.name?.toLowerCase() || '';
+        // 5. Guard: caller is an assignee on the task or has project.edit
+        const access = await userCanActOnTaskIssue(user.id, taskId, task.project_id, supabase);
 
-        if (!roleName.includes('lead') && !roleName.includes('manager')) {
+        if (!access.allowed) {
             return NextResponse.json(
-                { error: 'You do not have permission to modify GitHub issues for this project.' },
+                { error: access.reason },
                 { status: 403 },
             );
         }
@@ -127,7 +125,7 @@ export async function POST(request: NextRequest) {
         // 10. Return successes
         return NextResponse.json({ success: true });
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Unexpected error in close-issue route:', err);
         return NextResponse.json(
             { error: 'An unexpected server error occurred.' },

@@ -50,24 +50,22 @@ export function useTaskActions(): UseTaskActionsReturn {
     setIsDeleting(true);
     setError(null);
 
-    if (hasGithubIssue) {
-      try {
-        await fetch('/api/github/close-issue', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ taskId }),
-        });
-      } catch (err) {
-        console.error('Error closing github issue:', err);
-      }
-    }
-
     const result = await deleteTask(taskId);
 
     if (!result.success) {
       setError(result.error || 'Failed to delete task');
       setIsDeleting(false);
       return false;
+    }
+
+    if (hasGithubIssue) {
+      fetch('/api/github/close-issue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId }),
+      }).catch((err) => {
+        console.error('Error closing github issue:', err);
+      });
     }
 
     setIsDeleting(false);

@@ -9,11 +9,12 @@ interface TaskActionsMenuProps {
   onDelete: () => void;
   onPushToGithub?: () => void;
   canEdit: boolean;
+  canPushToGithub?: boolean;
   isCompleted?: boolean;
   githubUrl?: string | null;
 }
 
-export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, onPushToGithub, canEdit, isCompleted = false, githubUrl }: TaskActionsMenuProps) {
+export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, onPushToGithub, canEdit, canPushToGithub = false, isCompleted = false, githubUrl }: TaskActionsMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -109,7 +110,7 @@ export function TaskActionsMenu({ onEdit, onMarkComplete, onDelete, onPushToGith
               View in GitHub
             </a>
           ) : (
-            onPushToGithub && !isCompleted && (
+            canPushToGithub && onPushToGithub && !isCompleted && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();

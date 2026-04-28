@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getInstallationClient } from '@/lib/github/githubApp';
-import { resolveCallerRole } from '@/lib/services/projectMemberService';
+import { getServiceRoleClient } from '@/lib/supabase/serviceRoleClient';
+import { userHasProjectEdit } from '@/lib/permissions/githubAccess';
 
 export const runtime = 'nodejs';
 
@@ -27,11 +28,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing projectId or userId' }, { status: 400 });
         }
 
-        // 3. Admin Permission check (must be lead/manager)
-        const callerRole = await resolveCallerRole(user.id, projectId, supabase);
-        const roleName = callerRole?.name?.toLowerCase() || '';
-
-        if (!roleName.includes('lead') && !roleName.includes('manager')) {
+        // 3. Permission check: project-wide → require project.edit
+        const hasEdit = await userHasProjectEdit(user.id, projectId, supabase);
+        if (!hasEdit) {
             return NextResponse.json({ error: 'You do not have permission to invite collaborators to this project.' }, { status: 403 });
         }
 
@@ -44,6 +43,20 @@ export async function POST(request: NextRequest) {
 
         if (profileError || !profile || !profile.github_username) {
             return NextResponse.json({ error: 'User hasn\'t linked GitHub' }, { status: 400 });
+        }
+
+        const serviceClient = getServiceRoleClient();
+        const { data: targetAuth, error: authErr } = await serviceClient.auth.admin.getUserById(targetUserId);
+        if (authErr) {
+            console.error('Failed to look up target user identities:', authErr);
+            return NextResponse.json({ error: 'Failed to verify target user identity.' }, { status: 500 });
+        }
+        const hasGithubIdentity = targetAuth?.user?.identities?.some((i) => i.provider === 'github') ?? false;
+        if (!hasGithubIdentity) {
+            return NextResponse.json(
+                { error: 'Target user has not verified their GitHub account via OAuth.' },
+                { status: 400 },
+            );
         }
 
         // 5. Fetch project's github_repo
@@ -100,7 +113,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to invite user to GitHub repository.' }, { status: 500 });
         }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Unexpected error in invite-collaborator route:', err);
         return NextResponse.json({ error: 'An unexpected server error occurred.' }, { status: 500 });
     }
