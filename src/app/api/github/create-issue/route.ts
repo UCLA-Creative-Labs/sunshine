@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/server';
 import { getInstallationClient } from '@/lib/github/githubApp';
+import { getUserOctokit } from '@/lib/github/userOctokit';
 import { userCanActOnTaskIssue } from '@/lib/permissions/githubAccess';
 
 export const runtime = 'nodejs';
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
         // 9. Authenticate as GitHub App
         let octokit;
         try {
-            octokit = await getInstallationClient(project.github_repo);
+            octokit = (await getUserOctokit(user.id)) ?? (await getInstallationClient(project.github_repo));
         } catch (authError) {
             console.error('GitHub auth error:', authError);
             // Unlock task
@@ -138,6 +139,15 @@ export async function POST(request: NextRequest) {
 
         const [owner, repo] = project.github_repo.split('/');
 
+        const { data: assignmentRows } = await supabase
+            .from('task_assignments')
+            .select('profiles!inner(github_username)')
+            .eq('task_id', taskId);
+        const assignees = ((assignmentRows ?? []) as Array<{ profiles: { github_username: string | null } | { github_username: string | null }[] | null }>)
+            .flatMap((r) => (Array.isArray(r.profiles) ? r.profiles : r.profiles ? [r.profiles] : []))
+            .map((p) => p.github_username)
+            .filter((u): u is string => !!u);
+
         // 10. Create issue via octokit
         let issueData;
         try {
@@ -146,6 +156,7 @@ export async function POST(request: NextRequest) {
                 repo,
                 title: task.name,
                 body: task.description || 'No description provided.',
+                assignees,
             });
             issueData = response.data;
         } catch (apiError) {

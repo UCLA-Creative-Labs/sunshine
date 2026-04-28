@@ -29,16 +29,43 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
     const [manualInput, setManualInput] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [appAuthorized, setAppAuthorized] = useState<boolean>(false);
+    const [appLoading, setAppLoading] = useState(false);
 
     // Show status messages from the OAuth redirect
     useEffect(() => {
         const ghError = searchParams.get('github_error');
         const ghLinked = searchParams.get('github_linked');
+        const appAuthorizedParam = searchParams.get('app_authorized');
+        const appErrorParam = searchParams.get('app_error');
 
         if (ghError) setError(decodeURIComponent(ghError));
         if (ghLinked === 'true' && !ghError)
             setSuccessMsg('GitHub account linked successfully!');
+        if (appAuthorizedParam === 'true' && !appErrorParam) {
+            setSuccessMsg('Authorized to push as you ✓');
+            setAppAuthorized(true);
+        }
+        if (appErrorParam) setError(decodeURIComponent(appErrorParam));
     }, [searchParams]);
+
+    // Fetch app authorization status on mount
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch('/api/github/app-authorization-status');
+                if (!res.ok) return;
+                const body = await res.json();
+                if (!cancelled) setAppAuthorized(!!body.authorized);
+            } catch {
+                // Ignore — leave default false
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     // Auto-dismiss success message
     useEffect(() => {
@@ -60,6 +87,21 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
         } catch (err: any) {
             setError(err.message);
             setLoading(false);
+        }
+    };
+
+    // ── App authorization ──
+    const handleAppAuthorize = async () => {
+        setAppLoading(true);
+        setError(null);
+        try {
+            const res = await fetch('/api/github/app-authorize', { method: 'POST' });
+            const body = await res.json();
+            if (!res.ok) throw new Error(body.error ?? 'Failed to start authorization.');
+            window.location.href = body.url;
+        } catch (err: any) {
+            setError(err.message);
+            setAppLoading(false);
         }
     };
 
@@ -300,6 +342,61 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* App authorization (push-as-me) */}
+            {githubUsername && (
+                <div style={{ marginTop: '0.75rem' }}>
+                    {appAuthorized ? (
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                padding: '0.5rem 0.75rem',
+                                backgroundColor: '#F0FDF4',
+                                border: '1px solid #BBF7D0',
+                                borderRadius: '0.375rem',
+                                fontSize: '0.8125rem',
+                                color: '#16A34A',
+                            }}
+                        >
+                            <span
+                                style={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    backgroundColor: '#22C55E',
+                                    display: 'inline-block',
+                                }}
+                            />
+                            <span>Authorized to push as you</span>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={handleAppAuthorize}
+                            disabled={appLoading}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                padding: '0.5rem 1rem',
+                                backgroundColor: '#24292F',
+                                color: '#FFFFFF',
+                                fontSize: '0.875rem',
+                                fontWeight: 500,
+                                border: 'none',
+                                borderRadius: '0.375rem',
+                                cursor: appLoading ? 'not-allowed' : 'pointer',
+                                opacity: appLoading ? 0.6 : 1,
+                                transition: 'opacity 150ms',
+                            }}
+                        >
+                            {appLoading ? 'Authorizing…' : 'Authorize App to push as me'}
+                        </button>
+                    )}
                 </div>
             )}
         </div>
