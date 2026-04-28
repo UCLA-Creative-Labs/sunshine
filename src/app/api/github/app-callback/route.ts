@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin;
-    const redirectUri = `${siteUrl}/api/github/app-callback`;
-    const profileBase = `${siteUrl}/portal/profile`;
+    const origin = request.nextUrl.origin;
+    const redirectUri = `${origin}/api/github/app-callback`;
+    const profileBase = `${origin}/portal/profile`;
 
     const params = request.nextUrl.searchParams;
     const code = params.get('code');

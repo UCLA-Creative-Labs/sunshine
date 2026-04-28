@@ -27,8 +27,7 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin;
-    const redirectUri = `${siteUrl}/api/github/app-callback`;
+    const redirectUri = `${request.nextUrl.origin}/api/github/app-callback`;
 
     const state = randomBytes(16).toString('hex');
 
