@@ -46,15 +46,18 @@ export async function POST(request: NextRequest) {
         }
 
         const serviceClient = getServiceRoleClient();
-        const { data: targetAuth, error: authErr } = await serviceClient.auth.admin.getUserById(targetUserId);
-        if (authErr) {
-            console.error('Failed to look up target user identities:', authErr);
-            return NextResponse.json({ error: 'Failed to verify target user identity.' }, { status: 500 });
+        const { data: tokenRow, error: tokenErr } = await serviceClient
+            .from('github_user_tokens')
+            .select('user_id')
+            .eq('user_id', targetUserId)
+            .maybeSingle();
+        if (tokenErr) {
+            console.error('Failed to look up target user GitHub authorization:', tokenErr);
+            return NextResponse.json({ error: 'Failed to verify target user GitHub authorization.' }, { status: 500 });
         }
-        const hasGithubIdentity = targetAuth?.user?.identities?.some((i) => i.provider === 'github') ?? false;
-        if (!hasGithubIdentity) {
+        if (!tokenRow) {
             return NextResponse.json(
-                { error: 'Target user has not verified their GitHub account via OAuth.' },
+                { error: 'Target user has not authorized the GitHub App.' },
                 { status: 400 },
             );
         }

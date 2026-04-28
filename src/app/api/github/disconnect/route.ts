@@ -19,40 +19,24 @@ export async function POST() {
         );
     }
 
-    const githubIdentity = user.identities?.find(
-        (i) => i.provider === 'github',
-    );
-    if (!githubIdentity) {
-        return NextResponse.json(
-            { error: 'No GitHub account linked.' },
-            { status: 404 },
-        );
-    }
-
-    const { error: unlinkError } = await supabase.auth.unlinkIdentity(
-        githubIdentity,
-    );
-    if (unlinkError) {
-        console.error('unlinkIdentity failed:', unlinkError);
-        return NextResponse.json(
-            { error: unlinkError.message ?? 'Failed to disconnect GitHub.' },
-            { status: 400 },
-        );
-    }
-
     try {
         const serviceClient = getServiceRoleClient();
-        const { error: updateError } = await serviceClient
+
+        const { error: tokenError } = await serviceClient
+            .from('github_user_tokens')
+            .delete()
+            .eq('user_id', user.id);
+        if (tokenError) throw tokenError;
+
+        const { error: profileError } = await serviceClient
             .from('profiles')
             .update({ github_username: null })
             .eq('id', user.id);
-        if (updateError) throw updateError;
+        if (profileError) throw profileError;
     } catch (err) {
-        console.error('Failed to clear github_username:', err);
+        console.error('Failed to disconnect GitHub:', err);
         return NextResponse.json(
-            {
-                error: 'GitHub unlinked but failed to clear profile. Contact support.',
-            },
+            { error: 'Failed to disconnect GitHub.' },
             { status: 500 },
         );
     }

@@ -12,12 +12,6 @@ interface GitHubLinkSectionProps {
     onUsernameChange: (username: string | null) => void;
 }
 
-/**
- * GitHubLinkSection – renders inside the profile page.
- *
- * Connected state   → green badge + disconnect button
- * Disconnected state → "Connect GitHub" OAuth button + manual input fallback
- */
 const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
     userId,
     githubUsername,
@@ -30,26 +24,19 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [appAuthorized, setAppAuthorized] = useState<boolean>(false);
-    const [appLoading, setAppLoading] = useState(false);
+    const [statusChecked, setStatusChecked] = useState(false);
 
-    // Show status messages from the OAuth redirect
     useEffect(() => {
-        const ghError = searchParams.get('github_error');
-        const ghLinked = searchParams.get('github_linked');
         const appAuthorizedParam = searchParams.get('app_authorized');
         const appErrorParam = searchParams.get('app_error');
 
-        if (ghError) setError(decodeURIComponent(ghError));
-        if (ghLinked === 'true' && !ghError)
-            setSuccessMsg('GitHub account linked successfully!');
         if (appAuthorizedParam === 'true' && !appErrorParam) {
-            setSuccessMsg('Authorized to push as you ✓');
+            setSuccessMsg('GitHub account connected!');
             setAppAuthorized(true);
         }
         if (appErrorParam) setError(decodeURIComponent(appErrorParam));
     }, [searchParams]);
 
-    // Fetch app authorization status on mount
     useEffect(() => {
         let cancelled = false;
         (async () => {
@@ -60,6 +47,8 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                 if (!cancelled) setAppAuthorized(!!body.authorized);
             } catch {
                 // Ignore — leave default false
+            } finally {
+                if (!cancelled) setStatusChecked(true);
             }
         })();
         return () => {
@@ -67,22 +56,19 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
         };
     }, []);
 
-    // Auto-dismiss success message
     useEffect(() => {
         if (!successMsg) return;
         const t = setTimeout(() => setSuccessMsg(null), 5000);
         return () => clearTimeout(t);
     }, [successMsg]);
 
-    // ── OAuth linking ──
-    const handleOAuthLink = async () => {
+    const handleConnect = async () => {
         setLoading(true);
         setError(null);
         try {
             const res = await fetch('/api/github/link-account', { method: 'POST' });
             const body = await res.json();
             if (!res.ok) throw new Error(body.error ?? 'Failed to start linking.');
-            // Redirect to GitHub OAuth consent screen
             window.location.href = body.url;
         } catch (err: any) {
             setError(err.message);
@@ -90,22 +76,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
         }
     };
 
-    // ── App authorization ──
-    const handleAppAuthorize = async () => {
-        setAppLoading(true);
-        setError(null);
-        try {
-            const res = await fetch('/api/github/app-authorize', { method: 'POST' });
-            const body = await res.json();
-            if (!res.ok) throw new Error(body.error ?? 'Failed to start authorization.');
-            window.location.href = body.url;
-        } catch (err: any) {
-            setError(err.message);
-            setAppLoading(false);
-        }
-    };
-
-    // ── Manual username save ──
     const handleManualSave = async () => {
         const trimmed = manualInput.trim();
         if (!GITHUB_USERNAME_RE.test(trimmed)) {
@@ -128,7 +98,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
         }
     };
 
-    // ── Disconnect ──
     const handleDisconnect = async () => {
         setLoading(true);
         setError(null);
@@ -137,6 +106,7 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
             const body = await res.json();
             if (!res.ok) throw new Error(body.error ?? 'Failed to disconnect.');
             onUsernameChange(null);
+            setAppAuthorized(false);
             setSuccessMsg('GitHub account disconnected.');
         } catch (err: any) {
             setError(err.message);
@@ -144,6 +114,8 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
             setLoading(false);
         }
     };
+
+    const connected = appAuthorized;
 
     return (
         <div style={{ marginTop: '1.5rem' }}>
@@ -158,7 +130,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                 GitHub Account
             </h3>
 
-            {/* Status messages */}
             {error && (
                 <div
                     style={{
@@ -190,8 +161,7 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                 </div>
             )}
 
-            {githubUsername ? (
-                /* ── Connected state ── */
+            {connected ? (
                 <div
                     style={{
                         display: 'flex',
@@ -204,7 +174,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        {/* Green dot */}
                         <span
                             style={{
                                 width: 8,
@@ -215,8 +184,10 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                             }}
                         />
                         <span style={{ fontSize: '0.875rem', color: '#374151' }}>
-                            Connected as{' '}
-                            <strong style={{ color: '#111827' }}>@{githubUsername}</strong>
+                            Connected{githubUsername ? ' as ' : ''}
+                            {githubUsername && (
+                                <strong style={{ color: '#111827' }}>@{githubUsername}</strong>
+                            )}
                         </span>
                     </div>
                     <button
@@ -236,7 +207,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                     </button>
                 </div>
             ) : (
-                /* ── Disconnected state ── */
                 <div
                     style={{
                         display: 'flex',
@@ -244,10 +214,9 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                         gap: '0.75rem',
                     }}
                 >
-                    {/* OAuth button */}
                     <button
-                        onClick={handleOAuthLink}
-                        disabled={loading}
+                        onClick={handleConnect}
+                        disabled={loading || !statusChecked}
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -265,7 +234,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                             transition: 'opacity 150ms',
                         }}
                     >
-                        {/* GitHub icon (simple SVG) */}
                         <svg
                             width="16"
                             height="16"
@@ -288,7 +256,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                         {loading ? 'Connecting…' : 'Connect GitHub'}
                     </button>
 
-                    {/* Manual fallback */}
                     <div>
                         <p
                             style={{
@@ -342,61 +309,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                             </button>
                         </div>
                     </div>
-                </div>
-            )}
-
-            {/* App authorization (push-as-me) */}
-            {githubUsername && (
-                <div style={{ marginTop: '0.75rem' }}>
-                    {appAuthorized ? (
-                        <div
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                padding: '0.5rem 0.75rem',
-                                backgroundColor: '#F0FDF4',
-                                border: '1px solid #BBF7D0',
-                                borderRadius: '0.375rem',
-                                fontSize: '0.8125rem',
-                                color: '#16A34A',
-                            }}
-                        >
-                            <span
-                                style={{
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: '50%',
-                                    backgroundColor: '#22C55E',
-                                    display: 'inline-block',
-                                }}
-                            />
-                            <span>Authorized to push as you</span>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={handleAppAuthorize}
-                            disabled={appLoading}
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem',
-                                padding: '0.5rem 1rem',
-                                backgroundColor: '#24292F',
-                                color: '#FFFFFF',
-                                fontSize: '0.875rem',
-                                fontWeight: 500,
-                                border: 'none',
-                                borderRadius: '0.375rem',
-                                cursor: appLoading ? 'not-allowed' : 'pointer',
-                                opacity: appLoading ? 0.6 : 1,
-                                transition: 'opacity 150ms',
-                            }}
-                        >
-                            {appLoading ? 'Authorizing…' : 'Authorize App to push as me'}
-                        </button>
-                    )}
                 </div>
             )}
         </div>

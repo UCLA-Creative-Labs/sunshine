@@ -1,17 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomBytes } from 'node:crypto';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 
-/**
- * POST /api/github/link-account
- *
- * Initiates GitHub identity linking via Supabase Auth.
- * Returns a { url } the client should redirect to (GitHub OAuth consent).
- */
 export async function POST(request: NextRequest) {
-    const supabase = await createClient();
+    const clientId = process.env.GITHUB_APP_CLIENT_ID;
+    const clientSecret = process.env.GITHUB_APP_CLIENT_SECRET;
+    if (!clientId || !clientSecret) {
+        return NextResponse.json(
+            { error: 'Server is missing GITHUB_APP_CLIENT_ID or GITHUB_APP_CLIENT_SECRET.' },
+            { status: 500 },
+        );
+    }
 
+    const supabase = await createClient();
     const {
         data: { user },
         error: userError,
@@ -24,43 +27,23 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const githubIdentity = user.identities?.find(
-        (i) => i.provider === 'github',
-    );
-    if (githubIdentity) {
-        return NextResponse.json(
-            { error: 'A GitHub account is already linked.' },
-            { status: 409 },
-        );
-    }
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin;
+    const redirectUri = `${siteUrl}/api/github/app-callback`;
 
-    const origin = request.nextUrl.origin;
+    const state = randomBytes(16).toString('hex');
 
-    const { data, error } = await supabase.auth.linkIdentity({
-        provider: 'github',
-        options: {
-            redirectTo: `${origin}/api/github/callback`,
-            skipBrowserRedirect: true,
-            scopes: 'read:user user:email',
-        },
+    const url = new URL('https://github.com/login/oauth/authorize');
+    url.searchParams.set('client_id', clientId);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('state', state);
+
+    const response = NextResponse.json({ url: url.toString() });
+    response.cookies.set('gh_app_state', state, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/api/github',
+        maxAge: 600,
     });
-
-    if (error) {
-        console.error('linkIdentity failed:', error);
-        return NextResponse.json(
-            { error: error.message ?? 'Failed to initiate GitHub linking.' },
-            { status: 400 },
-        );
-    }
-
-    const url = data?.url;
-
-    if (!url) {
-        return NextResponse.json(
-            { error: 'No redirect URL returned from Supabase.' },
-            { status: 500 },
-        );
-    }
-
-    return NextResponse.json({ url });
+    return response;
 }

@@ -113,6 +113,32 @@ export async function GET(request: NextRequest) {
         return fail('persist_failed');
     }
 
+    try {
+        const ghUserRes = await fetch('https://api.github.com/user', {
+            headers: {
+                Accept: 'application/vnd.github+json',
+                Authorization: `Bearer ${access_token}`,
+                'X-GitHub-Api-Version': '2022-11-28',
+            },
+        });
+        if (ghUserRes.ok) {
+            const ghUser = (await ghUserRes.json()) as { login?: string };
+            if (ghUser.login) {
+                const { error: profileError } = await serviceClient
+                    .from('profiles')
+                    .update({ github_username: ghUser.login.toLowerCase() })
+                    .eq('id', user.id);
+                if (profileError) {
+                    console.error('Failed to save github_username:', profileError);
+                }
+            }
+        } else {
+            console.error('GET /user returned', ghUserRes.status);
+        }
+    } catch (err) {
+        console.error('Failed to fetch github user:', err);
+    }
+
     const response = NextResponse.redirect(`${profileBase}?app_authorized=true`);
     response.cookies.set('gh_app_state', '', { maxAge: 0, path: '/api/github' });
     return response;
