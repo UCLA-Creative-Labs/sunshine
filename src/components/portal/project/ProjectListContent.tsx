@@ -373,7 +373,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
       status: 'done',
     };
 
-    const success = await updateTaskAction(String(task.id), input);
+    const success = await updateTaskAction(String(task.id), input, !!task.github_issue_number);
     if (success) {
       refetch();
     }

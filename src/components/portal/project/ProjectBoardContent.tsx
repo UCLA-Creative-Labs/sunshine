@@ -244,7 +244,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
       status: 'done',
     };
 
-    const success = await updateTaskAction(String(task.id), input);
+    const success = await updateTaskAction(String(task.id), input, !!task.github_issue_number);
     if (success) {
       refetch();
     }
