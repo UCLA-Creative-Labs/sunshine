@@ -96,6 +96,15 @@ export async function POST(request: NextRequest) {
 
         const [owner, repo] = project.github_repo.split('/');
 
+        const { data: assignmentRows } = await supabase
+            .from('task_assignments')
+            .select('profiles!inner(github_username)')
+            .eq('task_id', taskId);
+        const assignees = ((assignmentRows ?? []) as Array<{ profiles: { github_username: string | null } | { github_username: string | null }[] | null }>)
+            .flatMap((r) => (Array.isArray(r.profiles) ? r.profiles : r.profiles ? [r.profiles] : []))
+            .map((p) => p.github_username)
+            .filter((u): u is string => !!u);
+
         // 8. Update issue via octokit
         try {
             await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
@@ -105,6 +114,7 @@ export async function POST(request: NextRequest) {
                 title: task.name,
                 body: task.description || 'No description provided.',
                 state: task.status === 'done' ? 'closed' : 'open',
+                assignees,
             });
         } catch (apiError) {
             console.error('GitHub API error:', apiError);
