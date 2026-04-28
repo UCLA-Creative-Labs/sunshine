@@ -170,6 +170,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const applied = (issueData.assignees ?? []).map((a: { login: string }) => a.login.toLowerCase());
+        const dropped = assignees.map((a) => a.toLowerCase()).filter((a) => !applied.includes(a));
+        if (dropped.length > 0) {
+            console.warn(`[create-issue] task=${taskId} repo=${project.github_repo} requested=${JSON.stringify(assignees)} applied=${JSON.stringify(applied)} dropped=${JSON.stringify(dropped)} (likely not repo collaborators — invite them via the portal)`);
+        }
+
         // 11. Update the task
         const { error: updateError } = await supabase
             .from('tasks')

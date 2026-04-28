@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
 
         // 8. Update issue via octokit
         try {
-            await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+            const patchRes = await octokit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
                 owner,
                 repo,
                 issue_number: task.github_issue_number,
@@ -116,6 +116,11 @@ export async function POST(request: NextRequest) {
                 state: task.status === 'done' ? 'closed' : 'open',
                 assignees,
             });
+            const applied = (patchRes.data.assignees ?? []).map((a: { login: string }) => a.login.toLowerCase());
+            const dropped = assignees.map((a) => a.toLowerCase()).filter((a) => !applied.includes(a));
+            if (dropped.length > 0) {
+                console.warn(`[update-issue] task=${taskId} repo=${project.github_repo} requested=${JSON.stringify(assignees)} applied=${JSON.stringify(applied)} dropped=${JSON.stringify(dropped)} (likely not repo collaborators — invite them via the portal)`);
+            }
         } catch (apiError) {
             console.error('GitHub API error:', apiError);
             return NextResponse.json(
