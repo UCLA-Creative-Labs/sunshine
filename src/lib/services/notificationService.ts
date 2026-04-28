@@ -26,7 +26,6 @@ export function mapNotificationAction(eventType: string, action: string): string
   if (eventType === 'issues') {
     if (action === 'opened' || action === 'reopened') return 'issue_opened';
     if (action === 'closed') return 'issue_closed';
-    if (action === 'assigned' || action === 'unassigned') return 'issue_assigned';
     if (action === 'edited') return 'issue_edited';
   }
   if (eventType === 'pull_request') {
@@ -44,8 +43,6 @@ function actionVerb(action: string): string {
       return 'Issue closed';
     case 'issue_edited':
       return 'Issue edited';
-    case 'issue_assigned':
-      return 'Issue assignment changed';
     case 'pr_opened':
       return 'Pull request opened';
     case 'pr_closed':
