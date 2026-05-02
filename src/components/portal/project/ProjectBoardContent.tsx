@@ -10,7 +10,11 @@ import { AddTaskModal } from './tasks/AddTaskModal';
 import { EditTaskModal } from './tasks/EditTaskModal';
 import { TaskActionsMenu } from './tasks/TaskActionsMenu';
 import { GitHubBadge } from './tasks/GitHubBadge';
-import { CreateTaskInput, UpdateTaskInput } from '@/lib/types/tasks';
+import {
+  CreateTaskAssignmentContext,
+  CreateTaskInput,
+  UpdateTaskInput,
+} from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 import { getProfileDisplayName } from '@/lib/utils/profileName';
 
@@ -192,7 +196,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const { members } = useProjectMembers(projectId);
   const { isCreating, error: createError, createTaskWithAssignees } = useCreateTask();
   const { canCreateTasks } = useUserRole(projectId, currentUserId);
-  const { updateTaskAction, deleteTaskAction, pushToGithubAction, isUpdating } = useTaskActions();
+  const { updateTaskAction, deleteTaskAction, pushToGithubAction, isUpdating } = useTaskActions(projectId, currentUserId);
 
   // modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -206,8 +210,11 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
     }));
 
   // handle task creation
-  const handleCreateTask = async (input: CreateTaskInput, assigneeIds: string[]) => {
-    const result = await createTaskWithAssignees(input, currentUserId, assigneeIds);
+  const handleCreateTask = async (
+    input: CreateTaskInput,
+    assignmentContext: CreateTaskAssignmentContext,
+  ) => {
+    const result = await createTaskWithAssignees(input, currentUserId, assignmentContext);
     if (result) {
       setIsModalOpen(false);
       refetch();
@@ -215,10 +222,14 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   };
 
   // handle task deletion
-  const handleDeleteTask = async (taskId: string, hasGithubIssue: boolean) => {
+  const handleDeleteTask = async (task: TaskWithAssignments) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
-    const success = await deleteTaskAction(taskId, hasGithubIssue);
+    const success = await deleteTaskAction(
+      String(task.id),
+      { taskName: task.name },
+      !!task.github_issue_number,
+    );
     if (success) {
       refetch();
     }
@@ -232,7 +243,12 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const handleEditSubmit = async (input: UpdateTaskInput) => {
     if (!editingTask) return;
 
-    const success = await updateTaskAction(String(editingTask.id), input, !!editingTask.github_issue_number);
+    const success = await updateTaskAction(
+      String(editingTask.id),
+      input,
+      { taskName: editingTask.name, previousStatus: editingTask.status },
+      !!editingTask.github_issue_number,
+    );
     if (success) {
       setEditingTask(null);
       refetch();
@@ -244,7 +260,12 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
       status: 'done',
     };
 
-    const success = await updateTaskAction(String(task.id), input, !!task.github_issue_number);
+    const success = await updateTaskAction(
+      String(task.id),
+      input,
+      { taskName: task.name, previousStatus: task.status },
+      !!task.github_issue_number,
+    );
     if (success) {
       refetch();
     }
@@ -349,7 +370,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
+                  onDelete={() => handleDeleteTask(task)}
                   canEdit={canCreateTasks}
                   canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
@@ -372,7 +393,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
+                  onDelete={() => handleDeleteTask(task)}
                   canEdit={canCreateTasks}
                   canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
@@ -395,7 +416,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
+                  onDelete={() => handleDeleteTask(task)}
                   canEdit={canCreateTasks}
                   canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
@@ -418,7 +439,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
                   delay={idx * 60}
                   onEdit={() => handleEditTask(task)}
                   onMarkComplete={() => handleMarkComplete(task)}
-                  onDelete={() => handleDeleteTask(task.id.toString(), !!task.github_issue_number)}
+                  onDelete={() => handleDeleteTask(task)}
                   canEdit={canCreateTasks}
                   canPushToGithub={canCreateTasks || (task.assignments ?? []).some(a => a.user_id === currentUserId)}
                   isCompleted={task.status === 'done'}
