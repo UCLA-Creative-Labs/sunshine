@@ -17,14 +17,14 @@ export interface CreateLinkPayload {
 }
 
 /**
- * Fetches all links ordered by creation date (oldest first).
+ * Fetches all links ordered by creation date (newest first).
  */
 export async function getLinks(): Promise<Link[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('links')
     .select('*')
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching links:', error);
