@@ -7,6 +7,7 @@ export interface Link {
   redirect_path: string;
   created_by: string | null;
   created_at: string;
+  position: number | null;
 }
 
 export interface CreateLinkPayload {
@@ -14,6 +15,7 @@ export interface CreateLinkPayload {
   url: string;
   redirect_path: string;
   created_by?: string | null;
+  position?: number | null;
 }
 
 /**
@@ -24,6 +26,7 @@ export async function getLinks(): Promise<Link[]> {
   const { data, error } = await supabase
     .from('links')
     .select('*')
+    .order('position', { ascending: true, nullsFirst: true })
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -50,10 +53,6 @@ export async function isRedirectPathTaken(redirectPath: string): Promise<boolean
 /**
  * Inserts a new link row.
  * NOTE: Requires an INSERT RLS policy on public.links for authenticated users.
- * Suggested policy:
- *   CREATE POLICY "Authenticated users can insert links"
- *   ON public.links FOR INSERT TO authenticated
- *   WITH CHECK (auth.uid() = created_by);
  */
 export async function createLink(payload: CreateLinkPayload): Promise<Link> {
   const supabase = createClient();
@@ -101,6 +100,29 @@ export async function deleteLink(id: string): Promise<void> {
 
   if (error) {
     console.error('Error deleting link:', error);
+    throw error;
+  }
+}
+/**
+ * Batch updates the positions of multiple links.
+ */
+export async function updateLinkPositions(updates: { id: string, position: number }[]): Promise<void> {
+  const supabase = createClient();
+  
+  // Note: For small numbers of links, individual updates are fine.
+  // For larger sets, a stored procedure (RPC) would be better.
+  const promises = updates.map(u => 
+    supabase
+      .from('links')
+      .update({ position: u.position })
+      .eq('id', u.id)
+  );
+
+  const results = await Promise.all(promises);
+  const error = results.find(r => r.error)?.error;
+
+  if (error) {
+    console.error('Error updating link positions:', error);
     throw error;
   }
 }

@@ -9,6 +9,7 @@
         "lint": "eslint ."
     },
     "dependencies": {
+        "@hello-pangea/dnd": "^18.0.1",
         "@supabase/ssr": "^0.8.0",
         "@supabase/supabase-js": "^2.90.1",
         "@types/fabric": "^5.3.6",

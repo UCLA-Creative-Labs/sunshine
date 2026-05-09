@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getLinks, deleteLink, Link } from '@/lib/supabase/linksService';
+import { getLinks, deleteLink, updateLinkPositions, Link } from '@/lib/supabase/linksService';
 import LinkBoard from '@/components/portal/internal/tinycl/LinkBoard';
 import LinkPanel from '@/components/portal/internal/tinycl/LinkPanel';
 
@@ -52,6 +52,24 @@ export default function TinyCLPage() {
     setIsPanelOpen(false);
   };
 
+  const handleOrderChange = async (updatedLinks: Link[]) => {
+    // Optimistically update the UI
+    setLinks(updatedLinks);
+
+    try {
+      // Persist the new positions to Supabase
+      const positionUpdates = updatedLinks.map((link, index) => ({
+        id: link.id,
+        position: index
+      }));
+      await updateLinkPositions(positionUpdates);
+    } catch (err) {
+      console.error('Failed to save link order:', err);
+      // Revert if it fails
+      loadLinks();
+    }
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header row — matches Design/Projects page */}
@@ -73,6 +91,7 @@ export default function TinyCLPage() {
         onEditLink={handleEditLink}
         onDeleteLink={handleDeleteLink}
         onAddNew={handleAddNew}
+        onOrderChange={handleOrderChange}
       />
 
       {/* Slide-over panel for Create/Update actions */}
