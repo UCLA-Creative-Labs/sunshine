@@ -44,7 +44,6 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
   const [displayName, setDisplayName] = useState('');
   const [url, setUrl] = useState('');
   const [redirectPath, setRedirectPath] = useState('');
-  const [slugEdited, setSlugEdited] = useState(false);
 
   // Validation state
   const [urlError, setUrlError] = useState('');
@@ -59,38 +58,37 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
         setDisplayName(editingLink.display_name);
         setUrl(editingLink.url);
         setRedirectPath(editingLink.redirect_path);
-        setSlugEdited(true);
       } else {
         setDisplayName('');
         setUrl('');
         setRedirectPath('');
-        setSlugEdited(false);
       }
     }
   }, [isOpen, editingLink]);
 
   useEffect(() => {
-    if (!slugEdited && !editingLink) {
-      setRedirectPath(toSlug(displayName));
-    }
-  }, [displayName, slugEdited, editingLink]);
+    const slug = toSlug(displayName);
+    setRedirectPath(slug);
+    
+    // Clear slug error when name changes
+    if (slugError) setSlugError('');
+  }, [displayName]);
 
   if (!isOpen) return null;
 
-  const handleRedirectPathBlur = async () => {
-    if (!redirectPath) return;
+  const validateSlug = async () => {
+    if (!redirectPath) return true;
     
     if (editingLink && editingLink.redirect_path === redirectPath) {
-      setSlugError('');
-      return;
+      return true;
     }
 
     const taken = await isRedirectPathTaken(redirectPath);
     if (taken) {
-      setSlugError('This redirect path is already taken.');
-    } else {
-      setSlugError('');
+      setSlugError('A link with this name already exists.');
+      return false;
     }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,9 +99,12 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
       setUrlError('Please enter a valid URL (e.g., https://...)');
       return;
     }
-    if (slugError) return;
+
+    const isSlugValid = await validateSlug();
+    if (!isSlugValid) return;
+
     if (!redirectPath) {
-      setSlugError('Redirect path is required.');
+      setSlugError('A valid display name is required to generate a link.');
       return;
     }
 
@@ -180,14 +181,25 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="e.g. S26 Project Member Application"
-              className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className={`px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                slugError ? 'border-red-400' : 'border-gray-200'
+              }`}
             />
+            {slugError && <p className="text-xs text-red-500 font-medium">{slugError}</p>}
+            
+            {/* URL Preview */}
+            {displayName && (
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 rounded-lg border border-blue-100 w-fit">
+                <span className="text-[11px] font-bold text-blue-400 uppercase tracking-tight">URL Preview:</span>
+                <span className="text-xs font-medium text-blue-700">tinycl.com/{redirectPath}</span>
+              </div>
+            )}
           </div>
 
           {/* URL */}
           <div className="flex flex-col space-y-2">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              URL <span className="text-red-400">*</span>
+              Destination URL <span className="text-red-400">*</span>
             </label>
             <input
               required
@@ -201,34 +213,6 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
               }`}
             />
             {urlError && <p className="text-xs text-red-500 font-medium">{urlError}</p>}
-          </div>
-
-          {/* Redirect Path */}
-          <div className="flex flex-col space-y-2">
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Redirect Path <span className="text-red-400">*</span>
-            </label>
-            <div className={`flex items-center bg-gray-50 border rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 transition-all ${
-              slugError ? 'border-red-400' : 'border-gray-200'
-            }`}>
-              <span className="px-3 py-3 bg-gray-100 text-gray-400 text-sm font-medium border-right border-gray-200 select-none">
-                tinycl.com/
-              </span>
-              <input
-                required
-                value={redirectPath}
-                onChange={(e) => {
-                  setRedirectPath(stripLeadingSlash(e.target.value));
-                  setSlugEdited(true);
-                  setSlugError('');
-                }}
-                onBlur={handleRedirectPathBlur}
-                placeholder="slug-here"
-                className="flex-1 px-3 py-3 bg-transparent focus:outline-none text-gray-900"
-              />
-            </div>
-            {slugError && <p className="text-xs text-red-500 font-medium">{slugError}</p>}
-            <p className="text-[11px] text-gray-400 font-medium">Must be a unique, lowercase-kebab slug.</p>
           </div>
 
           {/* Submit */}
