@@ -58,9 +58,9 @@ export default function TinyCLPage() {
 
     try {
       // Persist the new positions to Supabase
-      const positionUpdates = updatedLinks.map((link, index) => ({
+      const positionUpdates = updatedLinks.map((link) => ({
         id: link.id,
-        position: index
+        position: link.position
       }));
       await updateLinkPositions(positionUpdates);
     } catch (err) {

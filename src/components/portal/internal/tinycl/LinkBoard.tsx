@@ -31,9 +31,10 @@ export default function LinkBoard({
     reorderedLinks.splice(result.destination.index, 0, removed);
 
     // Update positions based on new index
+    // Higher position = Top of the list
     const updatedLinks = reorderedLinks.map((link, index) => ({
       ...link,
-      position: index
+      position: reorderedLinks.length - 1 - index
     }));
 
     onOrderChange(updatedLinks);

@@ -7,7 +7,7 @@ export interface Link {
   redirect_path: string;
   created_by: string | null;
   created_at: string;
-  position: number | null;
+  position: number;
 }
 
 export interface CreateLinkPayload {
@@ -15,19 +15,18 @@ export interface CreateLinkPayload {
   url: string;
   redirect_path: string;
   created_by?: string | null;
-  position?: number | null;
+  position?: number;
 }
 
 /**
- * Fetches all links ordered by creation date (newest first).
+ * Fetches all links ordered by position.
  */
 export async function getLinks(): Promise<Link[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('links')
     .select('*')
-    .order('position', { ascending: true, nullsFirst: true })
-    .order('created_at', { ascending: false });
+    .order('position', { ascending: false });
 
   if (error) {
     console.error('Error fetching links:', error);
@@ -52,13 +51,28 @@ export async function isRedirectPathTaken(redirectPath: string): Promise<boolean
 
 /**
  * Inserts a new link row.
- * NOTE: Requires an INSERT RLS policy on public.links for authenticated users.
+ * Automatically assigns the next position if not provided.
  */
 export async function createLink(payload: CreateLinkPayload): Promise<Link> {
   const supabase = createClient();
+
+  let finalPayload = { ...payload };
+
+  // If position is not provided, find the max position and add 1
+  if (finalPayload.position === undefined) {
+    const { data: maxPosData } = await supabase
+      .from('links')
+      .select('position')
+      .order('position', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    
+    finalPayload.position = (maxPosData?.position ?? -1) + 1;
+  }
+
   const { data, error } = await supabase
     .from('links')
-    .insert([payload])
+    .insert([finalPayload])
     .select()
     .single();
 
