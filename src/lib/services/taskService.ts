@@ -41,6 +41,8 @@ export async function createTask(
   const { data, error } = await supabase
     .from('tasks')
     .insert({
+      sort_order: 0,
+      synced_from_github: false,
       ...input,
       created_by: createdBy,
     })

@@ -9,6 +9,8 @@
         "lint": "eslint ."
     },
     "dependencies": {
+        "@octokit/app": "^16.1.2",
+        "@octokit/webhooks": "^14.2.0",
         "@hello-pangea/dnd": "^18.0.1",
         "@supabase/ssr": "^0.8.0",
         "@supabase/supabase-js": "^2.90.1",
@@ -25,6 +27,7 @@
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
+        "@netlify/functions": "^5.2.0",
         "@next/eslint-plugin-next": "^16.1.1",
         "@types/node": "latest",
         "@types/react": "latest",
