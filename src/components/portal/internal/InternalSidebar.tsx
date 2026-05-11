@@ -2,7 +2,8 @@
 
 import React, { useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { RxDashboard, RxPencil2 } from "react-icons/rx";
+import { RxDashboard, RxPencil2, RxLink2 } from "react-icons/rx";
+import { BsCashCoin } from "react-icons/bs";
 
 const NAV_STYLES = {
   base: "flex items-center gap-3 rounded-xl px-3 py-3 text-l transition-colors duration-150",
@@ -13,6 +14,8 @@ const NAV_STYLES = {
 const COMMITTEE_ITEMS = [
   { id: "projects", label: "Projects", href: "/portal/internal/projects", icon: RxDashboard },
   { id: "design", label: "Design", href: "/portal/internal/design", icon: RxPencil2 },
+  { id: "finance", label: "Finance", href: "/portal/internal/finance", icon: BsCashCoin },
+  { id: "tinycl", label: "TinyCL", href: "/portal/internal/tinycl", icon: RxLink2 },
 ] as const;
 
 export default function InternalSidebar({ className = "" }: { className?: string }) {
