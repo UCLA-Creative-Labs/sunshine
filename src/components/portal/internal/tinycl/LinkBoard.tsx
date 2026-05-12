@@ -18,7 +18,6 @@ export default function LinkBoard({
   loading, 
   onEditLink, 
   onDeleteLink, 
-  onAddNew,
   onOrderChange
 }: LinkBoardProps) {
 

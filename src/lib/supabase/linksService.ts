@@ -56,7 +56,7 @@ export async function isRedirectPathTaken(redirectPath: string): Promise<boolean
 export async function createLink(payload: CreateLinkPayload): Promise<Link> {
   const supabase = createClient();
 
-  let finalPayload = { ...payload };
+  const finalPayload = { ...payload };
 
   // If position is not provided, find the max position and add 1
   if (finalPayload.position === undefined) {

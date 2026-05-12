@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { createLink, updateLink, isRedirectPathTaken, Link } from '@/lib/supabase/linksService';
 import { createClient } from '@/lib/supabase/client';
 import { IoClose } from 'react-icons/io5';
@@ -23,9 +23,7 @@ function toSlug(value: string): string {
     .replace(/-+/g, '-');
 }
 
-function stripLeadingSlash(value: string): string {
-  return value.startsWith('/') ? value.slice(1) : value;
-}
+
 
 function isValidUrl(value: string): boolean {
   try {
@@ -132,9 +130,9 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
 
       onSubmit();
       onClose();
-    } catch (err: any) {
+    } catch (err) {
       console.error('Submission error:', err);
-      setError(err?.message ?? 'Failed to save link. Please try again.');
+      setError((err as Error)?.message ?? 'Failed to save link. Please try again.');
     } finally {
       setLoading(false);
     }
