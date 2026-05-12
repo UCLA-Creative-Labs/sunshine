@@ -85,6 +85,14 @@ export function useCreateTask(): UseCreateTaskReturn {
       }
     }
 
+    fetch('/api/github/create-issue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ taskId: newTask.id }),
+    }).catch((err) => {
+      console.error('Auto-push to github failed:', err);
+    });
+
     setIsCreating(false);
     return newTask;
   };

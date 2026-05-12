@@ -6,10 +6,11 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useUserRole } from '@/lib/hooks/useUserRole';
 import { useProjectMembers } from '@/lib/hooks/useProjectMembers';
 import InviteMemberModal from '@/components/portal/InviteMemberModal';
+import { MemberGitHubStatus } from '@/components/portal/project/MemberGitHubStatus';
 
 function getRoleBadgeStyles(roleName: string | undefined) {
   if (!roleName) return 'bg-gray-100 text-gray-600';
-  
+
   const lowerName = roleName.toLowerCase();
   if (lowerName.includes('lead')) {
     return 'bg-purple-100 text-purple-700';
@@ -89,6 +90,9 @@ export default function MembersPage({
                     Role
                   </th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">
+                    GitHub Status
+                  </th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">
                     Joined
                   </th>
                 </tr>
@@ -115,6 +119,13 @@ export default function MembersPage({
                       >
                         {member.rbac_role?.name || 'No role'}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <MemberGitHubStatus
+                        projectId={projectId}
+                        userId={member.user_id}
+                        currentUserId={userId}
+                      />
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-sm">
                       {new Date(member.joined_at).toLocaleDateString()}

@@ -102,3 +102,30 @@ export async function removeMember(
   }
   return { data: null, error: null, success: true };
 }
+
+/**
+ * Resolves the role of a user within a specific project.
+ */
+export async function resolveCallerRole(
+  userId: string,
+  projectId: string,
+  supabaseClient = supabase
+): Promise<Role | null> {
+  const { data, error } = await supabaseClient
+    .from('project_members')
+
+    .select('rbac_role:roles!project_members_rbac_role_id_fkey(*)')
+    .eq('user_id', userId)
+    .eq('project_id', projectId)
+    .single();
+
+  if (error || !data) {
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error resolving caller role:', error);
+    }
+    return null;
+  }
+
+  const roleData = data.rbac_role;
+  return (Array.isArray(roleData) ? roleData[0] : roleData) as unknown as Role | null;
+}

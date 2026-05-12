@@ -45,6 +45,7 @@ export interface Profiles {
   first_name: string | null;
   last_name: string | null;
   display_name?: string | null;
+  github_username?: string | null;
 }
 
 export interface ProjectMember {
@@ -79,6 +80,7 @@ export interface Task {
   github_pr_url: string | null;
   synced_from_github: boolean;
   last_github_sync_at: string | null;
+  github_push_pending_at: string | null;
   sort_order: number;
   label: string;
   label_color: string;
@@ -106,22 +108,22 @@ export interface ProjectInvite {
   times_used: number;
 }
 
-// export interface GithubIntegration {
-//   id: number;
-//   created_at: string;
-//   project_id: string;
-//   task_id: number | null;
-//   delivery_id: string;
-//   event_type: string;
-//   action: string;
-//   github_id: number;
-//   github_node_id: string | null;
-//   github_number: number;
-//   payload: Record<string, any>;
-//   processed: boolean;
-//   processed_at: string | null;
-//   error_message: string | null;
-// }
+export interface GithubIntegration {
+  id: number;
+  created_at: string;
+  project_id: string;
+  task_id: number | null;
+  delivery_id: string;
+  event_type: string;
+  action: string;
+  github_id: number | null;
+  github_node_id: string | null;
+  github_number: number | null;
+  payload: Record<string, unknown>;
+  processed: boolean;
+  processed_at: string | null;
+  error_message: string | null;
+}
 
 // export interface ActivityLog {
 //   id: number;

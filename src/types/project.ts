@@ -15,4 +15,7 @@ export interface Project {
     demoDayUrl?: string;
     instaPostUrl?: string;
     slack_channel_id?: string | null;
+    github_repo?: string | null;
+    slack_webhook_url?: string | null;
+    discord_webhook_url?: string | null;
 }
