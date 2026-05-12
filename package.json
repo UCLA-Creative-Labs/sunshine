@@ -9,9 +9,10 @@
         "lint": "eslint ."
     },
     "dependencies": {
-        "@octokit/app": "^16.1.2",
-        "@octokit/webhooks": "^14.2.0",
         "@hello-pangea/dnd": "^18.0.1",
+        "@octokit/app": "^16.1.2",
+        "@octokit/core": "^7.0.6",
+        "@octokit/webhooks": "^14.2.0",
         "@supabase/ssr": "^0.8.0",
         "@supabase/supabase-js": "^2.90.1",
         "@types/fabric": "^5.3.6",
