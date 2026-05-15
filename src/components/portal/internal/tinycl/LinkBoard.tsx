@@ -9,8 +9,8 @@ interface LinkBoardProps {
   loading: boolean;
   onEditLink: (link: Link) => void;
   onDeleteLink: (id: string) => void;
-  onAddNew: () => void;
   onOrderChange: (newLinks: Link[]) => void;
+  isApprover: boolean;
 }
 
 export default function LinkBoard({ 
@@ -18,7 +18,8 @@ export default function LinkBoard({
   loading, 
   onEditLink, 
   onDeleteLink, 
-  onOrderChange
+  onOrderChange,
+  isApprover
 }: LinkBoardProps) {
 
   const handleDragEnd = (result: DropResult) => {
@@ -53,7 +54,12 @@ export default function LinkBoard({
                 className="flex flex-col gap-3"
               >
                 {links.map((link, index) => (
-                  <Draggable key={link.id} draggableId={link.id} index={index}>
+                  <Draggable 
+                    key={link.id} 
+                    draggableId={link.id} 
+                    index={index}
+                    isDragDisabled={!isApprover}
+                  >
                     {(provided, snapshot) => (
                       <div
                         ref={provided.innerRef}
@@ -68,6 +74,7 @@ export default function LinkBoard({
                           onEdit={onEditLink}
                           onDelete={onDeleteLink}
                           dragHandleProps={provided.dragHandleProps}
+                          isApprover={isApprover}
                         />
                       </div>
                     )}
