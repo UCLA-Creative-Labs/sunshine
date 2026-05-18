@@ -28,9 +28,10 @@ interface DesignRequestBoardProps {
   selectedQuarter: string;
   onEditRequest: (request: DesignRequest) => void;
   onRefresh: () => void;
+  isApprover: boolean;
 }
 
-export default function DesignRequestBoard({ requests, selectedQuarter, onEditRequest, onRefresh }: DesignRequestBoardProps) {
+export default function DesignRequestBoard({ requests, selectedQuarter, onEditRequest, onRefresh, isApprover }: DesignRequestBoardProps) {
   const filteredRequests = useMemo(
     () => requests.filter(r => r.quarter === selectedQuarter),
     [requests, selectedQuarter]
@@ -77,6 +78,7 @@ export default function DesignRequestBoard({ requests, selectedQuarter, onEditRe
                 request={request}
                 onEdit={() => onEditRequest(request)}
                 onRefresh={onRefresh}
+                isApprover={isApprover}
               />
             ))}
             {grouped[urgency].length === 0 && (

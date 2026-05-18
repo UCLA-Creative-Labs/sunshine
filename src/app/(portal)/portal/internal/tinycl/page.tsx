@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import { getLinks, deleteLink, updateLinkPositions, Link } from '@/lib/supabase/linksService';
 import LinkBoard from '@/components/portal/internal/tinycl/LinkBoard';
 import LinkPanel from '@/components/portal/internal/tinycl/LinkPanel';
+import { useIsTinyCLApprover } from '@/lib/hooks/useIsTinyCLApprover';
 
 export default function TinyCLPage() {
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<Link | undefined>();
+  const { isApprover } = useIsTinyCLApprover();
+
 
   const loadLinks = async () => {
     try {
@@ -75,12 +78,14 @@ export default function TinyCLPage() {
       {/* Header row — matches Design/Projects page */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">TinyCL</h1>
-        <button
-          onClick={handleAddNew}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
-        >
-          New +
-        </button>
+        {isApprover && (
+          <button
+            onClick={handleAddNew}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
+          >
+            New +
+          </button>
+        )}
       </div>
 
 
@@ -90,8 +95,8 @@ export default function TinyCLPage() {
         loading={loading}
         onEditLink={handleEditLink}
         onDeleteLink={handleDeleteLink}
-        onAddNew={handleAddNew}
         onOrderChange={handleOrderChange}
+        isApprover={isApprover}
       />
 
       {/* Slide-over panel for Create/Update actions */}

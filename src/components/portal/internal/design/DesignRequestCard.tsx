@@ -42,9 +42,10 @@ interface DesignRequestCardProps {
   request: DesignRequest;
   onEdit: () => void;
   onRefresh: () => void;
+  isApprover: boolean;
 }
 
-export default function DesignRequestCard({ request, onEdit, onRefresh }: DesignRequestCardProps) {
+export default function DesignRequestCard({ request, onEdit, onRefresh, isApprover }: DesignRequestCardProps) {
   const [isUpdating, setIsUpdating] = useState(false);
   const [creatorProfile, setCreatorProfile] = useState<{ name: string; id: string } | null>(null);
 
@@ -93,12 +94,14 @@ export default function DesignRequestCard({ request, onEdit, onRefresh }: Design
   return (
     <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#D4D7E5]/50 space-y-3 hover:shadow-md transition-shadow relative group">
       {/* Three-dot edit menu */}
-      <button
-        onClick={onEdit}
-        className="absolute top-3 right-3 p-1 rounded-lg hover:bg-gray-100 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <BsThreeDots size={16} />
-      </button>
+      {isApprover && (
+        <button
+          onClick={onEdit}
+          className="absolute top-3 right-3 p-1 rounded-lg hover:bg-gray-100 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <BsThreeDots size={16} />
+        </button>
+      )}
 
       {/* Name / Title */}
       <div className="font-bold text-gray-800 leading-tight pr-6 text-[15px]">
@@ -139,21 +142,30 @@ export default function DesignRequestCard({ request, onEdit, onRefresh }: Design
       </div>
 
       {/* Status tabs */}
-      <div className={`flex p-0.5 bg-gray-100/80 rounded-xl mt-2 ${isUpdating ? 'opacity-50 pointer-events-none' : ''}`}>
-        {(Object.keys(STATUS_LABELS) as DesignRequestStatus[]).map((status) => (
-          <button
-            key={status}
-            onClick={() => handleStatusChange(status)}
-            className={`flex-1 text-[10px] font-bold py-1.5 px-1 rounded-lg transition-all ${
-              request.status === status
-                ? STATUS_ACTIVE_CLASS[status]
-                : 'text-gray-400 hover:text-gray-500'
-            }`}
-          >
-            {STATUS_LABELS[status]}
-          </button>
-        ))}
-      </div>
+      {isApprover ? (
+        <div className={`flex p-0.5 bg-gray-100/80 rounded-xl mt-2 ${isUpdating ? 'opacity-50 pointer-events-none' : ''}`}>
+          {(Object.keys(STATUS_LABELS) as DesignRequestStatus[]).map((status) => (
+            <button
+              key={status}
+              onClick={() => handleStatusChange(status)}
+              className={`flex-1 text-[10px] font-bold py-1.5 px-1 rounded-lg transition-all ${
+                request.status === status
+                  ? STATUS_ACTIVE_CLASS[status]
+                  : 'text-gray-400 hover:text-gray-500'
+              }`}
+            >
+              {STATUS_LABELS[status]}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="flex pt-1">
+          <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+            {STATUS_LABELS[request.status]}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
+

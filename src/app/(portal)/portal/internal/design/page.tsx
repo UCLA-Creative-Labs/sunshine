@@ -6,6 +6,7 @@ import { DesignRequest } from '@/types/designRequest';
 import DesignRequestBoard from '@/components/portal/internal/design/DesignRequestBoard';
 import RequestPanel from '@/components/portal/internal/design/RequestPanel';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
+import { useIsDesignApprover } from '@/lib/hooks/useIsDesignApprover';
 
 export default function DesignPage() {
   const [requests, setRequests] = useState<DesignRequest[]>([]);
@@ -13,6 +14,8 @@ export default function DesignPage() {
   const [editingRequest, setEditingRequest] = useState<DesignRequest | undefined>();
   const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
   const quarters = useMemo(() => getAllQuarters('2026-03-21'), []);
+  const { isApprover } = useIsDesignApprover();
+
 
   const loadRequests = async () => {
     try {
@@ -72,14 +75,16 @@ export default function DesignPage() {
       </div>
 
       {/* New Button - Below Instructions */}
-      <div className="flex justify-end">
-        <button
-          onClick={handleOpenCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
-        >
-          New +
-        </button>
-      </div>
+      {isApprover && (
+        <div className="flex justify-end">
+          <button
+            onClick={handleOpenCreate}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 active:scale-95"
+          >
+            New +
+          </button>
+        </div>
+      )}
 
       {/* Board */}
       <DesignRequestBoard
@@ -87,6 +92,7 @@ export default function DesignPage() {
         selectedQuarter={selectedQuarter}
         onEditRequest={handleOpenEdit}
         onRefresh={loadRequests}
+        isApprover={isApprover}
       />
 
       <RequestPanel

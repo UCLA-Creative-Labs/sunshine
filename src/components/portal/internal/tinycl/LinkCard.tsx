@@ -9,9 +9,10 @@ interface LinkCardProps {
   onEdit: (link: Link) => void;
   onDelete: (id: string) => void;
   dragHandleProps?: any;
+  isApprover: boolean;
 }
 
-export default function LinkCard({ link, onEdit, onDelete, dragHandleProps }: LinkCardProps) {
+export default function LinkCard({ link, onEdit, onDelete, dragHandleProps, isApprover }: LinkCardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -28,12 +29,14 @@ export default function LinkCard({ link, onEdit, onDelete, dragHandleProps }: Li
   return (
     <div className="relative w-full group flex items-center gap-2">
       {/* Drag Handle */}
-      <div 
-        {...dragHandleProps}
-        className="p-2 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing transition-colors"
-      >
-        <RxDragHandleDots2 size={24} />
-      </div>
+      {isApprover && (
+        <div 
+          {...dragHandleProps}
+          className="p-2 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing transition-colors"
+        >
+          <RxDragHandleDots2 size={24} />
+        </div>
+      )}
 
       <div className="relative flex-1">
         <a
@@ -45,43 +48,45 @@ export default function LinkCard({ link, onEdit, onDelete, dragHandleProps }: Li
           {link.display_name}
         </a>
         
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10" ref={menuRef}>
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setShowMenu(!showMenu);
-            }}
-            className="p-2 bg-transparent border-none cursor-pointer text-[#9ca3af] rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
-          >
-            <RxDotsVertical size={20} />
-          </button>
+        {isApprover && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10" ref={menuRef}>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+              className="p-2 bg-transparent border-none cursor-pointer text-[#9ca3af] rounded-full flex items-center justify-center transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none"
+            >
+              <RxDotsVertical size={20} />
+            </button>
 
-          {showMenu && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-[100] min-w-[120px] py-1 overflow-hidden animate-in fade-in zoom-in duration-100">
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(link);
-                  setShowMenu(false);
-                }}
-                className="w-full px-4 py-2 text-left bg-none border-none text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors"
-              >
-                Edit
-              </button>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(link.id);
-                  setShowMenu(false);
-                }}
-                className="w-full px-4 py-2 text-left bg-none border-none text-sm font-medium text-red-600 cursor-pointer hover:bg-red-50 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          )}
-        </div>
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-[100] min-w-[120px] py-1 overflow-hidden animate-in fade-in zoom-in duration-100">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(link);
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left bg-none border-none text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(link.id);
+                    setShowMenu(false);
+                  }}
+                  className="w-full px-4 py-2 text-left bg-none border-none text-sm font-medium text-red-600 cursor-pointer hover:bg-red-50 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
