@@ -1,6 +1,7 @@
 import ContentSection from "@/components/ContentSection"
 import GenericCard from "@/components/GenericCard"
 import ProjectCard from "@/components/ProjectCard"
+import projectData from "@/assets/projectData"
 import Link from "next/link";
 
 
@@ -39,24 +40,15 @@ export default function HomepageContent() {
                     </>
                 }
             >
-                <ProjectCard
-                    imgSrc="/projects/25-26/25-26_year_banner.svg"
-                    title="2025-2026"
-                    className="md:w-1/3"
-                    href="/projects/25-26"
-                />
-                <ProjectCard
-                    imgSrc="/projects/24-25/24-25_year_banner.svg"
-                    title="2024-2025"
-                    className="md:w-1/3"
-                    href="/projects/24-25"
-                />
-                <ProjectCard
-                    imgSrc="/projects/23-24/23-24_year_banner.svg"
-                    title="2023-2024"
-                    className="md:w-1/3"
-                    href="/projects/23-24"
-                />
+                {projectData.slice(0, 3).map((project) => (
+                    <ProjectCard
+                        key={project.year}
+                        imgSrc={project.img}
+                        title={project.title}
+                        className="md:w-1/3"
+                        href={`/${project.url}`}
+                    />
+                ))}
             </ContentSection>
         </div>
     )
