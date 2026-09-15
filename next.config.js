@@ -13,6 +13,11 @@ const nextConfig = {
 
   turbopack: {},
 
+  experimental: {
+    // Next.js 16.3 saves a Turbopack build cache that holds env values. The Netlify secret scan fails on it.
+    turbopackFileSystemCacheForBuild: false,
+  },
+
   env: {
     SPACE_ID: process.env.SPACE_ID,
     CDN_API_KEY: process.env.CDN_API_KEY,
