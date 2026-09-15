@@ -18,7 +18,7 @@
         "react": "latest",
         "react-dom": "latest",
         "react-icons": "^4.12.0",
-        "sharp": "^0.33.0"
+        "sharp": "^0.35.4"
     },
     "devDependencies": {
         "@types/node": "latest",
