@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    const origin = process.env.DEPLOY_PRIME_URL ?? request.nextUrl.origin;
+    const origin = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.DEPLOY_PRIME_URL ?? request.nextUrl.origin;
     const redirectUri = `${origin}/api/github/app-callback`;
     const profileBase = `${origin}/portal/profile`;
 
