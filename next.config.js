@@ -11,6 +11,17 @@ const nextConfig = {
     return config;
   },
 
+  async redirects() {
+    return [
+      { source: '/', destination: '/portal', permanent: false },
+      ...['about', 'join', 'team', 'projects'].map((p) => ({
+        source: `/${p}/:path*`,
+        destination: `https://www.creativelabsucla.com/${p}/:path*`,
+        permanent: true,
+      })),
+    ];
+  },
+
   turbopack: {},
 
   experimental: {
