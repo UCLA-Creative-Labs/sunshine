@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
 
 const TAB_STYLES = {
   base: "relative px-0 py-1 text-sm md:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white transition-colors duration-150",
@@ -89,6 +90,11 @@ export default function MembershipPortalNavbar({
     },
     [isControlled, onValueChange, pathname, router]
   );
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   const listRef = useRef<HTMLDivElement | null>(null);
 
@@ -202,6 +208,14 @@ export default function MembershipPortalNavbar({
             })}
           </div>
         </nav>
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          className={`${TAB_STYLES.base} ${TAB_STYLES.unselected} font-[family-name:var(--font-mulish)] self-center`}
+        >
+          Log out
+        </button>
       </div>
     </header>
   );
