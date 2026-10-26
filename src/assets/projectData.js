@@ -1,6 +1,17 @@
 // projectData.js
 const projectData = [
     {  
+        title: "2026 - 2027", 
+        description: "Featured Projects:", 
+        img: "/projects/26-27/26-27_year_banner.svg", 
+        alt: "2026 - 2027!", 
+        url: "projects/26-27",  
+        year: "26-27",
+        projects: {
+            fall: []
+        }
+    },
+    {  
         title: "2025 - 2026", 
         description: "Featured Projects:", 
         img: "/projects/25-26/25-26_year_banner.svg", 
