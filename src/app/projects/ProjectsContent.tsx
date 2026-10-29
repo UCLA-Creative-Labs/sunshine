@@ -3,6 +3,7 @@ import ContentSection from "@/components/ContentSection";
 import YearProjectCard from "./YearProjectCard";
 import projectData from '@/assets/projectData';
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import '../../styles/ProjectsContent.scss';
 
@@ -21,7 +22,7 @@ export default function ProjectsContent() {
           Every quarter, we have student teams collaborate and execute any
           creative idea. Here, we’ve archived all previous projects for you to
           browse and enjoy! If you’re inspired to create a project of your own,
-          learn more HERE!
+          learn more <Link href="/join" className="border-b border-black">HERE</Link>!
         </p>
 
         <ContentSection title="">
