@@ -203,7 +203,6 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   const [editingTask, setEditingTask] = useState<TaskWithAssignments | null>(null);
 
   const assigneeOptions = members
-    .filter((m) => m.user.id !== currentUserId)
     .map((m) => ({
       id: m.user.id,
       display_name: getProfileDisplayName(m.user),
