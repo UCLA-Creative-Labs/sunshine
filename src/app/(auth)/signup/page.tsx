@@ -17,6 +17,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +44,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/login`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -52,6 +54,11 @@ export default function SignupPage() {
 
     if (error) {
       setError(error.message);
+      setIsLoading(false);
+    } else if (!data.session) {
+      // "Confirm email" is on: there is no session until the user clicks the link.
+      // The profile row is created by the handle_new_user trigger on auth.users.
+      setAwaitingConfirmation(true);
       setIsLoading(false);
     } else {
       const user = data.user;
@@ -102,6 +109,20 @@ export default function SignupPage() {
             </p>
           </div>
 
+          {awaitingConfirmation ? (
+            <div className="text-center">
+              <div className="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 font-[family-name:var(--font-lato)] text-sm">
+                Check your UCLA inbox to confirm your account. We sent a confirmation link to {email}. Once you&apos;ve confirmed, log in to continue.
+              </div>
+              <Link
+                href="/login"
+                className="inline-block py-3 px-6 rounded-lg font-[family-name:var(--font-lato)] font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-all tracking-wide"
+              >
+                back to login
+              </Link>
+            </div>
+          ) : (
+          <>
           {/* Error Message */}
           {error && (
             <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 font-[family-name:var(--font-lato)] text-sm">
@@ -210,6 +231,8 @@ export default function SignupPage() {
               {isLoading ? "signing up..." : "sign up"}
             </button>
           </form>
+          </>
+          )}
         </div>
       </div>
     </div>
