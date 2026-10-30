@@ -57,6 +57,8 @@ export default function ResetPasswordPage() {
       setError(error.message);
       setIsLoading(false);
     } else {
+      // Sign out any other devices so an old session can't outlive the reset
+      await supabase.auth.signOut({ scope: "others" });
       router.push("/portal");
     }
   };
