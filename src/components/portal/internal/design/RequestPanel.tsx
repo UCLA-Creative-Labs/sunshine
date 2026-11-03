@@ -7,6 +7,7 @@ import {
   Publicity,
   Urgency,
   DesignRequest,
+  CreateDesignRequest,
 } from '@/types/designRequest';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
 import { getCurrentUserId } from '@/lib/supabase/profileService';
@@ -88,28 +89,30 @@ export default function RequestPanel({ isOpen, onClose, onSubmit, editingRequest
     }
 
     try {
-      const userId = await getCurrentUserId().catch(() => null);
-
-      const requestData: any = {
+      // Editable fields only. `created_by` belongs to the original requester and
+      // must not be rewritten when an approver saves an edit.
+      const requestData: Omit<CreateDesignRequest, 'created_by' | 'graphic_type'> & {
+        graphic_type: string;
+      } = {
         name: formData.get('name') as string,
         title: (formData.get('title') as string) || (formData.get('name') as string), // fallback to name if title empty
         committee: formData.get('committee') as Committee,
         graphic_type: finalGraphicType,
         content: (formData.get('content') as string) || '',
-        location: (formData.get('location') as string) || null,
-        event_date: formData.get('event_date') ? new Date(formData.get('event_date') as string).toISOString() : null,
+        location: (formData.get('location') as string) || undefined,
+        event_date: formData.get('event_date') ? new Date(formData.get('event_date') as string).toISOString() : undefined,
         due_date: formData.get('due_date') as string,
         publicity: formData.get('publicity') as Publicity,
         quarter: formData.get('quarter') as string,
         urgency: formData.get('urgency') as Urgency,
-        notes: (formData.get('notes') as string) || null,
-        created_by: userId,
+        notes: (formData.get('notes') as string) || undefined,
       };
 
       if (editingRequest) {
         await updateDesignRequest(editingRequest.id, requestData);
       } else {
-        await createDesignRequest(requestData);
+        const userId = await getCurrentUserId().catch(() => null);
+        await createDesignRequest({ ...requestData, created_by: userId ?? undefined });
       }
 
       formRef.current?.reset();

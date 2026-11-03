@@ -6,6 +6,7 @@ import {
   Committee,
   ExpenseCategory,
   FinanceRequest,
+  CreateFinanceRequest,
 } from '@/types/financeRequest';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
 import { getCurrentUserId } from '@/lib/supabase/profileService';
@@ -49,13 +50,12 @@ export default function FinanceRequestPanel({ isOpen, onClose, onSubmit, editing
     const formData = new FormData(e.currentTarget);
 
     try {
-      const userId = await getCurrentUserId().catch(() => null);
-
       const estimatedRaw = formData.get('estimated_amount') as string;
       const exactRaw = formData.get('exact_amount') as string;
       const peopleRaw = formData.get('how_many_people') as string;
 
-      const requestData: any = {
+      // Editable fields only. Keep the original requester on edit.
+      const requestData: Omit<CreateFinanceRequest, 'created_by'> = {
         name: formData.get('name') as string,
         event: (formData.get('event') as string) || null,
         expense_category: formData.get('expense_category') as ExpenseCategory,
@@ -73,13 +73,13 @@ export default function FinanceRequestPanel({ isOpen, onClose, onSubmit, editing
         due_date: (formData.get('due_date') as string) || null,
         quarter: formData.get('quarter') as string,
         notes: (formData.get('notes') as string) || null,
-        created_by: userId,
       };
 
       if (editingRequest) {
         await updateFinanceRequest(editingRequest.id, requestData);
       } else {
-        await createFinanceRequest(requestData);
+        const userId = await getCurrentUserId().catch(() => null);
+        await createFinanceRequest({ ...requestData, created_by: userId });
       }
 
       formRef.current?.reset();
