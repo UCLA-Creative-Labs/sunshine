@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { profileService } from '@/lib/supabase/profileService';
 import { ProjectEvent } from '@/types/events';
+import { makeLocalDate } from '@/lib/utils/dateOnly';
 
 interface Project {
   id: string;
@@ -75,7 +76,7 @@ export function EventForm({
     if (!eventDate) {
       newErrors.eventDate = 'Event date is required';
     } else {
-      const selectedDate = new Date(eventDate);
+      const selectedDate = new Date(makeLocalDate(eventDate));
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (selectedDate < today) {
@@ -97,9 +98,9 @@ export function EventForm({
       title: title.trim(),
       description: description.trim() || null,
       event_type: eventType.trim() || null,
-      event_date: new Date(eventDate + 'T00:00:00').toISOString(),
+      event_date: makeLocalDate(eventDate),
       event_time_display: eventTimeDisplay.trim() || null,
-      end_date: endDate ? new Date(endDate + 'T00:00:00').toISOString() : null,
+      end_date: endDate ? makeLocalDate(endDate) : null,
       location: location.trim() || null,
       location_type: locationType.trim() || null,
       virtual_link: virtualLink.trim() || null,
