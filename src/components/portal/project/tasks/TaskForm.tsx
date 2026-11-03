@@ -7,6 +7,7 @@ import {
   TASK_LABELS,
 } from '@/lib/types/tasks';
 import { TaskStatus, TaskPriority } from '@/lib/types/database';
+import { makeLocalDate } from '@/lib/utils/dateOnly';
 
 interface TaskFormProps {
   projectId: string;
@@ -78,7 +79,7 @@ export function TaskForm({
       description: description.trim(),
       status,
       priority,
-      due_date: new Date(dueDate).toISOString(),
+      due_date: makeLocalDate(dueDate),
       label: selectedLabel.name,
       label_color: selectedLabel.color,
     };
