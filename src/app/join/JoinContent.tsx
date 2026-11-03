@@ -84,27 +84,27 @@ export default function JoinContent({ pLeadLink='#', pMemLink='#', bMemLink='#' 
 			</ContentSection>
 			<ContentSection title="HOW DO WE OPERATE?">
 				<div className="flex flex-col space-y-6 md:[&>*]:text-xl [&>*]:leading-relaxed">
-					<p>Everyone is already part of the Creative Labs community! We also have various roles that students can apply to every quarter. Creative Labs has two main components: Internal Board which consist of four teams and External Projects which consist of Project Leads and Project Members.</p>
+					<p>Everyone is already part of the Creative Labs community! We also have various roles that students can apply to every quarter. Creative Labs has two main components: Internal Board which consists of five teams and External Projects which consist of Project Leads and Project Members.</p>
 				</div>
 			</ContentSection>
 
 			<ContentSection title="INTERNAL BOARD TEAMS">
 				<div className="flex flex-col space-y-8">
 					<div className="flex flex-col space-y-6 md:[&>*]:text-xl [&>*]:leading-relaxed">
-						<p>Our first main component is the internal board. The internal board is responsible for running things behind the scenes like organizing events, socials, and workshops. Responsibilities and tasks vary depending on which team within the internal board you apply to. These teams include Design, Tech, Marketing/External, and Projects. In simpler terms, the Creative Labs community is managed by a small group of UCLA designers, developers, marketers, and project managers hoping to create cool and creative things together! We accept applications 24/7 throughout the year.</p>
+						<p>Our first main component is the internal board. The internal board is responsible for running things behind the scenes like organizing events, socials, and workshops. Responsibilities and tasks vary depending on which team within the internal board you apply to. These five teams include Design, Tech, Marketing/External, Projects, and Finance. In simpler terms, the Creative Labs community is managed by a small group of UCLA designers, developers, marketers, and project managers hoping to create cool and creative things together! We accept applications 24/7 throughout the year.</p>
 					</div>
 					<div className="flex justify-center">
 						<div className="content-center grid md:grid-cols-2 gap-12">
 							<TeamCard 
 								bgClassName="bg-red-100 group-hover:bg-red-200" 
 								title="Design" 
-								imgSrc="/card_icons/orange_thing.svg"
+								imgSrc="/card_icons/pink_thing.svg"
 								description="Help us strengthen our visual identity by creating cool design-y things! You can also learn and improve your skills in graphic design, web design, and UI/UX!"
 							/>
 							<TeamCard 
 								bgClassName="bg-blue-100 group-hover:bg-blue-200" 
 								title="Tech" 
-								imgSrc="/card_icons/orange_thing.svg"
+								imgSrc="/card_icons/purple_thing.svg"
 								description="Support our club infrastructure and work on long-term community projects! We are currently working on a membership platform, board management tools, a market platform, and MLOps projects."
 							/>
 							<TeamCard 
@@ -117,14 +117,14 @@ export default function JoinContent({ pLeadLink='#', pMemLink='#', bMemLink='#' 
 							<TeamCard 
 								bgClassName="bg-purple-100 group-hover:bg-purple-200" 
 								title="Projects" 
-								imgSrc="/card_icons/orange_thing.svg" 
+								imgSrc="/card_icons/spring.svg"
 								reverse={true}
 								description="Our main responsibility is hosting Creative Labs projects! Tasks include reaching out to project teams, preparing for General Meetings and Demo Days, and ensuring smooth project operations."
 							/>
 							<TeamCard 
 								bgClassName="bg-yellow-100 group-hover:bg-yellow-200" 
 								title="Finance" 
-								imgSrc="/card_icons/orange_thing.svg" 
+								imgSrc="/card_icons/winter.svg"
 								reverse={true}
 								description="Securing funding and creating a club budget helps us continue to run CL projects and host even cooler events. Join us and help keep CL going!"
 							/>
