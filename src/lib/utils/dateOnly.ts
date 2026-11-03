@@ -1,7 +1,4 @@
-
-
-
-export function parseDateOnly(value: string) {
-  const [y, m, d] = value.slice(0, 10).split('-').map(Number);
-  
+export function makeLocalDate(value: string) {
+  const dateOnly = value.slice(0, 10);
+  return new Date(dateOnly + "T00:00:00").toISOString();
 }
