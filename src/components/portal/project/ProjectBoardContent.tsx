@@ -17,6 +17,7 @@ import {
 } from '@/lib/types/tasks';
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 import { getProfileDisplayName } from '@/lib/utils/profileName';
+import { makeLocalDate } from "@/lib/utils/dateOnly";
 
 const BUTTON_STYLES = {
   addTask: "mt-1 flex w-full items-center justify-center rounded-xl border border-dashed border-black/15 bg-white/60 px-3 py-2 text-[11px] md:text-xs font-medium text-black/70 transition-all duration-150 ease-out hover:bg-white hover:border-black/30 hover:-translate-y-0.5",
@@ -290,7 +291,7 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
   // helper to format date
   const formatDate = (dateString: string | null) => {
     if (!dateString) return undefined;
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(makeLocalDate(dateString)).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
     });
