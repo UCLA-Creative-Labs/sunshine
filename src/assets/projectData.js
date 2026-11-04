@@ -19,7 +19,9 @@ const projectData = [
         url: "projects/25-26",  
         year: "25-26",
         projects: {
-            fall: []
+            fall: [],
+            winter: [],
+            spring: []
         }
     },
     { 
