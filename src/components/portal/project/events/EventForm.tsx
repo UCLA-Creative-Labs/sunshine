@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { CreateEventInput } from '@/types/events';
+import { makeLocalDate } from '@/lib/utils/dateOnly';
 
 interface EventFormProps {
   projectId: string;
@@ -51,7 +52,7 @@ export function EventForm({
       title: title.trim(),
       description: description.trim() || null,
       event_type: null,
-      event_date: new Date(eventDate).toISOString(),
+      event_date: makeLocalDate(eventDate),
       event_time_display: eventTimeDisplay || null,
       end_date: null,
       location: location.trim() || null,

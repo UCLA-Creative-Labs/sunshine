@@ -17,6 +17,7 @@ import {
 import { TaskStatus, TaskWithAssignments } from '@/lib/types/database';
 import { getProfileDisplayName } from '@/lib/utils/profileName';
 import { GitHubBadge } from './tasks/GitHubBadge';
+import { makeLocalDate } from "@/lib/utils/dateOnly";
 
 type StatusId = "todo" | "in_progress" | "in_review" | "done";
 type Priority = "low" | "medium" | "high" | "urgent";
@@ -406,7 +407,7 @@ export default function ProjectListContent({ projectId, currentUserId }: Project
     status: mapTaskStatusToStatusId(task.status),
     statusLabel: task.label,
     dueDate: task.due_date
-      ? new Date(task.due_date).toLocaleDateString('en-US', {
+      ? new Date(makeLocalDate(task.due_date)).toLocaleDateString('en-US', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',

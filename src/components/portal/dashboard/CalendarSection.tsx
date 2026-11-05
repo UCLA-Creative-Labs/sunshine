@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { getUpcomingEvents } from "@/lib/supabase/eventsService";
 import { ProjectEvent } from "@/types/events";
 import ProjectEventCard from "@/components/portal/ProjectEventCard";
+import { makeLocalDate } from "@/lib/utils/dateOnly";
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -91,7 +92,7 @@ export default function CalendarSection({ onRefetchReady }: CalendarSectionProps
   const hasEvent = (day: number | null) => {
     if (day === null) return false;
     return events.some((event) => {
-      const eventDate = new Date(event.event_date);
+      const eventDate = new Date(makeLocalDate(event.event_date));
       return (
         eventDate.getDate() === day &&
         eventDate.getMonth() === currentMonth &&
@@ -103,7 +104,7 @@ export default function CalendarSection({ onRefetchReady }: CalendarSectionProps
   const getEventsForDay = (day: number | null): ProjectEvent[] => {
     if (day === null) return [];
     return events.filter((event) => {
-      const eventDate = new Date(event.event_date);
+      const eventDate = new Date(makeLocalDate(event.event_date));
       return (
         eventDate.getDate() === day &&
         eventDate.getMonth() === currentMonth &&

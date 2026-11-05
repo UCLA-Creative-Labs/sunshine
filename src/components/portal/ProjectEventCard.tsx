@@ -1,4 +1,5 @@
 import { ProjectEvent } from '@/types/events';
+import { makeLocalDate } from '@/lib/utils/dateOnly';
 
 interface ProjectEventCardProps {
   event: ProjectEvent;
@@ -6,7 +7,7 @@ interface ProjectEventCardProps {
 }
 
 export default function ProjectEventCard({ event, compact = false }: ProjectEventCardProps) {
-  const eventDate = new Date(event.event_date);
+  const eventDate = new Date(makeLocalDate(event.event_date));
   const isUpcoming = eventDate > new Date();
 
   const formatDate = (date: Date) => {
