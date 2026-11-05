@@ -1,0 +1,27 @@
+name: Slack announcement security
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/slack-announcement/**'
+      - '.github/workflows/slack-announcement.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.6
+      - name: Type-check the Edge Function
+        run: deno check --no-lock --node-modules-dir=none supabase/functions/slack-announcement/index.ts
+      - name: Lint the function and tests
+        run: deno lint --rules-exclude=no-import-prefix supabase/functions/slack-announcement/*.ts
+      - name: Run security regression tests
+        run: deno test --no-lock --node-modules-dir=none supabase/functions/slack-announcement/handler.test.ts
