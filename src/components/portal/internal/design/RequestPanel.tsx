@@ -7,6 +7,7 @@ import {
   Publicity,
   Urgency,
   DesignRequest,
+  CreateDesignRequest,
 } from '@/types/designRequest';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
 import { getCurrentUserId } from '@/lib/supabase/profileService';
@@ -88,9 +89,7 @@ export default function RequestPanel({ isOpen, onClose, onSubmit, editingRequest
     }
 
     try {
-      const userId = await getCurrentUserId().catch(() => null);
-
-      const requestData: any = {
+      const requestData: Omit<CreateDesignRequest, 'created_by'> = {
         name: formData.get('name') as string,
         title: (formData.get('title') as string) || (formData.get('name') as string), // fallback to name if title empty
         committee: formData.get('committee') as Committee,
@@ -103,13 +102,13 @@ export default function RequestPanel({ isOpen, onClose, onSubmit, editingRequest
         quarter: formData.get('quarter') as string,
         urgency: formData.get('urgency') as Urgency,
         notes: (formData.get('notes') as string) || null,
-        created_by: userId,
       };
 
       if (editingRequest) {
         await updateDesignRequest(editingRequest.id, requestData);
       } else {
-        await createDesignRequest(requestData);
+        const userId = await getCurrentUserId().catch(() => null);
+        await createDesignRequest({ ...requestData, created_by: userId });
       }
 
       formRef.current?.reset();

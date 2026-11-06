@@ -17,17 +17,17 @@ export interface DesignRequest {
   name: string; // The request entry name
   title: string; // Desired title of the graphic
   committee: Committee;
-  graphic_type: GraphicType;
+  graphic_type: string;
   content: string; // What would you like the graphic to communicate?
-  location?: string;
-  event_date?: string; // ISO string with time
+  location?: string | null;
+  event_date?: string | null; // ISO string with time
   due_date: string; // ISO date string
   publicity: Publicity;
   quarter: string;
   urgency: Urgency;
   status: DesignRequestStatus;
-  notes?: string;
-  created_by?: string;
+  notes?: string | null;
+  created_by?: string | null;
   created_at: string;
 }
 
