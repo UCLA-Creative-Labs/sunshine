@@ -4,14 +4,14 @@ import { useState, useEffect } from 'react';
 import { getLinks, deleteLink, updateLinkPositions, Link } from '@/lib/supabase/linksService';
 import LinkBoard from '@/components/portal/internal/tinycl/LinkBoard';
 import LinkPanel from '@/components/portal/internal/tinycl/LinkPanel';
-import { useIsTinyCLApprover } from '@/lib/hooks/useIsTinyCLApprover';
+import { useHasInternalRole, APPROVER_ROLES } from '@/lib/hooks/useHasInternalRole';
 
 export default function TinyCLPage() {
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<Link | undefined>();
-  const { isApprover } = useIsTinyCLApprover();
+  const { hasRole: isApprover } = useHasInternalRole(APPROVER_ROLES.tinycl);
 
 
   const loadLinks = async () => {
