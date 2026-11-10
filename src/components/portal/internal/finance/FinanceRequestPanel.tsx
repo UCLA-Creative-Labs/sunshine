@@ -9,6 +9,7 @@ import {
   CreateFinanceRequest,
 } from '@/types/financeRequest';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
+import { formatLocalDateTime } from '@/lib/utils/localDateTime';
 import { getCurrentUserId } from '@/lib/supabase/profileService';
 import { IoClose } from 'react-icons/io5';
 
@@ -49,6 +50,9 @@ export default function FinanceRequestPanel({ isOpen, onClose, onSubmit, editing
 
     const formData = new FormData(e.currentTarget);
 
+    const eventDate = formData.get('event_date') as string;
+    const eventDateChanged = !editingRequest || eventDate !== formatLocalDateTime(editingRequest.event_date);
+
     try {
       const estimatedRaw = formData.get('estimated_amount') as string;
       const exactRaw = formData.get('exact_amount') as string;
@@ -68,7 +72,8 @@ export default function FinanceRequestPanel({ isOpen, onClose, onSubmit, editing
         outcomes: (formData.get('outcomes') as string) || '',
         cost_documentation: (formData.get('cost_documentation') as string) || '',
         event_location: (formData.get('event_location') as string) || null,
-        event_date: formData.get('event_date') ? new Date(formData.get('event_date') as string).toISOString() : null,
+        // Preserve the stored timestamp when the displayed minute has not changed.
+        ...(eventDateChanged && { event_date: eventDate ? new Date(eventDate).toISOString() : null }),
         due_date: (formData.get('due_date') as string) || null,
         quarter: formData.get('quarter') as string,
         notes: (formData.get('notes') as string) || null,
@@ -288,7 +293,7 @@ export default function FinanceRequestPanel({ isOpen, onClose, onSubmit, editing
               <input
                 type="datetime-local"
                 name="event_date"
-                defaultValue={editingRequest?.event_date ? new Date(editingRequest.event_date).toISOString().slice(0, 16) : ''}
+                defaultValue={formatLocalDateTime(editingRequest?.event_date)}
                 className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
