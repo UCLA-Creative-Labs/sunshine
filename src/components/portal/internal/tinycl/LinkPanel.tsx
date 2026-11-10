@@ -64,13 +64,6 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
     }
   }, [isOpen, editingLink]);
 
-  useEffect(() => {
-    const slug = toSlug(displayName);
-    setRedirectPath(slug);
-    
-    // Clear slug error when name changes
-    if (slugError) setSlugError('');
-  }, [displayName]);
 
   if (!isOpen) return null;
 
@@ -83,7 +76,7 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
 
     const taken = await isRedirectPathTaken(redirectPath);
     if (taken) {
-      setSlugError('A link with this name already exists.');
+      setSlugError('A link with this short path already exists.');
       return false;
     }
     return true;
@@ -102,9 +95,13 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
     if (!isSlugValid) return;
 
     if (!redirectPath) {
-      setSlugError('A valid display name is required to generate a link.');
+      setSlugError('A short path is required.');
       return;
     }
+
+    if (editingLink && redirectPath !== editingLink.redirect_path && !window.confirm(
+      'Changing this short path will stop old links from working. Continue?'
+    )) return;
 
     setLoading(true);
     setError(null);
@@ -177,7 +174,13 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
             <input
               required
               value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
+              onChange={(e) => {
+                setDisplayName(e.target.value);
+                if (!editingLink) {
+                  setRedirectPath(toSlug(e.target.value));
+                  setSlugError('');
+                }
+              }}
               placeholder="e.g. S26 Project Member Application"
               className={`px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
                 slugError ? 'border-red-400' : 'border-gray-200'
@@ -185,6 +188,26 @@ export default function LinkPanel({ isOpen, onClose, onSubmit, editingLink }: Li
             />
             {slugError && <p className="text-xs text-red-500 font-medium">{slugError}</p>}
             
+            {editingLink && (
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="redirect-path" className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                  Short Path <span className="text-red-400">*</span>
+                </label>
+                <input
+                  id="redirect-path"
+                  required
+                  value={redirectPath}
+                  onChange={(e) => { setRedirectPath(toSlug(e.target.value)); setSlugError(''); }}
+                  className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {redirectPath !== editingLink.redirect_path && (
+                  <p role="alert" className="text-sm text-amber-700">
+                    Changing this path will stop old links from working. Update any shared links after saving.
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* URL Preview */}
             {displayName && (
               <div className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 rounded-lg border border-blue-100 w-fit">
