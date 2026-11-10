@@ -17,19 +17,12 @@ interface Dependencies {
   fetch: typeof fetch;
 }
 
-// Retain existing destinations for the independent #278 security fix.
-// Channel configuration and routing changes belong to #282.
-const VISIBILITY_MAPPING: Record<string, string> = {
-  club_wide: 'C042EJJE33K',
-  board: 'C042EJJE33K',
-};
-
-const TEAM_CHANNELS: Record<string, string> = {
-  tech: 'C07GEAH55EX',
-  finance: 'C07GT3VRNDP',
-  marketing: 'C07GBGY0AH3',
-  design: 'C07GT3VMEHF',
-  project_managers: 'C07GBGXEXMK',
+const TEAM_CHANNEL_SECRETS: Record<string, string> = {
+  tech: 'SLACK_TECH_CHANNEL_ID',
+  finance: 'SLACK_FINANCE_CHANNEL_ID',
+  marketing: 'SLACK_MARKETING_CHANNEL_ID',
+  design: 'SLACK_DESIGN_CHANNEL_ID',
+  project_managers: 'SLACK_PROJECT_MANAGERS_CHANNEL_ID',
 };
 
 function json(body: object, status = 200): Response {
@@ -118,30 +111,38 @@ export function createAnnouncementHandler(deps: Dependencies) {
       // Only the ID comes from the webhook. All content and routing come from the database.
       const announcement = await deps.getAnnouncement(id);
       if (!announcement) return json({ error: 'Announcement not found' }, 404);
-      const { title, description, visibility, project_id, target_team, link_url } = announcement;
+      const { title, description, visibility, project_id, target_team, link_url, priority } = announcement;
 
       let channelId: string | null | undefined;
       if (visibility === 'project' && project_id) {
         channelId = await deps.getProjectChannel(project_id);
       } else if (visibility === 'team' && target_team) {
-        channelId = Object.hasOwn(TEAM_CHANNELS, target_team) ? TEAM_CHANNELS[target_team] : undefined;
-      } else {
-        channelId = Object.hasOwn(VISIBILITY_MAPPING, visibility) ? VISIBILITY_MAPPING[visibility] : undefined;
+        const name = Object.hasOwn(TEAM_CHANNEL_SECRETS, target_team)
+          ? TEAM_CHANNEL_SECRETS[target_team] : undefined;
+        channelId = name ? deps.env(name) : undefined;
+      } else if (visibility === 'club_wide' || visibility === 'board') {
+        const boardChannel = deps.env('SLACK_BOARD_CHANNEL_ID');
+        const clubChannel = deps.env('SLACK_CLUB_WIDE_CHANNEL_ID');
+        // These audiences may intentionally share a Slack channel.
+        channelId = visibility === 'board' ? boardChannel : clubChannel;
       }
       channelId = channelId?.trim();
       if (!channelId || !/^[CG][A-Z0-9]+$/.test(channelId)) {
         console.warn(`No Slack channel mapping found for: visibility=${visibility}, team=${target_team}, project=${project_id}`);
-        return json({ error: 'No channel mapping' });
+        // Projects without a Slack channel are a normal state; other audiences need a configured secret.
+        if (visibility === 'project') return json({ error: 'No channel mapping' });
+        return json({ error: 'No valid Slack channel configured for this audience' }, 503);
       }
 
       const safeTitle = escapeSlack(title);
       // Escaping lengthens text, so truncate afterwards and drop any entity cut in half.
-      const safeDescription = truncate(escapeSlack(description || ''), SECTION_MAX).replace(/&[a-z]{0,3}…$/, '…');
+      const escapedDescription = escapeSlack(description || '');
+      const slackDescription = priority === 'high' ? `<!channel>\n${escapedDescription}` : escapedDescription;
+      const safeDescription = truncate(slackDescription, SECTION_MAX).replace(/&[a-z]{0,3}…$/, '…');
       const blocks = [
         // plain_text is never parsed for mentions and Slack shows entities literally, so use the raw title.
         { type: 'header', text: { type: 'plain_text', text: truncate(`📢 ${title}`, HEADER_MAX), emoji: true } },
-        // Escape explicit mentions and disable automatic @here/@channel parsing.
-        // The intentional high-priority ping is a separate fix in #282.
+        // Disable automatic @here/@channel parsing; the trusted <!channel> still works.
         { type: 'section', text: { type: 'mrkdwn', text: safeDescription || ' ', verbatim: true } },
       ];
 

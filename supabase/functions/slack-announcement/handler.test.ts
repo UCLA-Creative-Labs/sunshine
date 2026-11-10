@@ -7,6 +7,9 @@ function setup(overrides: Partial<Announcement> = {}, envOverrides: Record<strin
   const env: Record<string, string> = {
     SLACK_ANNOUNCEMENT_WEBHOOK_SECRET: 'test-secret-é',
     SLACK_BOT_TOKEN: 'test-token',
+    SLACK_CLUB_WIDE_CHANNEL_ID: 'CCLUB',
+    SLACK_BOARD_CHANNEL_ID: 'CBOARD',
+    SLACK_TECH_CHANNEL_ID: 'CTECH',
     ...envOverrides,
   };
   const announcement: Announcement = {
@@ -112,25 +115,25 @@ test('ignores non-insert events', async () => {
   }
 });
 
-test('uses stored announcement content and audience, ignoring forged record fields', async () => {
-  const s = setup({ visibility: 'team', target_team: 'tech' });
+test('uses stored announcement content, priority and audience, ignoring forged record fields', async () => {
+  const s = setup({ visibility: 'board' });
   const res = await s.handler(s.request({ ...s.payload,
     record: { id: 'announcement-id', title: 'FORGED', description: '<!channel>', priority: 'high', visibility: 'club_wide' },
   }));
   assert.equal(res.status, 200);
   assert.deepEqual(s.calls.announcements, ['announcement-id']);
-  assert.equal(s.calls.slack[0].channel, 'C07GEAH55EX');
+  assert.equal(s.calls.slack[0].channel, 'CBOARD');
   assert.equal(JSON.stringify(s.calls.slack[0]).includes('FORGED'), false);
   assert.equal(JSON.stringify(s.calls.slack[0]).includes('<!channel>'), false);
 });
 
-test('escapes title and description without adding the separate #282 priority-ping fix', async () => {
+test('escapes title and description while adding only the trusted high-priority ping', async () => {
   const s = setup({ title: 'A & <B>', description: '<!channel> & <@U123>', priority: 'high' });
   assert.equal((await s.handler(s.request())).status, 200);
   const message = s.calls.slack[0];
   const blocks = message.blocks as { text: { text: string; verbatim?: boolean } }[];
   assert.equal(blocks[0].text.text, '📢 A & <B>');
-  assert.equal(blocks[1].text.text, '&lt;!channel&gt; &amp; &lt;@U123&gt;');
+  assert.equal(blocks[1].text.text, '<!channel>\n&lt;!channel&gt; &amp; &lt;@U123&gt;');
   assert.equal(blocks[1].text.verbatim, true);
   assert.equal(message.text, 'New Announcement: A &amp; &lt;B&gt;');
 });
@@ -152,34 +155,80 @@ test('plain-text broadcast names cannot become automatic mentions', async () => 
   assert.equal(JSON.stringify(message).includes('<!channel>'), false);
 });
 
-test('keeps existing team routing and stored project channels without new channel secrets', async () => {
+test('routes team and project announcements using configured and stored channels', async () => {
   for (const visibility of ['team', 'project']) {
     const s = setup({ visibility, target_team: 'tech', project_id: 'project-id' });
     assert.equal((await s.handler(s.request())).status, 200);
-    assert.equal(s.calls.slack[0].channel, visibility === 'team' ? 'C07GEAH55EX' : 'CPROJECT');
+    assert.equal(s.calls.slack[0].channel, visibility === 'team' ? 'CTECH' : 'CPROJECT');
     assert.deepEqual(s.calls.projects, visibility === 'project' ? ['project-id'] : []);
   }
 });
 
-test('keeps existing visibility mappings without depending on #282 channel secrets', async () => {
+test('missing board channel fails closed', async () => {
+  const s = setup({ visibility: 'board' }, { SLACK_BOARD_CHANNEL_ID: '' });
+  assert.equal((await s.handler(s.request())).status, 503);
+  assert.equal(s.calls.slack.length, 0);
+});
+
+test('board and club-wide announcements can intentionally share a channel', async () => {
+  const env = { SLACK_BOARD_CHANNEL_ID: 'C042EJJE33K', SLACK_CLUB_WIDE_CHANNEL_ID: 'C042EJJE33K' };
   for (const visibility of ['board', 'club_wide']) {
-    const s = setup({ visibility });
+    const s = setup({ visibility }, env);
     assert.equal((await s.handler(s.request())).status, 200);
     assert.equal(s.calls.slack[0].channel, 'C042EJJE33K');
   }
 });
 
-test('unmapped audiences are skipped without posting or falling back to another channel', async () => {
+test('each board team uses its configured channel secret', async () => {
+  const teams = {
+    tech: 'SLACK_TECH_CHANNEL_ID',
+    finance: 'SLACK_FINANCE_CHANNEL_ID',
+    marketing: 'SLACK_MARKETING_CHANNEL_ID',
+    design: 'SLACK_DESIGN_CHANNEL_ID',
+    project_managers: 'SLACK_PROJECT_MANAGERS_CHANNEL_ID',
+  };
+  for (const [target_team, secret] of Object.entries(teams)) {
+    const s = setup({ visibility: 'team', target_team }, { [secret]: 'CDESTINATION' });
+    assert.equal((await s.handler(s.request())).status, 200);
+    assert.equal(s.calls.slack[0].channel, 'CDESTINATION');
+  }
+});
+
+test('board delivery works with its confirmed ID while an unconfigured club-wide audience cannot post', async () => {
+  const env = { SLACK_BOARD_CHANNEL_ID: 'C042EJJE33K', SLACK_CLUB_WIDE_CHANNEL_ID: '' };
+  const board = setup({ visibility: 'board' }, env);
+  assert.equal((await board.handler(board.request())).status, 200);
+  assert.equal(board.calls.slack[0].channel, env.SLACK_BOARD_CHANNEL_ID);
+
+  const club = setup({ visibility: 'club_wide' }, env);
+  assert.equal((await club.handler(club.request())).status, 503);
+  assert.equal(club.calls.slack.length, 0);
+});
+
+test('missing, invalid and unknown audience channels never fall back to club-wide', async () => {
   for (const overrides of [
-    { visibility: 'unknown' }, { visibility: 'team', target_team: 'toString' },
-    { visibility: 'toString' }, { visibility: 'project' },
+    { visibility: 'unknown' }, { visibility: 'toString' }, { visibility: 'team', target_team: 'toString' },
+    { visibility: 'team', target_team: 'finance' },
   ]) {
     const s = setup(overrides);
-    const res = await s.handler(s.request());
-    assert.equal(res.status, 200);
-    assert.deepEqual(await res.json(), { error: 'No channel mapping' });
+    assert.equal((await s.handler(s.request())).status, 503);
     assert.equal(s.calls.slack.length, 0);
   }
+  const s = setup({}, { SLACK_CLUB_WIDE_CHANNEL_ID: '<!channel>' });
+  assert.equal((await s.handler(s.request())).status, 503);
+  assert.equal(s.calls.slack.length, 0);
+});
+
+test('projects without a Slack channel are skipped with 200, not reported as server errors', async () => {
+  const s = setup({ visibility: 'project' });
+  assert.deepEqual(await (await s.handler(s.request())).json(), { error: 'No channel mapping' });
+  assert.equal(s.calls.slack.length, 0);
+});
+
+test('channel secrets pasted with surrounding whitespace still deliver', async () => {
+  const s = setup({ visibility: 'team', target_team: 'tech' }, { SLACK_TECH_CHANNEL_ID: ' CTECH\n' });
+  assert.equal((await s.handler(s.request())).status, 200);
+  assert.equal(s.calls.slack[0].channel, 'CTECH');
 });
 
 test('missing database row, query failures and missing project channel cannot post', async () => {
