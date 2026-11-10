@@ -129,7 +129,7 @@ test('escapes title and description without adding the separate #282 priority-pi
   assert.equal((await s.handler(s.request())).status, 200);
   const message = s.calls.slack[0];
   const blocks = message.blocks as { text: { text: string; verbatim?: boolean } }[];
-  assert.equal(blocks[0].text.text, '📢 A &amp; &lt;B&gt;');
+  assert.equal(blocks[0].text.text, '📢 A & <B>');
   assert.equal(blocks[1].text.text, '&lt;!channel&gt; &amp; &lt;@U123&gt;');
   assert.equal(blocks[1].text.verbatim, true);
   assert.equal(message.text, 'New Announcement: A &amp; &lt;B&gt;');
@@ -195,10 +195,52 @@ test('missing database row, query failures and missing project channel cannot po
   assert.equal(p.calls.slack.length, 0);
 });
 
-test('missing bot token cannot send', async () => {
+test('missing bot token fails before database or Slack access', async () => {
   const s = setup({}, { SLACK_BOT_TOKEN: '' });
   assert.equal((await s.handler(s.request())).status, 503);
-  assert.equal(s.calls.slack.length, 0);
+  assert.deepEqual(s.calls, { announcements: [], projects: [], slack: [] });
+});
+
+test('long titles and descriptions stay within Slack block limits after escaping', async () => {
+  const s = setup({ title: '&'.repeat(200), description: 'x' + '&'.repeat(1000) });
+  assert.equal((await s.handler(s.request())).status, 200);
+  const blocks = s.calls.slack[0].blocks as { text: { text: string } }[];
+  assert.equal(blocks[0].text.text.length, 150);
+  assert.ok(blocks[0].text.text.endsWith('&…'));
+  assert.ok(blocks[1].text.text.length <= 3000);
+  // The cut must not leave a partial entity like "&am" before the ellipsis.
+  assert.match(blocks[1].text.text, /^x(&amp;)+…$/);
+});
+
+test('short text is not truncated', async () => {
+  const s = setup({ title: 'a'.repeat(147), description: 'b'.repeat(3000) });
+  await s.handler(s.request());
+  const blocks = s.calls.slack[0].blocks as { text: { text: string } }[];
+  assert.equal(blocks[0].text.text, `📢 ${'a'.repeat(147)}`);
+  assert.equal(blocks[1].text.text, 'b'.repeat(3000));
+});
+
+test('stored project channel IDs are trimmed; non-channel values are skipped and logged', async () => {
+  const p = setup({ visibility: 'project', project_id: 'project-id' });
+  p.deps.getProjectChannel = () => Promise.resolve(' CPROJECT\n');
+  assert.equal((await p.handler(p.request())).status, 200);
+  assert.equal(p.calls.slack[0].channel, 'CPROJECT');
+
+  const warn = console.warn;
+  const warnings: unknown[][] = [];
+  console.warn = (...args: unknown[]) => { warnings.push(args); };
+  try {
+    for (const channel of ['#proj-alpha', 'U123ABC']) {
+      const s = setup({ visibility: 'project', project_id: 'project-id' });
+      s.deps.getProjectChannel = () => Promise.resolve(channel);
+      assert.deepEqual(await (await s.handler(s.request())).json(), { error: 'No channel mapping' });
+      assert.equal(s.calls.slack.length, 0);
+    }
+  } finally {
+    console.warn = warn;
+  }
+  assert.equal(warnings.length, 2);
+  assert.ok(String(warnings[0][0]).includes('project=project-id'));
 });
 
 test('safe links render and unsafe link markup cannot inject Slack mentions', async () => {
