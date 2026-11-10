@@ -6,7 +6,7 @@ import { DesignRequest } from '@/types/designRequest';
 import DesignRequestBoard from '@/components/portal/internal/design/DesignRequestBoard';
 import RequestPanel from '@/components/portal/internal/design/RequestPanel';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
-import { useIsDesignApprover } from '@/lib/hooks/useIsDesignApprover';
+import { useHasInternalRole, APPROVER_ROLES } from '@/lib/hooks/useHasInternalRole';
 
 export default function DesignPage() {
   const [requests, setRequests] = useState<DesignRequest[]>([]);
@@ -14,7 +14,7 @@ export default function DesignPage() {
   const [editingRequest, setEditingRequest] = useState<DesignRequest | undefined>();
   const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
   const quarters = useMemo(() => getAllQuarters('2026-03-21'), []);
-  const { isApprover } = useIsDesignApprover();
+  const { hasRole: isApprover } = useHasInternalRole(APPROVER_ROLES.design);
 
 
   const loadRequests = async () => {

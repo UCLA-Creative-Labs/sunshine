@@ -5,6 +5,7 @@ import { getAllAnnouncements, createAnnouncement } from "@/lib/supabase/eventsSe
 import { ProjectAnnouncement, CreateAnnouncementInput } from "@/types/events";
 import { DashboardAnnouncementModal } from "./DashboardAnnouncementModal";
 import { supabase } from "@/lib/supabase/client";
+import { useHasInternalRole, APPROVER_ROLES } from "@/lib/hooks/useHasInternalRole";
 
 function useMountAnimation(delay: number) {
   const [mounted, setMounted] = useState(false);
@@ -25,9 +26,9 @@ export default function AnnouncementsSection() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [canPost, setCanPost] = useState(false);
   const [userProjects, setUserProjects] = useState<{ id: string; projectName: string; isLead: boolean }[]>([]);
-  const [isDirectorOrPresident, setIsDirectorOrPresident] = useState(false);
+  const { hasRole: isDirectorOrPresident } = useHasInternalRole(APPROVER_ROLES.clubAnnouncements);
+  const canPost = isDirectorOrPresident || userProjects.length > 0;
 
   const fetchAnnouncements = useCallback(async () => {
     setLoading(true);
@@ -40,23 +41,11 @@ export default function AnnouncementsSection() {
     fetchAnnouncements();
   }, [fetchAnnouncements]);
 
-  // Check if user can post (is a project lead, director, or president)
+  // Load the projects this user leads (leads can post to their projects)
   useEffect(() => {
     async function checkPermissions() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      const { data: internalRoles } = await supabase
-        .from('user_context_roles')
-        .select('roles!inner(name)')
-        .eq('user_id', user.id);
-
-      const roleNames = (internalRoles || []).map(
-        (r) => ((r.roles as unknown as { name: string })?.name)
-      );
-      const isDirectorOrPresident = roleNames.some(
-        (name) => name === 'director' || name === 'president'
-      );
 
       const { data: memberships } = await supabase
         .from('project_members')
@@ -73,11 +62,7 @@ export default function AnnouncementsSection() {
         };
       }).filter((p) => p.id);
 
-      const leadsAnyProject = projects.some((p) => p.isLead);
-
       setUserProjects(projects.filter((p) => p.isLead));
-      setIsDirectorOrPresident(isDirectorOrPresident);
-      setCanPost(isDirectorOrPresident || leadsAnyProject);
     }
 
     checkPermissions();

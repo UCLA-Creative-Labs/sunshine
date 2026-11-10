@@ -6,7 +6,7 @@ import { FinanceRequest } from '@/types/financeRequest';
 import FinanceRequestBoard from '@/components/portal/internal/finance/FinanceRequestBoard';
 import FinanceRequestPanel from '@/components/portal/internal/finance/FinanceRequestPanel';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
-import { useIsFinanceApprover } from '@/lib/hooks/useIsFinanceApprover';
+import { useHasInternalRole, APPROVER_ROLES } from '@/lib/hooks/useHasInternalRole';
 
 export default function FinancePage() {
   const [requests, setRequests] = useState<FinanceRequest[]>([]);
@@ -14,7 +14,7 @@ export default function FinancePage() {
   const [editingRequest, setEditingRequest] = useState<FinanceRequest | undefined>();
   const [selectedQuarter, setSelectedQuarter] = useState(getCurrentQuarter());
   const quarters = useMemo(() => getAllQuarters('2026-03-21'), []);
-  const { isApprover } = useIsFinanceApprover();
+  const { hasRole: isApprover } = useHasInternalRole(APPROVER_ROLES.finance);
 
   const loadRequests = async () => {
     try {
