@@ -18,7 +18,8 @@ club-wide announcements may intentionally use the same channel.
 - Send `slackDescription` in the message section, with a trusted `<!channel>`
   prefix only for stored announcements with `priority: 'high'`.
 - Read board, club-wide, and team channel IDs from Edge Function secrets.
-  Project destinations remain in `projects.slack_channel_id`. Missing or invalid
+  Project destinations remain in `projects.slack_channel_id`; a project without a
+  valid channel is skipped with 200. Missing or invalid board, club-wide, or team
   mappings return 503 without posting; there are no hardcoded channel fallbacks.
 
 There are no frontend changes or schema migrations. Separate board and club-wide

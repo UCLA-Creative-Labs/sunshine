@@ -36,6 +36,16 @@ function escapeSlack(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Slack block limits: header plain_text 150 chars, section mrkdwn 3000 chars.
+const HEADER_MAX = 150;
+const SECTION_MAX = 3000;
+
+function truncate(text: string, max: number): string {
+  if (text.length <= max) return text;
+  // Drop a dangling surrogate half so the cut never produces an invalid character.
+  return text.slice(0, max - 1).replace(/[\uD800-\uDBFF]$/, '') + '…';
+}
+
 function secretsMatch(provided: string, expected: string): boolean {
   // Fixed-size digests let timingSafeEqual compare secrets of any byte length.
   const digest = (value: string) => createHash('sha256').update(value).digest();
@@ -70,6 +80,9 @@ export function createAnnouncementHandler(deps: Dependencies) {
     if (!provided || !secretsMatch(provided, secret)) {
       return json({ error: 'Unauthorized' }, 401);
     }
+
+    const token = deps.env('SLACK_BOT_TOKEN');
+    if (!token) return json({ error: 'Slack bot token is not configured' }, 503);
 
     let payload: unknown;
     try {
@@ -113,21 +126,24 @@ export function createAnnouncementHandler(deps: Dependencies) {
         // These audiences may intentionally share a Slack channel.
         channelId = visibility === 'board' ? boardChannel : clubChannel;
       }
+      channelId = channelId?.trim();
       if (!channelId || !/^[CG][A-Z0-9]+$/.test(channelId)) {
+        console.warn(`No Slack channel mapping found for: visibility=${visibility}, team=${target_team}, project=${project_id}`);
+        // Projects without a Slack channel are a normal state; other audiences need a configured secret.
+        if (visibility === 'project') return json({ error: 'No channel mapping' });
         return json({ error: 'No valid Slack channel configured for this audience' }, 503);
       }
 
-      const token = deps.env('SLACK_BOT_TOKEN');
-      if (!token) return json({ error: 'Slack bot token is not configured' }, 503);
-
       const safeTitle = escapeSlack(title);
-      const safeDescription = escapeSlack(description || '');
-      const slackDescription = priority === 'high'
-        ? `<!channel>\n${safeDescription}` : safeDescription;
+      // Escaping lengthens text, so truncate afterwards and drop any entity cut in half.
+      const escapedDescription = escapeSlack(description || '');
+      const slackDescription = priority === 'high' ? `<!channel>\n${escapedDescription}` : escapedDescription;
+      const safeDescription = truncate(slackDescription, SECTION_MAX).replace(/&[a-z]{0,3}…$/, '…');
       const blocks = [
-        { type: 'header', text: { type: 'plain_text', text: `📢 ${safeTitle}`, emoji: true } },
+        // plain_text is never parsed for mentions and Slack shows entities literally, so use the raw title.
+        { type: 'header', text: { type: 'plain_text', text: truncate(`📢 ${title}`, HEADER_MAX), emoji: true } },
         // Disable automatic @here/@channel parsing; the trusted <!channel> still works.
-        { type: 'section', text: { type: 'mrkdwn', text: slackDescription || ' ', verbatim: true } },
+        { type: 'section', text: { type: 'mrkdwn', text: safeDescription || ' ', verbatim: true } },
       ];
 
       const link = link_url ? safeLink(link_url) : null;
