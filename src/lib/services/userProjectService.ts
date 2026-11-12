@@ -11,11 +11,13 @@ export interface UserProject {
 export async function getUserCurrentProject(
   userId: string
 ): Promise<TaskOperationResult<UserProject | null>> {
-  // Fetch project membership
+  // Fetch the most recently joined project membership, with its RBAC role
   const { data, error } = await supabase
     .from('project_members')
-    .select('project_id, projects!project_members_project_id_fkey(projectName)')
+    .select('project_id, projects!project_members_project_id_fkey(projectName), rbac_role:roles!project_members_rbac_role_id_fkey(id, name, context, description)')
     .eq('user_id', userId)
+    .order('joined_at', { ascending: false, nullsFirst: false })
+    .order('id', { ascending: false })
     .limit(1)
     .maybeSingle();
 
@@ -31,15 +33,7 @@ export async function getUserCurrentProject(
   const projects = data.projects as any;
   const projectName = projects?.projectName || 'Unknown Project';
 
-  // Fetch RBAC role
-  const { data: roleData } = await supabase
-    .from('user_context_roles')
-    .select('role:roles(id, name, context, description)')
-    .eq('user_id', userId)
-    .eq('context', 'external')
-    .single();
-
-  const fetchedRole = roleData?.role;
+  const fetchedRole = data.rbac_role;
   const userRole = (fetchedRole && typeof fetchedRole === 'object' && !Array.isArray(fetchedRole))
     ? fetchedRole as Role
     : null;
