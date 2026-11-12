@@ -10,10 +10,15 @@ export interface ProjectSettingsUpdate {
   logoUrl?: string | null;
 }
 
+// Columns the app reads from projects. Listed explicitly instead of select('*')
+// so queries keep working when column access is narrowed.
+const PROJECT_COLUMNS =
+  'id, created_at, year, quarter, projectName, projectDescription, projectLeads, projectManagers, projectMembers, logoUrl, demoDayUrl, instaPostUrl, prototypeUrl, githubUrl, figmaUrl, notionUrl, github_repo, slack_channel_id';
+
 export async function getProjectsByYear(year: string): Promise<Project[]> {
   const { data, error } = await supabase
     .from('projects')
-    .select('*')
+    .select(PROJECT_COLUMNS)
     .eq('year', year);
 
   if (error) {
@@ -27,7 +32,7 @@ export async function getProjectsByYear(year: string): Promise<Project[]> {
 export async function getAllProjects(): Promise<Project[]> {
   const { data, error } = await supabase
     .from('projects')
-    .select('*');
+    .select(PROJECT_COLUMNS);
 
   if (error) {
     console.error('Error fetching all projects:', error);
@@ -43,7 +48,7 @@ export async function getAllProjects(): Promise<Project[]> {
 export async function getProjectById(projectId: string): Promise<Project | null> {
   const { data, error } = await supabase
     .from('projects')
-    .select('*')
+    .select(PROJECT_COLUMNS)
     .eq('id', projectId)
     .single();
 
@@ -61,7 +66,7 @@ export async function getProjectById(projectId: string): Promise<Project | null>
 export async function getProjectByUserId(userId: string): Promise<Project | null> {
   const { data, error } = await supabase
     .from('project_members')
-    .select('project_id, projects(*)')
+    .select(`project_id, projects(${PROJECT_COLUMNS})`)
     .eq('user_id', userId)
     .single();
 
@@ -86,7 +91,7 @@ export async function createProject(project: Omit<Project, 'id'>): Promise<Proje
   const { data, error } = await supabase
     .from('projects')
     .insert(project)
-    .select()
+    .select(PROJECT_COLUMNS)
     .single();
 
   if (error) {
@@ -105,7 +110,7 @@ export async function updateProject(projectId: number, updates: Partial<Project>
     .from('projects')
     .update(updates)
     .eq('id', projectId)
-    .select()
+    .select(PROJECT_COLUMNS)
     .single();
 
   if (error) {
@@ -145,7 +150,7 @@ export async function updateProjectSettings(
     .from('projects')
     .update(finalUpdates)
     .eq('id', projectId)
-    .select('*')
+    .select(PROJECT_COLUMNS)
     .single();
 
   if (error || !data) {
