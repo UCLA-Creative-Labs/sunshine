@@ -7,7 +7,7 @@ export function parseGithubRepo(input: string): string | null {
 
   const direct = raw.match(/^([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)$/);
   if (direct) {
-    return `${direct[1]}/${direct[2]}`.toLowerCase();
+    return `${direct[1]}/${direct[2].replace(/\.git$/, '')}`.toLowerCase();
   }
 
   let url: URL;
