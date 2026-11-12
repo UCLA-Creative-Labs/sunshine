@@ -1,5 +1,8 @@
 import { supabase } from './client';
 import { Project } from '@/types/project';
+import { parseGithubRepo } from '@/lib/github/parseRepo';
+
+export const INVALID_GITHUB_URL_MESSAGE = 'Enter a GitHub repository URL, e.g. https://github.com/org/repo';
 
 export interface ProjectSettingsUpdate {
   projectName?: string;
@@ -126,17 +129,9 @@ export async function updateProjectSettings(
     const url = updates.githubUrl;
     let githubRepo: string | null = null;
     if (url) {
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes('github.com')) {
-          const parts = u.pathname.split('/').filter(Boolean);
-          if (parts.length >= 2) {
-            githubRepo = `${parts[0]}/${parts[1]}`.toLowerCase();
-          }
-        }
-      } catch (e) {
-        // ignore invalid URL
-      }
+      githubRepo = parseGithubRepo(url);
+      // invalid input must not unlink the repo
+      if (!githubRepo) throw new Error(INVALID_GITHUB_URL_MESSAGE);
     }
     finalUpdates.github_repo = githubRepo;
   }
