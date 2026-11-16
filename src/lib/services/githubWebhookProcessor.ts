@@ -190,7 +190,7 @@ async function processIssueEvent(
 ): Promise<void> {
   const { data: existing, error: existingError } = await supabase
     .from('tasks')
-    .select('id')
+    .select('id, synced_from_github, created_by')
     .eq('project_id', projectId)
     .eq('github_issue_number', issue.number)
     .maybeSingle();
@@ -198,13 +198,23 @@ async function processIssueEvent(
     throw new Error(`task lookup failed for issue #${issue.number}: ${existingError.message}`);
   }
 
-  const existingTaskId = (existing as { id: number } | null)?.id ?? null;
+  const existingTask = existing as { id: number; synced_from_github: boolean; created_by: string | null } | null;
+  const existingTaskId = existingTask?.id ?? null;
 
   switch (action) {
     case 'opened':
     case 'reopened': {
       if (existingTaskId) {
         await updateTaskFromIssue(supabase, existingTaskId, issue);
+        // A previous attempt may have created/linked the task before a later
+        // write failed. Resume those writes instead of treating existence as done.
+        await linkIntegrationToTask(supabase, integrationId, existingTaskId);
+        await syncAssignments(supabase, existingTaskId, issue.assignees ?? []);
+        // Portal-created tasks can also be synced from GitHub after a push.
+        // Their original creation belongs to the portal user, not this webhook.
+        if (existingTask?.synced_from_github && existingTask.created_by === null) {
+          await ensureTaskCreationActivity(supabase, projectId, existingTaskId, issue);
+        }
         return;
       }
 
@@ -298,13 +308,7 @@ async function linkPendingTaskToIssue(
     throw new Error(`linking pending task ${taskId} to issue #${issue.number} failed: ${linkError.message}`);
   }
 
-  const { error: integrationError } = await supabase
-    .from('github_integrations')
-    .update({ task_id: taskId })
-    .eq('id', integrationId);
-  if (integrationError) {
-    throw new Error(`linking integration ${integrationId} to task ${taskId} failed: ${integrationError.message}`);
-  }
+  await linkIntegrationToTask(supabase, integrationId, taskId);
 
   if (issue.assignees?.length) {
     await syncAssignments(supabase, taskId, issue.assignees);
@@ -346,6 +350,20 @@ async function createTaskFromIssue(
 
   const taskId = (task as { id: number }).id;
 
+  await linkIntegrationToTask(supabase, integrationId, taskId);
+
+  if (issue.assignees?.length) {
+    await syncAssignments(supabase, taskId, issue.assignees);
+  }
+
+  await ensureTaskCreationActivity(supabase, projectId, taskId, issue);
+}
+
+async function linkIntegrationToTask(
+  supabase: SupabaseClient,
+  integrationId: number,
+  taskId: number,
+): Promise<void> {
   const { error: integrationError } = await supabase
     .from('github_integrations')
     .update({ task_id: taskId })
@@ -353,10 +371,29 @@ async function createTaskFromIssue(
   if (integrationError) {
     throw new Error(`linking integration ${integrationId} to task ${taskId} failed: ${integrationError.message}`);
   }
+}
 
-  if (issue.assignees?.length) {
-    await syncAssignments(supabase, taskId, issue.assignees);
+async function ensureTaskCreationActivity(
+  supabase: SupabaseClient,
+  projectId: string,
+  taskId: number,
+  issue: GithubIssue,
+): Promise<void> {
+  // Completion can fail after the log insert succeeded. Replays should reuse
+  // that entry rather than inserting another creation message for the same task.
+  const { data: activity, error: lookupError } = await supabase
+    .from('activity_log')
+    .select('id')
+    .eq('project_id', projectId)
+    .eq('task_id', taskId)
+    .eq('action', 'created_task_from_github')
+    .contains('metadata', { github_issue_number: issue.number })
+    .limit(1)
+    .maybeSingle();
+  if (lookupError) {
+    throw new Error(`activity log lookup failed for task ${taskId}: ${lookupError.message}`);
   }
+  if (activity) return;
 
   const { error: activityError } = await supabase.from('activity_log').insert({
     action: 'created_task_from_github',

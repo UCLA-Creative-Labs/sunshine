@@ -50,6 +50,7 @@ function database(steps, state = { processed: false, processed_at: null, error_m
         not(...args) { query.filters.push(args); return builder; },
         gte(...args) { query.filters.push(args); return builder; },
         in(...args) { query.filters.push(args); return builder; },
+        contains(...args) { query.filters.push(args); return builder; },
         order() { return builder; },
         limit() { return builder; },
         maybeSingle() { return builder; },
@@ -104,7 +105,8 @@ const scenarios = [
     step('tasks', 'select', null, 'pending push lookup'),
     step('tasks', 'upsert', { id: 42 }, 'task upsert'),
     step('github_integrations', 'update', null, 'linking integration'),
-    ...assignments(), step('activity_log', 'insert', null, 'activity log insert'),
+    ...assignments(), step('activity_log', 'select', null, 'activity log lookup'),
+    step('activity_log', 'insert', null, 'activity log insert'),
   ] },
   { name: 'pending push bounce-back', event: issueEvent('opened'), steps: [
     step('tasks', 'select', null, 'task lookup'),
@@ -116,6 +118,13 @@ const scenarios = [
   ] },
   { name: 'pull request', event: prEvent(), steps: [
     existingTask(), step('tasks', 'update', null, 'updating task'),
+  ] },
+  { name: 'existing imported issue', event: issueEvent('opened'), steps: [
+    step('tasks', 'select', { id: 42, synced_from_github: true, created_by: null }, 'task lookup'),
+    step('tasks', 'update', null, 'updating task'),
+    step('github_integrations', 'update', null, 'linking integration'),
+    ...assignments(), step('activity_log', 'select', null, 'activity log lookup'),
+    step('activity_log', 'insert', null, 'activity log insert'),
   ] },
 ];
 
@@ -239,5 +248,77 @@ test('notification failures remain best-effort after successful database process
   assert.equal(db.state.processed, true);
   assert.equal(db.state.error_message, null);
   assert.equal(p.notifications.length, 1);
+  db.assertComplete();
+});
+
+const recoveredTaskSteps = () => [
+  step('tasks', 'select', { id: 42, synced_from_github: true, created_by: null }),
+  step('tasks', 'update'), { ...step('github_integrations', 'update'), values: { task_id: 42 } }, ...assignments(),
+  step('activity_log', 'select'), step('activity_log', 'insert'), completed(),
+];
+
+for (const failAt of [3, 6, 7, 8]) {
+  test(`new-task recovery resumes unfinished writes after failure at step ${failAt}`, async () => {
+    const p = await processor();
+    const steps = scenarios.find(s => s.name === 'new issue').steps;
+    const failed = database([...initial(), ...steps.slice(0, failAt),
+      { ...steps[failAt], error: 'transient failure' }, recorded(),
+    ]);
+    await assert.rejects(p.processEvent(failed.client, issueEvent('opened')), /transient failure/);
+    assert.equal(failed.state.processed, false);
+    const retry = database([...initial(), ...recoveredTaskSteps()], failed.state);
+    await p.processEvent(retry.client, { ...issueEvent('opened'), existingId: 7 });
+    assert.equal(retry.state.processed, true);
+    assert.ok(retry.calls.some(q => q.table === 'task_assignments' && q.operation === 'insert'));
+    assert.ok(retry.calls.some(q => q.table === 'activity_log' && q.operation === 'insert'));
+    assert.equal(retry.calls.some(q => q.table === 'tasks' && q.operation === 'upsert'), false);
+    failed.assertComplete();
+    retry.assertComplete();
+  });
+}
+
+test('recovery after completion failure reuses an already written creation log', async () => {
+  const p = await processor();
+  const first = database([...initial(), ...scenarios[3].steps,
+    { ...completed(), error: 'completion failed' }, recorded(),
+  ]);
+  await assert.rejects(p.processEvent(first.client, issueEvent('opened')), /completion failed/);
+  const retrySteps = recoveredTaskSteps();
+  retrySteps.splice(-3, 2, step('activity_log', 'select', { id: 900 }));
+  const retry = database([...initial(), ...retrySteps], first.state);
+  await p.processEvent(retry.client, { ...issueEvent('opened'), existingId: 7 });
+  assert.equal(retry.state.processed, true);
+  assert.equal(retry.calls.some(q => q.table === 'activity_log' && q.operation === 'insert'), false);
+  first.assertComplete();
+  retry.assertComplete();
+});
+
+test('a pending task linked before a failure resumes integration and assignment writes', async () => {
+  const p = await processor();
+  const steps = scenarios.find(s => s.name === 'pending push bounce-back').steps;
+  const first = database([...initial(), ...steps.slice(0, 4),
+    { ...steps[4], error: 'integration link failed' }, recorded(),
+  ]);
+  await assert.rejects(p.processEvent(first.client, issueEvent('opened')), /integration link failed/);
+  const retrySteps = recoveredTaskSteps();
+  retrySteps[0].data.created_by = 'portal-user';
+  retrySteps.splice(-3, 2); // pushed portal tasks do not get an imported-task creation log
+  const retry = database([...initial(), ...retrySteps], first.state);
+  await p.processEvent(retry.client, { ...issueEvent('opened'), existingId: 7 });
+  assert.equal(retry.state.task_id, 42);
+  assert.equal(retry.state.processed, true);
+  assert.ok(retry.calls.some(q => q.table === 'task_assignments' && q.operation === 'insert'));
+  first.assertComplete();
+  retry.assertComplete();
+});
+
+test('reopening an existing portal task syncs assignments without a false creation log', async () => {
+  const db = database([...initial(), step('tasks', 'select', { id: 42, synced_from_github: true, created_by: 'portal-user' }), step('tasks', 'update'),
+    step('github_integrations', 'update'), ...assignments(), completed(),
+  ]);
+  const p = await processor();
+  await p.processEvent(db.client, issueEvent('reopened'));
+  assert.equal(db.state.processed, true);
+  assert.equal(db.calls.some(q => q.table === 'activity_log'), false);
   db.assertComplete();
 });
