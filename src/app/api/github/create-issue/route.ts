@@ -7,21 +7,30 @@ import { userCanActOnTaskIssue } from '@/lib/permissions/githubAccess';
 
 export const runtime = 'nodejs';
 
-// Best-effort: clear the github_push_pending_at lock on a task. Errors are swallowed.
-async function clearLock(supabase: SupabaseClient, taskId: number | string): Promise<void> {
+const PUSH_LOCK_WINDOW_MS = 2 * 60_000;
+
+interface PushLock {
+    taskId: number | string;
+    pendingAt: string;
+}
+
+// Best-effort cleanup must never release a newer request's lock.
+async function clearLock(supabase: SupabaseClient, lock: PushLock): Promise<void> {
     try {
-        await supabase
+        const { error } = await supabase
             .from('tasks')
             .update({ github_push_pending_at: null })
-            .eq('id', taskId);
-    } catch {
-        // Intentionally ignored — clearing the lock is best-effort.
+            .eq('id', lock.taskId)
+            .eq('github_push_pending_at', lock.pendingAt);
+        if (error) console.error('Failed to clear GitHub push lock:', error);
+    } catch (error) {
+        console.error('Failed to clear GitHub push lock:', error);
     }
 }
 
 export async function POST(request: NextRequest) {
     const supabase = await createClient();
-    let lockedTaskId: number | string | null = null;
+    let lock: PushLock | null = null;
 
     try {
 
@@ -106,11 +115,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 8. Block multiple pushes
-        const { error: lockError } = await supabase
+        // 8. Atomically claim an unlinked task with no active push.
+        const now = new Date();
+        const pendingAt = now.toISOString();
+        const staleBefore = new Date(now.getTime() - PUSH_LOCK_WINDOW_MS).toISOString();
+        const { data: lockedTasks, error: lockError } = await supabase
             .from('tasks')
-            .update({ github_push_pending_at: new Date().toISOString() })
-            .eq('id', taskId);
+            .update({ github_push_pending_at: pendingAt })
+            .eq('id', taskId)
+            .is('github_issue_number', null)
+            .or(`github_push_pending_at.is.null,github_push_pending_at.lt.${staleBefore}`)
+            .select('id');
 
         if (lockError) {
             console.error('Failed to lock task for pushing:', lockError);
@@ -120,7 +135,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        lockedTaskId = taskId;
+        if (!lockedTasks?.length) {
+            return NextResponse.json(
+                { error: 'Task is already linked to a GitHub issue or a push is in progress.' },
+                { status: 409 },
+            );
+        }
+
+        lock = { taskId, pendingAt };
 
         // 9. Authenticate as GitHub App
         let octokit;
@@ -129,8 +151,8 @@ export async function POST(request: NextRequest) {
         } catch (authError) {
             console.error('GitHub auth error:', authError);
             // Unlock task
-            await clearLock(supabase, taskId);
-            lockedTaskId = null;
+            await clearLock(supabase, lock);
+            lock = null;
             return NextResponse.json(
                 { error: 'Failed to connect to the GitHub repository. Ensure the GitHub App is installed.' },
                 { status: 500 },
@@ -162,8 +184,8 @@ export async function POST(request: NextRequest) {
         } catch (apiError) {
             console.error('GitHub API error:', apiError);
             // Unlock task
-            await clearLock(supabase, taskId);
-            lockedTaskId = null;
+            await clearLock(supabase, lock);
+            lock = null;
             return NextResponse.json(
                 { error: 'Failed to create GitHub issue.' },
                 { status: 500 },
@@ -188,7 +210,8 @@ export async function POST(request: NextRequest) {
 
         if (updateError) {
             console.error('Failed to update task with GitHub issue info:', updateError);
-            // Issue was created, but task not updated. This is tricky.
+            await clearLock(supabase, lock);
+            lock = null;
             return NextResponse.json(
                 { error: 'Issue created on GitHub, but failed to link it to the task.' },
                 { status: 500 },
@@ -196,7 +219,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Successful update cleared the lock as part of the same row.
-        lockedTaskId = null;
+        lock = null;
 
         // 12. Log to activity_log (ignore errors to not block the main flow)
         supabase.from('activity_log').insert({
@@ -216,8 +239,8 @@ export async function POST(request: NextRequest) {
 
     } catch (err: unknown) {
         console.error('Unexpected error in create-issue route:', err);
-        if (lockedTaskId !== null) {
-            await clearLock(supabase, lockedTaskId);
+        if (lock !== null) {
+            await clearLock(supabase, lock);
         }
         return NextResponse.json(
             { error: 'An unexpected server error occurred.' },
