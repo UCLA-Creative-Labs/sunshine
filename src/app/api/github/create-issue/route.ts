@@ -199,23 +199,52 @@ export async function POST(request: NextRequest) {
         }
 
         // 11. Update the task
-        const { error: updateError } = await supabase
+        const { data: linkedTasks, error: updateError } = await supabase
             .from('tasks')
             .update({
                 github_issue_number: issueData.number,
                 github_issue_url: issueData.html_url,
                 github_push_pending_at: null,
             })
-            .eq('id', taskId);
+            .eq('id', taskId)
+            .eq('github_push_pending_at', lock.pendingAt)
+            .is('github_issue_number', null)
+            .select('id');
 
         if (updateError) {
             console.error('Failed to update task with GitHub issue info:', updateError);
             await clearLock(supabase, lock);
             lock = null;
             return NextResponse.json(
-                { error: 'Issue created on GitHub, but failed to link it to the task.' },
+                {
+                    error: 'Issue created on GitHub, but failed to link it to the task.',
+                    issueNumber: issueData.number,
+                    issueUrl: issueData.html_url,
+                },
                 { status: 500 },
             );
+        }
+
+        if (!linkedTasks?.length) {
+            // The webhook may already have linked this same issue. Otherwise a
+            // newer request owns the task; never overwrite its link or lock.
+            const { data: currentTask, error: currentError } = await supabase
+                .from('tasks')
+                .select('github_issue_number')
+                .eq('id', taskId)
+                .maybeSingle();
+            await clearLock(supabase, lock);
+            lock = null;
+            if (currentError || currentTask?.github_issue_number !== issueData.number) {
+                return NextResponse.json(
+                    {
+                        error: 'Issue created on GitHub, but the task link changed. Reconcile this issue before retrying.',
+                        issueNumber: issueData.number,
+                        issueUrl: issueData.html_url,
+                    },
+                    { status: currentError ? 500 : 409 },
+                );
+            }
         }
 
         // Successful update cleared the lock as part of the same row.

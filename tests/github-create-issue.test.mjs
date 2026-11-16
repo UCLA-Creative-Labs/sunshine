@@ -19,6 +19,7 @@ async function setup(options = {}) {
       const builder = {
         select(columns) { query.columns = columns; return builder; },
         single() { return builder; },
+        maybeSingle() { return builder; },
         update(values) { query.operation = 'update'; query.values = values; return builder; },
         insert(values) { query.operation = 'insert'; query.values = values; return builder; },
         eq(column, value) { query.filters.push([column, value]); return builder; },
@@ -192,3 +193,55 @@ test('cleanup errors preserve the original failure response and allow later stal
   assert.match((await response.json()).error, /Failed to connect/);
   assert.ok(s.task.github_push_pending_at);
 });
+
+test('an expired request cannot overwrite a newer linked GitHub issue', async () => {
+  const replacement = new Date(Date.now() + 1_000).toISOString();
+  const s = await setup({ onCreate: (task) => {
+    task.github_push_pending_at = replacement;
+    task.github_issue_number = 99;
+    task.github_issue_url = 'https://github.com/org/repo/issues/99';
+  } });
+  const response = await s.post();
+  assert.equal(response.status, 409);
+  assert.equal(s.task.github_issue_number, 99);
+  assert.equal(s.task.github_issue_url, 'https://github.com/org/repo/issues/99');
+  assert.equal(s.task.github_push_pending_at, replacement);
+  assert.equal((await response.json()).issueNumber, 42, 'report the newly created issue for reconciliation');
+});
+
+test('an expired request cannot clear a replacement lock while saving its result', async () => {
+  const replacement = new Date(Date.now() + 1_000).toISOString();
+  const s = await setup({ onCreate: (task) => { task.github_push_pending_at = replacement; } });
+  assert.equal((await s.post()).status, 409);
+  assert.equal(s.task.github_issue_number, null);
+  assert.equal(s.task.github_push_pending_at, replacement);
+});
+
+test('a webhook linking the same issue before the HTTP response is accepted as success', async () => {
+  const s = await setup({ onCreate: (task) => {
+    task.github_issue_number = 42;
+    task.github_issue_url = 'https://github.com/org/repo/issues/42';
+    task.github_push_pending_at = null;
+  } });
+  assert.equal((await s.post()).status, 200);
+  assert.equal(s.task.github_issue_number, 42);
+  assert.equal(s.task.github_push_pending_at, null);
+});
+
+test('a burst of 64 concurrent pushes creates only one issue', async () => {
+  const s = await setup();
+  const responses = await Promise.all(Array.from({ length: 64 }, () => s.post()));
+  assert.equal(responses.filter(r => r.status === 200).length, 1);
+  assert.equal(responses.filter(r => r.status === 409).length, 63);
+  assert.equal(s.issueCalls, 1);
+});
+
+for (const [age, expected] of [[120_001, 200], [120_000, 409], [119_999, 409], [-1_000, 409]]) {
+  test(`lock age ${age}ms respects the strict two-minute boundary`, async (t) => {
+    const now = Date.parse('2026-11-16T12:00:00Z');
+    t.mock.timers.enable({ apis: ['Date'], now });
+    const s = await setup({ task: { github_push_pending_at: new Date(now - age).toISOString() } });
+    assert.equal((await s.post()).status, expected);
+    assert.equal(s.issueCalls, expected === 200 ? 1 : 0);
+  });
+}
