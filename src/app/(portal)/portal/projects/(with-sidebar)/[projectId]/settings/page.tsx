@@ -34,6 +34,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
 
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [logoError, setLogoError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
@@ -55,6 +56,16 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const maxLogoSize: number = 5 * 1024 * 1024;
+    if (file.size > maxLogoSize) {
+      setLogoError("File must be under 5MB");
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      setLogoError("Please upload a PNG, JPG or SVG");
+      return;
+    }
+    setLogoError(null);
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
   };
@@ -133,7 +144,10 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
               >
                 Upload image
               </button>
-              {logoPreview && logoPreview !== (project?.logoUrl ?? null) && (
+              {logoError && (
+                <p className="text-xs text-red/50">{logoError}</p>
+              )}
+              {logoPreview && !logoError && logoPreview !== (project?.logoUrl ?? null) && (
                 <p className="text-xs text-black/50">New logo selected — save to apply</p>
               )}
               <p className="text-xs text-black/40">PNG, JPG, SVG up to 5 MB</p>
