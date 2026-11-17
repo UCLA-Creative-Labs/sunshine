@@ -322,3 +322,57 @@ test('reopening an existing portal task syncs assignments without a false creati
   assert.equal(db.calls.some(q => q.table === 'activity_log'), false);
   db.assertComplete();
 });
+
+test('an event without a repository does not write to the database', async () => {
+  const db = database([]);
+  const p = await processor();
+  const event = issueEvent('opened');
+  delete event.payload.repository;
+  await p.processEvent(db.client, event);
+  assert.equal(db.calls.length, 0);
+  db.assertComplete();
+});
+
+test('an unlinked repository is ignored without creating tasks', async () => {
+  const db = database([step('projects', 'select')]);
+  const p = await processor();
+  await p.processEvent(db.client, issueEvent('opened'));
+  assert.equal(db.calls.length, 1);
+  db.assertComplete();
+});
+
+test('removing the last assignee clears assignments without a profile lookup', async () => {
+  const db = database([...initial(), existingTask(), step('task_assignments', 'delete'), completed()]);
+  const p = await processor();
+  const event = issueEvent('unassigned');
+  event.payload.issue = { ...issue, assignees: [] };
+  await p.processEvent(db.client, event);
+  assert.equal(db.state.processed, true);
+  assert.equal(db.calls.some(q => q.table === 'profiles'), false);
+  assert.equal(db.calls.filter(q => q.table === 'task_assignments' && q.operation === 'delete').length, 1);
+  db.assertComplete();
+});
+
+for (const [action, merged, status] of [['opened', false, 'in_review'], ['closed', true, 'done'], ['closed', false, undefined]]) {
+  test(`pull request ${action} merged=${merged} preserves the intended task status`, async () => {
+    const db = database([...initial(), existingTask(), step('tasks', 'update'), completed()]);
+    const p = await processor();
+    const event = prEvent(action);
+    event.payload.pull_request.merged = merged;
+    await p.processEvent(db.client, event);
+    const update = db.calls.find(q => q.table === 'tasks' && q.operation === 'update');
+    assert.equal(update.values.status, status);
+    assert.equal(update.values.github_pr_number, 20);
+    assert.equal(Boolean(update.values.completed_at), status === 'done');
+    db.assertComplete();
+  });
+}
+
+test('a PR without a matching task is processed without inventing a task', async () => {
+  const db = database([...initial(), step('tasks', 'select'), completed()]);
+  const p = await processor();
+  await p.processEvent(db.client, prEvent());
+  assert.equal(db.calls.some(q => q.table === 'tasks' && q.operation !== 'select'), false);
+  assert.equal(db.state.processed, true);
+  db.assertComplete();
+});
