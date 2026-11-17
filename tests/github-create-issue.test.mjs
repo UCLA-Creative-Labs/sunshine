@@ -13,7 +13,7 @@ async function setup(options = {}) {
   const issue = { number: 42, html_url: 'https://github.com/org/repo/issues/42', assignees: [] };
 
   const supabase = {
-    auth: { getUser: async () => ({ data: { user: { id: 'user' } }, error: null }) },
+    auth: { getUser: async () => ({ data: { user: options.unauthenticated ? null : { id: 'user' } }, error: null }) },
     from(table) {
       const query = { table, filters: [], values: null, operation: 'select', columns: null, or: null };
       const builder = {
@@ -33,7 +33,7 @@ async function setup(options = {}) {
               return { data: [], error: null };
             }
             if (table !== 'tasks') return { data: null, error: null };
-            if (query.operation === 'select') return { data: { ...task }, error: null };
+            if (query.operation === 'select') return { data: options.missingTask ? null : { ...task }, error: null };
 
             const kind = query.values.github_push_pending_at ? 'claim'
               : query.values.github_issue_number ? 'link' : 'clear';
@@ -72,12 +72,12 @@ async function setup(options = {}) {
         } };
       },
     },
-    '@/lib/permissions/githubAccess': { userCanActOnTaskIssue: async () => ({ allowed: true }) },
+    '@/lib/permissions/githubAccess': { userCanActOnTaskIssue: async () => ({ allowed: !options.denied, reason: 'Access denied' }) },
   });
   return {
     task, calls, get issueCalls() { return issueCalls; },
-    post: () => POST(new Request('http://localhost/api/github/create-issue', {
-      method: 'POST', body: JSON.stringify({ taskId: 1 }),
+    post: (taskId = 1) => POST(new Request('http://localhost/api/github/create-issue', {
+      method: 'POST', body: JSON.stringify({ taskId }),
     })),
   };
 }
@@ -243,5 +243,20 @@ for (const [age, expected] of [[120_001, 200], [120_000, 409], [119_999, 409], [
     const s = await setup({ task: { github_push_pending_at: new Date(now - age).toISOString() } });
     assert.equal((await s.post()).status, expected);
     assert.equal(s.issueCalls, expected === 200 ? 1 : 0);
+  });
+}
+
+for (const [name, options, taskId, status] of [
+  ['unauthenticated caller', { unauthenticated: true }, 1, 401],
+  ['caller without task permissions', { denied: true }, 1, 403],
+  ['missing task ID', {}, null, 400],
+  ['missing task', { missingTask: true }, 1, 404],
+  ['already linked task', { task: { github_issue_number: 99 } }, 1, 409],
+]) {
+  test(`${name} cannot claim a lock or create a GitHub issue`, async () => {
+    const s = await setup(options);
+    assert.equal((await s.post(taskId)).status, status);
+    assert.equal(s.issueCalls, 0);
+    assert.equal(s.calls.some(q => q.operation !== 'select'), false);
   });
 }
