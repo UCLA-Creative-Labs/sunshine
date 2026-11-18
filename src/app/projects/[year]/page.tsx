@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 
 import QuarterProjectCard from "../QuarterProjectCard";
 import "../../../styles/QuarterProjectCard.scss";
-import { useParams } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import QuarterProjectCardList from '../QuarterProjectCardList';
 
 import projectData from '@/assets/projectData';
@@ -13,14 +13,18 @@ import projectData from '@/assets/projectData';
 export default function About() {
 
   const { year } = useParams<{ year: string }>();
-  const [start, end] = year.split("-");
-  const formattedYear = `20${start}-20${end}`;
   const yearlyProjects = projectData.find(proj => proj.year === year);
   const [fExpand, setFExpand] = useState(false);
   const [wExpand, setWExpand] = useState(false);
   const [sExpand, setSExpand] = useState(false);
 
-console.log(fExpand);
+  if (!yearlyProjects) {
+    notFound();
+  }
+
+  const [start, end] = year.split("-");
+  const formattedYear = `20${start}-20${end}`;
+
   return (
     <main className="flex min-h-screen flex-col">
       <Navbar />
