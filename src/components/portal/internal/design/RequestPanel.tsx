@@ -10,6 +10,7 @@ import {
   CreateDesignRequest,
 } from '@/types/designRequest';
 import { getCurrentQuarter, getAllQuarters } from '@/lib/utils/quarterService';
+import { formatLocalDateTime } from '@/lib/utils/localDateTime';
 import { getCurrentUserId } from '@/lib/supabase/profileService';
 import { IoClose } from 'react-icons/io5';
 
@@ -88,6 +89,9 @@ export default function RequestPanel({ isOpen, onClose, onSubmit, editingRequest
       return;
     }
 
+    const eventDate = formData.get('event_date') as string;
+    const eventDateChanged = !editingRequest || eventDate !== formatLocalDateTime(editingRequest.event_date);
+
     try {
       const requestData: Omit<CreateDesignRequest, 'created_by'> = {
         name: formData.get('name') as string,
@@ -96,7 +100,8 @@ export default function RequestPanel({ isOpen, onClose, onSubmit, editingRequest
         graphic_type: finalGraphicType,
         content: (formData.get('content') as string) || '',
         location: (formData.get('location') as string) || null,
-        event_date: formData.get('event_date') ? new Date(formData.get('event_date') as string).toISOString() : null,
+        // Preserve the stored timestamp when the displayed minute has not changed.
+        ...(eventDateChanged && { event_date: eventDate ? new Date(eventDate).toISOString() : null }),
         due_date: formData.get('due_date') as string,
         publicity: formData.get('publicity') as Publicity,
         quarter: formData.get('quarter') as string,
@@ -259,7 +264,7 @@ export default function RequestPanel({ isOpen, onClose, onSubmit, editingRequest
                 required
                 type="datetime-local"
                 name="event_date"
-                defaultValue={editingRequest?.event_date ? new Date(editingRequest.event_date).toISOString().slice(0, 16) : ''}
+                defaultValue={formatLocalDateTime(editingRequest?.event_date)}
                 className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
