@@ -161,7 +161,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
                 Upload image
               </button>
               {logoError && (
-                <p className="text-xs text-red/50">{logoError}</p>
+                <p className="text-xs text-red-500">{logoError}</p>
               )}
               {logoPreview && !logoError && logoPreview !== (project?.logoUrl ?? null) && (
                 <p className="text-xs text-black/50">New logo selected — save to apply</p>
