@@ -36,7 +36,6 @@ const BASE_ITEMS = [
   { id: "board", label: "Board", path: "board", icon: RxDashboard },
   { id: "list", label: "List", path: "list", icon: RxRows },
   { id: "members", label: "Members", path: "members", icon: RxPerson },
-  { id: "docs", label: "Docs", path: "docs", icon: RxFileText },
   { id: "settings", label: "Settings", path: "settings", icon: RxGear },
 ];
 
