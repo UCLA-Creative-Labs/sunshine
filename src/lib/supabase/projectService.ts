@@ -127,19 +127,36 @@ export async function updateProjectSettings(
   return data as Project;
 }
 
+
+const LOGO_TYPE_TO_EXT: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/svg+xml': 'svg',
+};
+export const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml'];
+
 export async function uploadProjectLogo(
   projectId: string,
   file: File,
   bucketName = 'project_logos'
 ): Promise<string | null> {
-  const fileExt = file.name.split('.').pop() || 'png';
+  if (!ALLOWED_LOGO_TYPES.includes(file.type)) {
+    console.error(`Invalid File Type, type=${file.type}`);
+    return null;
+  }
+  const maxLogoSize: number = 5 * 1024 * 1024;
+  if (file.size > maxLogoSize) {
+    console.error(`File too big, size=${file.size}`);
+    return null;
+  }
+  const fileExt = LOGO_TYPE_TO_EXT[file.type];
   const fileName = `logo-${Date.now()}.${fileExt}`;
   const filePath = `${projectId}/${fileName}`;
 
   const { error: uploadError } = await supabase
     .storage
     .from(bucketName)
-    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+    .upload(filePath, file, { cacheControl: '3600', upsert: true, contentType: file.type });
 
   if (uploadError) {
     console.error('Error uploading project logo:', uploadError);

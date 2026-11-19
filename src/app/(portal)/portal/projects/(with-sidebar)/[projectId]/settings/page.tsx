@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { getProjectById, updateProjectSettings, uploadProjectLogo, INVALID_GITHUB_URL_MESSAGE } from '@/lib/supabase/projectService';
 import { parseGithubRepo } from '@/lib/github/parseRepo';
 import { Project } from '@/types/project';
+import { ALLOWED_LOGO_TYPES } from '@/lib/supabase/projectService';
 
 interface SettingsField {
   key: keyof Pick<Project, 'githubUrl' | 'figmaUrl' | 'notionUrl'>;
@@ -35,6 +36,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
 
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [logoError, setLogoError] = useState<string | null>(null);
   const [githubUrlError, setGithubUrlError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -54,9 +56,29 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
     load();
   }, [projectId]);
 
+  useEffect(() => {
+    return () => {
+      if (logoPreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    }
+  }, [logoPreview]);
+
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const maxLogoSize: number = 5 * 1024 * 1024;
+    if (file.size > maxLogoSize) {
+      e.target.value = '';
+      setLogoError("File must be under 5MB");
+      return;
+    }
+    if (!ALLOWED_LOGO_TYPES.includes(file.type)) {
+      e.target.value = '';
+      setLogoError("Please upload a PNG, JPG or SVG");
+      return;
+    }
+    setLogoError(null);
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
   };
@@ -78,6 +100,11 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
     if (logoFile) {
       const uploaded = await uploadProjectLogo(projectId, logoFile);
       if (uploaded) logoUrl = uploaded;
+      else {
+        setSaveStatus('error');
+        setSaving(false);
+        return;
+      }
     }
 
     const updated = await updateProjectSettings(projectId, {
@@ -143,7 +170,10 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
               >
                 Upload image
               </button>
-              {logoPreview && logoPreview !== (project?.logoUrl ?? null) && (
+              {logoError && (
+                <p className="text-xs text-red-500">{logoError}</p>
+              )}
+              {logoPreview && !logoError && logoPreview !== (project?.logoUrl ?? null) && (
                 <p className="text-xs text-black/50">New logo selected — save to apply</p>
               )}
               <p className="text-xs text-black/40">PNG, JPG, SVG up to 5 MB</p>
