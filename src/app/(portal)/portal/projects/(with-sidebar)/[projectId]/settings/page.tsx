@@ -53,15 +53,25 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
     load();
   }, [projectId]);
 
+  useEffect(() => {
+    return () => {
+      if (logoPreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    }
+  }, [logoPreview]);
+
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const maxLogoSize: number = 5 * 1024 * 1024;
     if (file.size > maxLogoSize) {
+      e.target.value = '';
       setLogoError("File must be under 5MB");
       return;
     }
     if (!file.type.startsWith('image/')) {
+      e.target.value = '';
       setLogoError("Please upload a PNG, JPG or SVG");
       return;
     }
