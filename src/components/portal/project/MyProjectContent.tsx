@@ -46,6 +46,7 @@ import {
     getActivityMessage,
 } from '@/lib/utils/projectOverviewDisplay';
 import { getInitials, getColor } from '@/lib/utils/avatar';
+import { SEASONS } from '@/lib/utils/quarterService';
 
 const CARD_STYLES = {
     base: 'rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl',
@@ -412,7 +413,7 @@ export default function MyProjectContent({
                             <div className="flex flex-col sm:flex-row gap-4">
                                 {/* Quarter Segmented Control */}
                                 <div className="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
-                                    {['Fall', 'Winter', 'Spring'].map((q) => (
+                                    {SEASONS.map((q) => (
                                         <button
                                             key={q}
                                             onClick={() =>
