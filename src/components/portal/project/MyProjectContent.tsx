@@ -138,7 +138,6 @@ interface MyProjectContentProps {
     currentUserId: string;
 }
 
-// TODO: Fetch project data from database (description, leads, tasks, activity)
 export default function MyProjectContent({
     projectId,
     currentUserId,
@@ -373,11 +372,11 @@ export default function MyProjectContent({
     };
 
     const handleYearStep = (direction: 'next' | 'prev') => {
-        const currentYearStr = editForm.year || '23-24';
+        const currentYearStr = editForm.year;
+        if (!currentYearStr) return;
         // Parse start year from "YY-YY" format
-        let startYear = parseInt('20' + currentYearStr.split('-')[0]);
-
-        if (isNaN(startYear)) startYear = 2023; // Default fallback
+        let startYear = parseInt('20' + currentYearStr?.split('-')[0]);
+        if (isNaN(startYear)) return; // Default fallback
 
         const newStartYear =
             direction === 'next' ? startYear + 1 : startYear - 1;
@@ -439,7 +438,7 @@ export default function MyProjectContent({
                                         <FaChevronLeft className="w-3 h-3" />
                                     </button>
                                     <span className="w-20 text-center font-medium text-sm">
-                                        {editForm.year || '23-24'}
+                                        {editForm.year}
                                     </span>
                                     <button
                                         onClick={() => handleYearStep('next')}
@@ -453,7 +452,7 @@ export default function MyProjectContent({
                     ) : (
                         <div className="space-y-1">
                             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-                                {project.projectName || 'My Project'}
+                                {project.projectName}
                             </h1>
                             <p className="text-black/60">
                                 {project.quarter} {project.year}
