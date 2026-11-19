@@ -2,7 +2,8 @@
 
 import { use, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { getProjectById, updateProjectSettings, uploadProjectLogo } from '@/lib/supabase/projectService';
+import { getProjectById, updateProjectSettings, uploadProjectLogo, INVALID_GITHUB_URL_MESSAGE } from '@/lib/supabase/projectService';
+import { parseGithubRepo } from '@/lib/github/parseRepo';
 import { Project } from '@/types/project';
 import { ALLOWED_LOGO_TYPES } from '@/lib/supabase/projectService';
 
@@ -36,6 +37,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [logoError, setLogoError] = useState<string | null>(null);
+  const [githubUrlError, setGithubUrlError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!projectId) return;
@@ -82,6 +84,14 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
   };
 
   const handleSave = async () => {
+    const trimmedGithubUrl = githubUrl.trim();
+    if (trimmedGithubUrl && !parseGithubRepo(trimmedGithubUrl)) {
+      setGithubUrlError(INVALID_GITHUB_URL_MESSAGE);
+      setSaveStatus('idle');
+      return;
+    }
+    setGithubUrlError(null);
+
     setSaving(true);
     setSaveStatus('idle');
 
@@ -98,7 +108,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
     }
 
     const updated = await updateProjectSettings(projectId, {
-      githubUrl: githubUrl || null,
+      githubUrl: trimmedGithubUrl || null,
       figmaUrl: figmaUrl || null,
       notionUrl: notionUrl || null,
       logoUrl,
@@ -194,6 +204,9 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
                   placeholder={placeholder}
                   className="w-full rounded-lg border border-[#D4D7E5] px-3 py-2 text-sm text-black placeholder:text-black/30 focus:outline-none focus:ring-2 focus:ring-[#3F86FF]/40"
                 />
+                {key === 'githubUrl' && githubUrlError && (
+                  <p className="text-sm text-red-500">{githubUrlError}</p>
+                )}
               </div>
             );
           })}

@@ -88,55 +88,5 @@ export async function addMembersToProject(
     return { data: null, error: error.message, success: false };
   }
 
-  // Add user_context_roles entries for each new member
-  if (finalRoleId) {
-    const userContextRoles = userIds.map(userId => ({
-      user_id: userId,
-      role_id: finalRoleId,
-      context: 'external' as const,
-    }));
-
-    const { error: roleError } = await supabase
-      .from('user_context_roles')
-      .insert(userContextRoles)
-      .select();
-
-    if (roleError) {
-      console.error('Error adding user context roles:', roleError);
-      // Don't fail the whole operation, just log the error
-    }
-  }
-
   return { data: data.length, error: null, success: true };
-}
-
-export async function removeMemberFromProject(
-  projectId: string,
-  userId: string
-): Promise<TaskOperationResult<boolean>> {
-  // Remove from user_context_roles
-  const { error: roleError } = await supabase
-    .from('user_context_roles')
-    .delete()
-    .eq('user_id', userId)
-    .eq('context', 'external');
-
-  if (roleError) {
-    console.error('Error removing user context role:', roleError);
-    // Continue with project_members deletion
-  }
-
-  // Remove from project_members
-  const { error } = await supabase
-    .from('project_members')
-    .delete()
-    .eq('project_id', projectId)
-    .eq('user_id', userId);
-
-  if (error) {
-    console.error('Error removing member from project:', error);
-    return { data: false, error: error.message, success: false };
-  }
-
-  return { data: true, error: null, success: true };
 }

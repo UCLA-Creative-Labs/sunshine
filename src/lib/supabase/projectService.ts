@@ -1,5 +1,8 @@
 import { supabase } from './client';
 import { Project } from '@/types/project';
+import { parseGithubRepo } from '@/lib/github/parseRepo';
+
+export const INVALID_GITHUB_URL_MESSAGE = 'Enter a GitHub repository URL, e.g. https://github.com/org/repo';
 
 export interface ProjectSettingsUpdate {
   projectName?: string;
@@ -56,30 +59,6 @@ export async function getProjectById(projectId: string): Promise<Project | null>
 }
 
 /**
- * Fetches the project associated with a user via the project_members join table.
- */
-export async function getProjectByUserId(userId: string): Promise<Project | null> {
-  const { data, error } = await supabase
-    .from('project_members')
-    .select('project_id, projects(*)')
-    .eq('user_id', userId)
-    .single();
-
-  if (error || !data) {
-    console.error('Error fetching project for user:', error);
-    return null;
-  }
-
-  const projectData = data.projects;
-
-  if (!projectData || Array.isArray(projectData)) {
-    return null;
-  }
-
-  return projectData as unknown as Project;
-}
-
-/**
  * Creates a new project in the database.
  */
 export async function createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
@@ -126,17 +105,9 @@ export async function updateProjectSettings(
     const url = updates.githubUrl;
     let githubRepo: string | null = null;
     if (url) {
-      try {
-        const u = new URL(url);
-        if (u.hostname.includes('github.com')) {
-          const parts = u.pathname.split('/').filter(Boolean);
-          if (parts.length >= 2) {
-            githubRepo = `${parts[0]}/${parts[1]}`.toLowerCase();
-          }
-        }
-      } catch (e) {
-        // ignore invalid URL
-      }
+      githubRepo = parseGithubRepo(url);
+      // invalid input must not unlink the repo
+      if (!githubRepo) throw new Error(INVALID_GITHUB_URL_MESSAGE);
     }
     finalUpdates.github_repo = githubRepo;
   }
