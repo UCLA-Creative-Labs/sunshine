@@ -71,7 +71,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
       setLogoError("File must be under 5MB");
       return;
     }
-    if (ALLOWED_LOGO_TYPES.includes(file.type)) {
+    if (!ALLOWED_LOGO_TYPES.includes(file.type)) {
       e.target.value = '';
       setLogoError("Please upload a PNG, JPG or SVG");
       return;
@@ -90,6 +90,11 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
     if (logoFile) {
       const uploaded = await uploadProjectLogo(projectId, logoFile);
       if (uploaded) logoUrl = uploaded;
+      else {
+        setSaveStatus('error');
+        setSaving(false);
+        return;
+      }
     }
 
     const updated = await updateProjectSettings(projectId, {
