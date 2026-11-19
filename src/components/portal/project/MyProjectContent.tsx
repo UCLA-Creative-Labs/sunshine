@@ -45,6 +45,7 @@ import {
     getActivityComment,
     getActivityMessage,
 } from '@/lib/utils/projectOverviewDisplay';
+import { getInitials, getColor } from '@/lib/utils/avatar';
 
 const CARD_STYLES = {
     base: 'rounded-2xl border border-[#D4D7E5] bg-white p-6 md:p-8 shadow-lg transform transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl',
@@ -52,9 +53,9 @@ const CARD_STYLES = {
 } as const;
 
 const AVATAR_STYLES = {
-    large: 'flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[#E5E7EB]',
-    medium: 'h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-[#E5E7EB]',
-    small: 'inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[#E5E7EB]',
+    large: 'flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full border-2 border-[#333] bg-[#E5E7EB] text-lg font-bold',
+    medium: 'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 border-[#333] bg-[#E5E7EB] text-sm font-bold',
+    small: 'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-[#333] bg-[#E5E7EB] text-xs font-bold',
 } as const;
 
 function useMountAnimation(delay: number) {
@@ -111,14 +112,8 @@ interface ActivityItemProps {
 function ActivityItem({ name, time, action, comment }: ActivityItemProps) {
     return (
         <div className="flex gap-3">
-            <div className={AVATAR_STYLES.medium}>
-                <Image
-                    src="/images/default-avatar.svg"
-                    alt={`${name} avatar`}
-                    width={40}
-                    height={40}
-                    className="h-full w-full object-cover"
-                />
+            <div className={AVATAR_STYLES.medium} style={{ backgroundColor: getColor(name) }}>
+                {getInitials(name)}
             </div>
             <div className="flex-1">
                 <div className="mb-1 flex items-center justify-between">
@@ -533,14 +528,8 @@ export default function MyProjectContent({
                                         key={member.user_id}
                                         className="flex items-center gap-4"
                                     >
-                                        <div className={AVATAR_STYLES.large}>
-                                            <Image
-                                                src="/images/default-avatar.svg"
-                                                alt={`${member.user.display_name} avatar`}
-                                                width={56}
-                                                height={56}
-                                                className="h-full w-full object-cover"
-                                            />
+                                        <div className={AVATAR_STYLES.large} style={{ backgroundColor: getColor(member.user.display_name) }}>
+                                            {getInitials(member.user.display_name)}
                                         </div>
                                         <div className="space-y-1">
                                             <p className="text-sm font-semibold text-[#E1225C]">
@@ -616,6 +605,7 @@ export default function MyProjectContent({
                                                 TASK_STATUS_STYLES[task.status];
                                             const additionalAssignees =
                                                 task.assignments.length - 1;
+                                            const assigneeName = task.assignments[0]?.assignee.display_name ?? '';
 
                                             return (
                                                 <tr key={task.id}>
@@ -660,19 +650,9 @@ export default function MyProjectContent({
                                                     </td>
                                                     <td className="py-4 align-middle">
                                                         <div className="inline-flex items-center gap-2">
-                                                            <span
-                                                                className={
-                                                                    AVATAR_STYLES.small
-                                                                }
-                                                            >
-                                                                <Image
-                                                                    src="/images/default-avatar.svg"
-                                                                    alt="Task assignee avatar"
-                                                                    width={32}
-                                                                    height={32}
-                                                                    className="h-full w-full object-cover"
-                                                                />
-                                                            </span>
+                                                            <div className={AVATAR_STYLES.small} style={{ backgroundColor: getColor(assigneeName) }}>
+                                                                {getInitials(assigneeName)}
+                                                            </div>
                                                             {additionalAssignees >
                                                                 0 && (
                                                                 <span className="text-xs text-black/60">
