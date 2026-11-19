@@ -56,30 +56,6 @@ export async function getProjectById(projectId: string): Promise<Project | null>
 }
 
 /**
- * Fetches the project associated with a user via the project_members join table.
- */
-export async function getProjectByUserId(userId: string): Promise<Project | null> {
-  const { data, error } = await supabase
-    .from('project_members')
-    .select('project_id, projects(*)')
-    .eq('user_id', userId)
-    .single();
-
-  if (error || !data) {
-    console.error('Error fetching project for user:', error);
-    return null;
-  }
-
-  const projectData = data.projects;
-
-  if (!projectData || Array.isArray(projectData)) {
-    return null;
-  }
-
-  return projectData as unknown as Project;
-}
-
-/**
  * Creates a new project in the database.
  */
 export async function createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
