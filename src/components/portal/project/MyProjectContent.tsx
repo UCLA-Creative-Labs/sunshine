@@ -809,29 +809,36 @@ export default function MyProjectContent({
                     </Section>
 
                     <Section title="Quick Links" delay={320}>
-                        <div className="flex items-center justify-center gap-6 text-sm text-black/80">
-                            <a
-                                href="#"
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-                                aria-label="GitHub"
-                            >
-                                <FaGithub className="h-5 w-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-                                aria-label="Figma"
-                            >
-                                <SiFigma className="h-5 w-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
-                                aria-label="Notion"
-                            >
-                                <SiNotion className="h-5 w-5" />
-                            </a>
-                        </div>
+                        {(() => {
+                            const links = [
+                                { label: 'GitHub', url: project?.githubUrl, Icon: FaGithub },
+                                { label: 'Figma', url: project?.figmaUrl, Icon: SiFigma },
+                                { label: 'Notion', url: project?.notionUrl, Icon: SiNotion },
+                            ].filter((l) => l.url);
+                            if (links.length === 0) {
+                                return (
+                                    <p className="text-center text-sm text-black/50">
+                                        No links yet. Add them in Settings!
+                                    </p>
+                                );
+                            }
+                            return (
+                                <div className="flex items-center justify-center gap-6 text-sm text-black/80">
+                                    {links.map(({ label, url, Icon }) => (
+                                        <a
+                                            key={label}
+                                            href={url as string}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex h-10 w-10 items-center justify-center rounded-full border border-black bg-white hover:bg-black hover:text-white transform transition-transform transition-colors duration-200 ease-out hover:-translate-y-0.5 hover:scale-105"
+                                            aria-label={label}
+                                        >
+                                            <Icon className="h-5 w-5" />
+                                        </a>
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </Section>
                 </div>
             </div>
