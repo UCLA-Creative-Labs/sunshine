@@ -341,7 +341,6 @@ export default function ProjectBoardContent({ projectId, currentUserId }: Projec
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-black">
             Tasks
           </h1>
-          <p className="text-sm font-semibold text-black">Tasks</p>
           <p className="text-[11px] md:text-xs text-black/50">{today}</p>
         </div>
         <div className="flex items-center gap-4">
