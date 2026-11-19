@@ -4,6 +4,7 @@ import { use, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getProjectById, updateProjectSettings, uploadProjectLogo } from '@/lib/supabase/projectService';
 import { Project } from '@/types/project';
+import { ALLOWED_LOGO_TYPES } from '@/lib/supabase/projectService';
 
 interface SettingsField {
   key: keyof Pick<Project, 'githubUrl' | 'figmaUrl' | 'notionUrl'>;
@@ -70,7 +71,7 @@ export default function SettingsPage({ params }: { params: Promise<{ projectId: 
       setLogoError("File must be under 5MB");
       return;
     }
-    if (!file.type.startsWith('image/')) {
+    if (ALLOWED_LOGO_TYPES.includes(file.type)) {
       e.target.value = '';
       setLogoError("Please upload a PNG, JPG or SVG");
       return;

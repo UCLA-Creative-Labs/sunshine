@@ -156,7 +156,7 @@ export async function updateProjectSettings(
   return data as Project;
 }
 
-export const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpg', 'image/svg', 'image/webp'];
+export const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpg', 'image/svg'];
 
 export async function uploadProjectLogo(
   projectId: string,
