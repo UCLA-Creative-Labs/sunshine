@@ -33,7 +33,16 @@ export async function GET() {
         );
     }
 
-    if (!data) {
+    const { data: profile, error: profileError } = await serviceClient
+        .from('profiles')
+        .select('github_username')
+        .eq('id', user.id)
+        .single();
+    if (profileError) {
+        return NextResponse.json({ error: 'Failed to read linked account.' }, { status: 500 });
+    }
+
+    if (!data || !profile?.github_username) {
         return NextResponse.json({ authorized: false, expires_at: null });
     }
 

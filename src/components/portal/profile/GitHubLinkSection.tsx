@@ -2,25 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { profileService } from '@/lib/supabase/profileService';
-
-const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
 
 interface GitHubLinkSectionProps {
-    userId: string;
     githubUsername: string | null | undefined;
     onUsernameChange: (username: string | null) => void;
 }
 
 const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
-    userId,
     githubUsername,
     onUsernameChange,
 }) => {
     const searchParams = useSearchParams();
 
     const [loading, setLoading] = useState(false);
-    const [manualInput, setManualInput] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [appAuthorized, setAppAuthorized] = useState<boolean>(false);
@@ -32,7 +26,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
 
         if (appAuthorizedParam === 'true' && !appErrorParam) {
             setSuccessMsg('GitHub account connected!');
-            setAppAuthorized(true);
         }
         if (appErrorParam) setError(decodeURIComponent(appErrorParam));
     }, [searchParams]);
@@ -72,28 +65,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
             window.location.href = body.url;
         } catch (err: any) {
             setError(err.message);
-            setLoading(false);
-        }
-    };
-
-    const handleManualSave = async () => {
-        const trimmed = manualInput.trim();
-        if (!GITHUB_USERNAME_RE.test(trimmed)) {
-            setError(
-                'Invalid username. Letters, numbers, and hyphens only (1-39 chars, cannot start/end with hyphen).',
-            );
-            return;
-        }
-        setLoading(true);
-        setError(null);
-        try {
-            await profileService.updateGithubUsername(userId, trimmed);
-            onUsernameChange(trimmed.toLowerCase());
-            setManualInput('');
-            setSuccessMsg('GitHub username saved!');
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
             setLoading(false);
         }
     };
@@ -255,60 +226,6 @@ const GitHubLinkSection: React.FC<GitHubLinkSectionProps> = ({
                         </svg>
                         {loading ? 'Connecting…' : 'Connect GitHub'}
                     </button>
-
-                    <div>
-                        <p
-                            style={{
-                                fontSize: '0.8125rem',
-                                color: '#6B7280',
-                                marginBottom: '0.375rem',
-                            }}
-                        >
-                            Or enter your GitHub username manually:
-                        </p>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <input
-                                type="text"
-                                value={manualInput}
-                                onChange={(e) => {
-                                    setManualInput(e.target.value);
-                                    setError(null);
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleManualSave();
-                                }}
-                                placeholder="e.g. octocat"
-                                disabled={loading}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.375rem 0.625rem',
-                                    fontSize: '0.875rem',
-                                    border: '1px solid #D1D5DB',
-                                    borderRadius: '0.375rem',
-                                    outline: 'none',
-                                }}
-                            />
-                            <button
-                                onClick={handleManualSave}
-                                disabled={loading || !manualInput.trim()}
-                                style={{
-                                    padding: '0.375rem 0.75rem',
-                                    fontSize: '0.8125rem',
-                                    fontWeight: 500,
-                                    backgroundColor: '#F3F4F6',
-                                    border: '1px solid #D1D5DB',
-                                    borderRadius: '0.375rem',
-                                    cursor:
-                                        loading || !manualInput.trim()
-                                            ? 'not-allowed'
-                                            : 'pointer',
-                                    opacity: loading || !manualInput.trim() ? 0.5 : 1,
-                                }}
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

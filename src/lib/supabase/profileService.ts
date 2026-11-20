@@ -10,8 +10,6 @@ export interface Profile {
   created_at: string;
 }
 
-const GITHUB_USERNAME_RE = /^[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
-
 export async function getCurrentUserId(): Promise<string | null> {
   const { data: { user } } = await supabase.auth.getUser();
   return user?.id ?? null;
@@ -95,7 +93,7 @@ export const profileService = {
     return data;
   },
 
-  async updateProfile(id: string, updates: Partial<Profile>) {
+  async updateProfile(id: string, updates: Partial<Omit<Profile, 'github_username'>>) {
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
@@ -103,34 +101,6 @@ export const profileService = {
       .select()
       .single();
 
-    if (error) throw error;
-    return data;
-  },
-
-  async updateGithubUsername(userId: string, username: string) {
-    const trimmed = username.trim().toLowerCase();
-    if (!GITHUB_USERNAME_RE.test(trimmed)) {
-      throw new Error(
-        'Invalid GitHub username. Must be 1-39 characters: letters, numbers, and hyphens (cannot start/end with hyphen).',
-      );
-    }
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ github_username: trimmed })
-      .eq('id', userId)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
-  },
-
-  async clearGithubUsername(userId: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ github_username: null })
-      .eq('id', userId)
-      .select()
-      .single();
     if (error) throw error;
     return data;
   },
