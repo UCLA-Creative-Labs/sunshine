@@ -170,7 +170,6 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({
                     {/* GitHub Account */}
                     {onGithubUsernameChange && (
                         <GitHubLinkSection
-                            userId={profile.id}
                             githubUsername={githubUsername ?? null}
                             onUsernameChange={onGithubUsernameChange}
                         />

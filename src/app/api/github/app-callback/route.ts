@@ -92,51 +92,38 @@ export async function GET(request: NextRequest) {
     const accessExpiresAt = new Date(now + (Number(expires_in) - 30) * 1000).toISOString();
     const refreshExpiresAt = new Date(now + (Number(refresh_token_expires_in) - 86400) * 1000).toISOString();
 
-    const serviceClient = getServiceRoleClient();
-    const { error: upsertError } = await serviceClient
-        .from('github_user_tokens')
-        .upsert(
-            {
-                user_id: user.id,
-                access_token,
-                refresh_token,
-                access_expires_at: accessExpiresAt,
-                refresh_expires_at: refreshExpiresAt,
-                scope: scope ?? null,
-                updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'user_id' },
-        );
-
-    if (upsertError) {
-        console.error('Failed to persist github_user_tokens:', upsertError);
-        return fail('persist_failed');
-    }
-
     try {
-        const ghUserRes = await fetch('https://api.github.com/user', {
+        const githubUserResponse = await fetch('https://api.github.com/user', {
             headers: {
                 Accept: 'application/vnd.github+json',
                 Authorization: `Bearer ${access_token}`,
                 'X-GitHub-Api-Version': '2022-11-28',
             },
         });
-        if (ghUserRes.ok) {
-            const ghUser = (await ghUserRes.json()) as { login?: string };
-            if (ghUser.login) {
-                const { error: profileError } = await serviceClient
-                    .from('profiles')
-                    .update({ github_username: ghUser.login.toLowerCase() })
-                    .eq('id', user.id);
-                if (profileError) {
-                    console.error('Failed to save github_username:', profileError);
-                }
+        if (!githubUserResponse.ok) return fail('github_identity_failed');
+
+        const githubUser = (await githubUserResponse.json()) as { login?: string };
+        if (!githubUser.login) return fail('github_identity_missing');
+
+        // The database saves both records together, so a failed link leaves no partial changes.
+        const { error } = await getServiceRoleClient().rpc('link_verified_github_account', {
+            p_user_id: user.id,
+            p_username: githubUser.login.toLowerCase(),
+            p_access_token: access_token,
+            p_refresh_token: refresh_token,
+            p_access_expires_at: accessExpiresAt,
+            p_refresh_expires_at: refreshExpiresAt,
+            p_scope: scope ?? null,
+        });
+        if (error) {
+            console.error('Failed to link verified GitHub account:', error.code);
+            if (error.code === '23505') {
+                return fail('github_account_already_linked');
             }
-        } else {
-            console.error('GET /user returned', ghUserRes.status);
+            return fail('persist_failed');
         }
-    } catch (err) {
-        console.error('Failed to fetch github user:', err);
+    } catch {
+        return fail('github_identity_failed');
     }
 
     const response = NextResponse.redirect(`${profileBase}?app_authorized=true`);
