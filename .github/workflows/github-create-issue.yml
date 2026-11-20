@@ -1,0 +1,25 @@
+name: GitHub issue push regression tests
+
+on:
+  pull_request:
+    paths:
+      - 'src/app/api/github/create-issue/**'
+      - 'tests/github-create-issue.test.mjs'
+      - 'tests/helpers/load-typescript.mjs'
+      - '.github/workflows/github-create-issue.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.3'
+      - name: Run isolated route regression tests
+        run: node --experimental-vm-modules --test tests/github-create-issue.test.mjs
