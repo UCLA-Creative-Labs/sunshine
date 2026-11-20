@@ -376,7 +376,7 @@ export default function MyProjectContent({
         const currentYearStr = editForm.year;
         if (!currentYearStr) return;
         // Parse start year from "YY-YY" format
-        let startYear = parseInt('20' + currentYearStr?.split('-')[0]);
+        const startYear = parseInt('20' + currentYearStr?.split('-')[0]);
         if (isNaN(startYear)) return; // Default fallback
 
         const newStartYear =
