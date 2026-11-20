@@ -1,8 +1,8 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   dispatchNotifications,
   mapNotificationAction,
-  NotificationEvent,
+  type NotificationEvent,
 } from './notificationService';
 
 const PENDING_PUSH_WINDOW_MS = 30_000;
@@ -104,10 +104,13 @@ export async function processEvent(
       await processPREvent(supabase, projectId, action, pr);
     }
 
-    await supabase
+    const { error: processedError } = await supabase
       .from('github_integrations')
       .update({ processed: true, processed_at: new Date().toISOString() })
       .eq('id', integrationId);
+    if (processedError) {
+      throw new Error(`marking delivery ${deliveryId} processed failed: ${processedError.message}`);
+    }
 
     // best-effort chat notification — never let failure here surface to github
     const notificationAction = mapNotificationAction(eventType, action);
@@ -149,10 +152,15 @@ export async function processEvent(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    await supabase
+    const { error: recordError } = await supabase
       .from('github_integrations')
-      .update({ error_message: message })
+      .update({ processed: false, processed_at: null, error_message: message })
       .eq('id', integrationId);
+    if (recordError) {
+      throw new Error(
+        `recording failure for delivery ${deliveryId} failed: ${recordError.message}; original error: ${message}`,
+      );
+    }
     throw err;
   }
 }
@@ -162,11 +170,14 @@ async function resolveProjectId(
   repoFullName: string | undefined,
 ): Promise<string | null> {
   if (!repoFullName) return null;
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('projects')
     .select('id')
     .eq('github_repo', repoFullName.toLowerCase())
     .maybeSingle();
+  if (error) {
+    throw new Error(`project lookup failed for repository ${repoFullName}: ${error.message}`);
+  }
   return (data as { id: string } | null)?.id ?? null;
 }
 
@@ -177,20 +188,33 @@ async function processIssueEvent(
   issue: GithubIssue,
   integrationId: number,
 ): Promise<void> {
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from('tasks')
-    .select('id')
+    .select('id, synced_from_github, created_by')
     .eq('project_id', projectId)
     .eq('github_issue_number', issue.number)
     .maybeSingle();
+  if (existingError) {
+    throw new Error(`task lookup failed for issue #${issue.number}: ${existingError.message}`);
+  }
 
-  const existingTaskId = (existing as { id: number } | null)?.id ?? null;
+  const existingTask = existing as { id: number; synced_from_github: boolean; created_by: string | null } | null;
+  const existingTaskId = existingTask?.id ?? null;
 
   switch (action) {
     case 'opened':
     case 'reopened': {
       if (existingTaskId) {
         await updateTaskFromIssue(supabase, existingTaskId, issue);
+        // A previous attempt may have created/linked the task before a later
+        // write failed. Resume those writes instead of treating existence as done.
+        await linkIntegrationToTask(supabase, integrationId, existingTaskId);
+        await syncAssignments(supabase, existingTaskId, issue.assignees ?? []);
+        // Portal-created tasks can also be synced from GitHub after a push.
+        // Their original creation belongs to the portal user, not this webhook.
+        if (existingTask?.synced_from_github && existingTask.created_by === null) {
+          await ensureTaskCreationActivity(supabase, projectId, existingTaskId, issue);
+        }
         return;
       }
 
@@ -214,7 +238,7 @@ async function processIssueEvent(
 
     case 'closed': {
       if (existingTaskId) {
-        await supabase
+        const { error } = await supabase
           .from('tasks')
           .update({
             status: 'done',
@@ -222,6 +246,9 @@ async function processIssueEvent(
             last_github_sync_at: new Date().toISOString(),
           })
           .eq('id', existingTaskId);
+        if (error) {
+          throw new Error(`closing task ${existingTaskId} for issue #${issue.number} failed: ${error.message}`);
+        }
       }
       return;
     }
@@ -241,7 +268,7 @@ async function findPendingPushTask(
   projectId: string,
 ): Promise<number | null> {
   const cutoff = new Date(Date.now() - PENDING_PUSH_WINDOW_MS).toISOString();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('tasks')
     .select('id')
     .eq('project_id', projectId)
@@ -252,6 +279,9 @@ async function findPendingPushTask(
     .order('github_push_pending_at', { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (error) {
+    throw new Error(`pending push lookup failed for project ${projectId}: ${error.message}`);
+  }
 
   return (data as { id: number } | null)?.id ?? null;
 }
@@ -264,7 +294,7 @@ async function linkPendingTaskToIssue(
 ): Promise<void> {
   await updateTaskFromIssue(supabase, taskId, issue);
 
-  await supabase
+  const { error: linkError } = await supabase
     .from('tasks')
     .update({
       github_issue_number: issue.number,
@@ -274,11 +304,11 @@ async function linkPendingTaskToIssue(
       last_github_sync_at: new Date().toISOString(),
     })
     .eq('id', taskId);
+  if (linkError) {
+    throw new Error(`linking pending task ${taskId} to issue #${issue.number} failed: ${linkError.message}`);
+  }
 
-  await supabase
-    .from('github_integrations')
-    .update({ task_id: taskId })
-    .eq('id', integrationId);
+  await linkIntegrationToTask(supabase, integrationId, taskId);
 
   if (issue.assignees?.length) {
     await syncAssignments(supabase, taskId, issue.assignees);
@@ -314,28 +344,66 @@ async function createTaskFromIssue(
     .select('id')
     .single();
 
-  if (upsertErr) {
-    throw new Error(`task upsert failed for issue #${issue.number}: ${upsertErr.message}`);
+  if (upsertErr || !task) {
+    throw new Error(`task upsert failed for issue #${issue.number}: ${upsertErr?.message ?? 'no row returned'}`);
   }
-  if (!task) return;
 
   const taskId = (task as { id: number }).id;
 
-  await supabase
-    .from('github_integrations')
-    .update({ task_id: taskId })
-    .eq('id', integrationId);
+  await linkIntegrationToTask(supabase, integrationId, taskId);
 
   if (issue.assignees?.length) {
     await syncAssignments(supabase, taskId, issue.assignees);
   }
 
-  await supabase.from('activity_log').insert({
+  await ensureTaskCreationActivity(supabase, projectId, taskId, issue);
+}
+
+async function linkIntegrationToTask(
+  supabase: SupabaseClient,
+  integrationId: number,
+  taskId: number,
+): Promise<void> {
+  const { error: integrationError } = await supabase
+    .from('github_integrations')
+    .update({ task_id: taskId })
+    .eq('id', integrationId);
+  if (integrationError) {
+    throw new Error(`linking integration ${integrationId} to task ${taskId} failed: ${integrationError.message}`);
+  }
+}
+
+async function ensureTaskCreationActivity(
+  supabase: SupabaseClient,
+  projectId: string,
+  taskId: number,
+  issue: GithubIssue,
+): Promise<void> {
+  // Completion can fail after the log insert succeeded. Replays should reuse
+  // that entry rather than inserting another creation message for the same task.
+  const { data: activity, error: lookupError } = await supabase
+    .from('activity_log')
+    .select('id')
+    .eq('project_id', projectId)
+    .eq('task_id', taskId)
+    .eq('action', 'created_task_from_github')
+    .contains('metadata', { github_issue_number: issue.number })
+    .limit(1)
+    .maybeSingle();
+  if (lookupError) {
+    throw new Error(`activity log lookup failed for task ${taskId}: ${lookupError.message}`);
+  }
+  if (activity) return;
+
+  const { error: activityError } = await supabase.from('activity_log').insert({
     action: 'created_task_from_github',
     project_id: projectId,
     task_id: taskId,
     metadata: { github_issue_number: issue.number },
   });
+  if (activityError) {
+    throw new Error(`activity log insert failed for task ${taskId}: ${activityError.message}`);
+  }
 }
 
 async function updateTaskFromIssue(
@@ -343,7 +411,7 @@ async function updateTaskFromIssue(
   taskId: number,
   issue: GithubIssue,
 ): Promise<void> {
-  await supabase
+  const { error } = await supabase
     .from('tasks')
     .update({
       name: issue.title,
@@ -353,6 +421,9 @@ async function updateTaskFromIssue(
       last_github_sync_at: new Date().toISOString(),
     })
     .eq('id', taskId);
+  if (error) {
+    throw new Error(`updating task ${taskId} from issue #${issue.number} failed: ${error.message}`);
+  }
 }
 
 async function syncAssignments(
@@ -361,22 +432,31 @@ async function syncAssignments(
   assignees: GithubAssignee[],
 ): Promise<void> {
   // delete then insert — brief gap is fine since the UI uses refetch, not realtime
-  await supabase.from('task_assignments').delete().eq('task_id', taskId);
+  const { error: deleteError } = await supabase.from('task_assignments').delete().eq('task_id', taskId);
+  if (deleteError) {
+    throw new Error(`clearing assignments for task ${taskId} failed: ${deleteError.message}`);
+  }
 
   const usernames = assignees.map((a) => a.login.toLowerCase()).filter(Boolean);
   if (!usernames.length) return;
 
-  const { data: profiles } = await supabase
+  const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
     .select('id')
     .in('github_username', usernames);
+  if (profilesError) {
+    throw new Error(`assignee profile lookup failed for task ${taskId}: ${profilesError.message}`);
+  }
 
   const matched = (profiles as { id: string }[] | null) ?? [];
   if (!matched.length) return;
 
-  await supabase
+  const { error: insertError } = await supabase
     .from('task_assignments')
     .insert(matched.map((p) => ({ task_id: taskId, user_id: p.id, assigned_by: null })));
+  if (insertError) {
+    throw new Error(`saving assignments for task ${taskId} failed: ${insertError.message}`);
+  }
 }
 
 async function processPREvent(
@@ -391,12 +471,15 @@ async function processPREvent(
 
   const issueNumber = Number.parseInt(ref[1], 10);
 
-  const { data: task } = await supabase
+  const { data: task, error: taskError } = await supabase
     .from('tasks')
     .select('id')
     .eq('project_id', projectId)
     .eq('github_issue_number', issueNumber)
     .maybeSingle();
+  if (taskError) {
+    throw new Error(`task lookup failed for pull request #${pr.number}: ${taskError.message}`);
+  }
 
   if (!task) return;
 
@@ -414,7 +497,10 @@ async function processPREvent(
     updates.completed_at = new Date().toISOString();
   }
 
-  await supabase.from('tasks').update(updates).eq('id', taskId);
+  const { error: updateError } = await supabase.from('tasks').update(updates).eq('id', taskId);
+  if (updateError) {
+    throw new Error(`updating task ${taskId} from pull request #${pr.number} failed: ${updateError.message}`);
+  }
 }
 
 function extractPriority(labels: GithubLabel[] | undefined): string {
