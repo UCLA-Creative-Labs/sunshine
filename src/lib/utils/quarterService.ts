@@ -11,6 +11,8 @@ export interface QuarterRange {
  * Summer: June 21 – Aug 31 (Label: Summer 'YY)
  */
 
+export const SEASONS = ['Fall', 'Winter', 'Spring'] as const;
+
 export function getCurrentQuarter(): string {
   return getQuarterFromDate(new Date());
 }

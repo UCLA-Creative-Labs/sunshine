@@ -12,6 +12,7 @@ import FloatingAddButton from './FloatingAddButton';
 import CreateProjectModal from './CreateProjectModal';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { profileService } from '@/lib/supabase/profileService';
+import { getInitials, getColor } from '@/lib/utils/avatar';
 
 // Projects Directory Component
 const ProjectsDirectory = () => {
@@ -51,25 +52,6 @@ const ProjectsDirectory = () => {
     }
     checkProjectLeadRole();
   }, [userId]);
-
-  // Helper to generate consistent colors from names
-  const getColor = (name) => {
-    const colors = ['#FFB6C1', '#ADD8E6', '#DDA0DD', '#F0E68C', '#98FB98', '#FFE4B5', '#E0BBE4', '#B4E7CE'];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
-  };
-
-  const getInitials = (name) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  };
 
   const fetchProjects = useCallback(async () => {
     try {

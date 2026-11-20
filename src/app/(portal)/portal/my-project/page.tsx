@@ -10,15 +10,52 @@ export default async function MyProjectPage() {
     redirect('/login');
   }
 
-  const { data: membership, error: membershipError } = await supabase
+  const { data: memberships, error: membershipError } = await supabase
     .from('project_members')
-    .select('project_id')
-    .eq('user_id', user.id)
-    .limit(1)
-    .maybeSingle();
+    .select('project_id, project:projects!project_members_project_id_fkey(id, projectName)')
+    .eq('user_id', user.id);
 
-  if (!membershipError && membership?.project_id) {
-    redirect(`/portal/projects/${membership.project_id}/overview`);
+  if (membershipError) {
+    console.error('Failed to load memberships:', membershipError);
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <p className="text-sm text-red-500">
+          Couldn&apos;t load your projects. Please refresh and try again.
+        </p>
+      </div>
+    );
+  }
+
+  type MemberProject = { id: string; projectName: string };
+  const projects = (memberships ?? [])
+    .map((m) => m.project as unknown as MemberProject | null)
+    .filter((p): p is MemberProject => !!p)
+    .sort((a, b) => a.projectName.localeCompare(b.projectName));
+
+  if (projects.length === 1) {
+    redirect(`/portal/projects/${projects[0].id}/overview`);
+  }
+
+  if (projects.length > 1) {
+    return (
+      <div className="flex-1 text-black px-6 py-8 md:px-10 md:py-10">
+        <div className="mx-auto max-w-5xl space-y-6">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">Choose a project</h1>
+          <ul className="space-y-2">
+            {projects.map((p) => (
+              <li key={p.id}>
+                <Link
+                  href={`/portal/projects/${p.id}/overview`}
+                  className="block rounded-lg border border-[#D4D7E5] bg-white px-4 py-3 text-sm font-medium text-black hover:bg-gray-50 transition-colors"
+                >
+                  {p.projectName}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
   }
 
   return (
