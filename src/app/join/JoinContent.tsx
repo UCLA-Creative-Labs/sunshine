@@ -130,6 +130,11 @@ export default function JoinContent({ pLeadLink='#', pMemLink='#', bMemLink='#' 
 							/>
 						</div>
 					</div>
+					<div className="flex justify-center">
+						<a href={bMemLink} target="_blank" rel="noopener noreferrer" className="text-black-500 font-semibold text-xl hover:underline">
+							BOARD APPLICATION ➜
+						</a>
+					</div>
 				</div>
 			</ContentSection>
 			<ContentSection title="EXTERNAL QUARTERLY PROJECTS">
