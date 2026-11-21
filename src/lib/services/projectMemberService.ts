@@ -72,14 +72,20 @@ export async function updateMemberRole(
   memberId: number,
   roleId: number
 ): Promise<TaskOperationResult<void>> {
-  const { error } = await supabase
+  // RLS blocks an update by matching zero rows, not by returning an error,
+  // so ask for the updated row back and treat none as a failure.
+  const { data, error } = await supabase
     .from('project_members')
     .update({ rbac_role_id: roleId })
-    .eq('id', memberId);
+    .eq('id', memberId)
+    .select('id');
 
   if (error) {
     console.error('Error updating member role:', error);
     return { data: null, error: error.message, success: false };
+  }
+  if (!data?.length) {
+    return { data: null, error: "You don't have permission to change this member's role.", success: false };
   }
   return { data: null, error: null, success: true };
 }
@@ -91,14 +97,19 @@ export async function updateMemberRole(
 export async function removeMember(
   memberId: number
 ): Promise<TaskOperationResult<void>> {
-  const { error } = await supabase
+  // Same as updateMemberRole: a delete blocked by RLS returns zero rows, not an error.
+  const { data, error } = await supabase
     .from('project_members')
     .delete()
-    .eq('id', memberId);
+    .eq('id', memberId)
+    .select('id');
 
   if (error) {
     console.error('Error removing member:', error);
     return { data: null, error: error.message, success: false };
+  }
+  if (!data?.length) {
+    return { data: null, error: "You don't have permission to remove this member.", success: false };
   }
   return { data: null, error: null, success: true };
 }
